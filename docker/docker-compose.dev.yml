@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+
+  server:
+    container_name: server
+    build:
+      context: ../.
+      dockerfile: docker/server/Dockerfile.dev
+    image: hypertube-server
+    ports: 
+      - "80:80"
+    links:
+      - api:api
+      - app:app
+
+  app:
+    container_name: app
+    build:
+      context: ../.
+      dockerfile: docker/app/Dockerfile.dev
+    image: hypertube-app
+    environment:
+      - NODE_ENV=development
+      - TZ=Europe/Paris
+    volumes:
+      - ./../app:/usr/src/app
+    ports:
+      - "3000:3000"
+
+  api:
+    container_name: api
+    build:
+      context: ../.
+      dockerfile: docker/api/Dockerfile.dev
+    image: hypertube-api
+    env_file: 
+      - ./api/api.env
+    volumes:
+      - ./../api:/usr/src/api
+    ports:
+      - "8080:8080"

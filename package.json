@@ -1,0 +1,19 @@
+{
+  "name": "hypertube",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:install": "sh ./install-dev.sh",
+    "dev:up": "docker-compose -f docker/docker-compose.dev.yml up",
+    "dev:down": "docker-compose -f docker/docker-compose.dev.yml down",
+    "dev:uninstall": "docker-compose -f docker/docker-compose.dev.yml down --rmi all",
+    "dev:connect:api": "docker exec -it api /bin/sh",
+    "dev:connect:app": "docker exec -it app /bin/bash",
+    "dev:connect:server": "docker exec -it server /bin/bash",
+    "logs:server": "docker logs server",
+    "logs:api": "docker logs api",
+    "logs:app": "docker logs app"
+  },
+  "author": "42",
+  "license": "MIT"
+}
