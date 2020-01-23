@@ -1,15 +1,21 @@
+const colors = require('colors')
+const connectDB = require('./config/db');
 const express = require('express')
+
+// Connect to database
+connectDB();
+
 const app = express()
-const port = 8080
 
-app.get('/', (request, response) => {
-  response.send('Hello from Express!')
-})
+// Dev logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
-app.listen(port, (err) => {
+app.listen(process.env.PORT, (err) => {
   if (err) {
     return console.log('something bad happened', err)
   }
 
-  console.log(`server is listening on ${port}`)
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`)
 })

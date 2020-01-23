@@ -40,3 +40,19 @@ services:
       - ./../api:/usr/src/api
     ports:
       - "8080:8080"
+    links:
+      - mongo:mongo
+    depends_on:
+      - "mongo"
+
+  mongo:
+    container_name: mongo
+    build:
+        context: ../.
+        dockerfile: docker/mongo/Dockerfile.dev
+    image: hypertube-mongo
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+  

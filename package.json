@@ -10,9 +10,11 @@
     "dev:connect:api": "docker exec -it api /bin/sh",
     "dev:connect:app": "docker exec -it app /bin/bash",
     "dev:connect:server": "docker exec -it server /bin/bash",
+    "dev:connect:mongo": "docker exec -it server /bin/bash",
     "logs:server": "docker logs server",
     "logs:api": "docker logs api",
-    "logs:app": "docker logs app"
+    "logs:app": "docker logs app",
+    "logs:mongo": "docker logs mongo"
   },
   "author": "42",
   "license": "MIT"
