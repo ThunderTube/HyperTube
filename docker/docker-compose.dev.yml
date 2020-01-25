@@ -52,7 +52,7 @@ services:
         dockerfile: docker/mongo/Dockerfile.dev
     image: hypertube-mongo
     volumes:
-      - ./data/db:/data/db
+      - ./mongo/data/db:/data/db
     ports:
       - 27017:27017
   

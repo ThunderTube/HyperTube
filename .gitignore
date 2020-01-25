@@ -2,7 +2,7 @@
 node_modules
 /dist
 *.lock
-docker/data
+docker/mongo/data
 
 # local env files
 .env.local
