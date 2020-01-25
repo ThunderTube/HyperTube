@@ -7,7 +7,9 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@fullhuman/postcss-purgecss": "^2.0.5",
     "core-js": "^3.4.3",
+    "tailwindcss": "^1.1.4",
     "vue": "^2.6.10",
     "vue-router": "^3.1.3",
     "vuex": "^3.1.2"
