@@ -1,6 +1,6 @@
 <template>
-  <Slide class="fixed z-50">
-    <router-link to="/about" class="flex items-center mb-10">
+  <Slide>
+    <router-link to="/movie" class="flex items-center mb-10">
       <div>
         <img src="@/assets/img/avatar.jpg" alt="avatar" class="rounded-full w-12 h-12" />
       </div>
@@ -66,7 +66,7 @@
       </svg>
       <span>Originals</span>
     </router-link>
-    <router-link to="/about">
+    <router-link to="/movie">
       <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24" class="icon-cog">
         <path
           class="primary"

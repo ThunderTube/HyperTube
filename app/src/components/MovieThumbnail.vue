@@ -1,8 +1,8 @@
 <template>
   <div class="shadow-xl m-2">
-    <a href="#">
+    <router-link to="/movie">
       <img class="movie-thumbnail" src="@/assets/img/star_wars.jpg" alt />
-    </a>
+    </router-link>
   </div>
 </template>
 
