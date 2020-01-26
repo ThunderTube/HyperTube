@@ -17,5 +17,8 @@
     "logs:mongo": "docker logs mongo"
   },
   "author": "42",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "vue-burger-menu": "^2.0.3"
+  }
 }
