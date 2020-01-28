@@ -1,20 +1,26 @@
 const connectDB = require('./config/db');
-const express = require('express')
-const morgan = require('morgan')
+const express = require('express');
+const morgan = require('morgan');
+const dotenv = require('dotenv');
+
+// Load env vars
+dotenv.config({ path: './config/config.env' });
 
 // Connect to database
 connectDB();
 
-const app = express()
+const app = express();
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.listen(process.env.PORT, (err) => {
+app.listen(process.env.PORT, err => {
   if (err) {
-    return console.log('something bad happened', err)
+    return console.log('something bad happened', err);
   }
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`)
-})
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
+  );
+});
