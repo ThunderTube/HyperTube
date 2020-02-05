@@ -16,6 +16,7 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+const app = express();
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
