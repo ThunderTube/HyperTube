@@ -10,7 +10,7 @@ const SUPPORTED_EXTENSIONS = new Set(['mp4', 'webm']);
 
 function transcode(extension, inputStream) {
     if (SUPPORTED_EXTENSIONS.has(extension)) {
-        return stream;
+        return inputStream;
     }
 
     // Transcode the video stream to a WebM stream
@@ -29,6 +29,7 @@ function transcode(extension, inputStream) {
 class TorrentFile {
     constructor(file, basePath) {
         this.file = file;
+        this.size = file.length
         this.finishedFSDownloading = false;
         this.fsPath = join(basePath, file.path);
         this.extension = extname(file.path).slice(1);

@@ -2,10 +2,10 @@
 
 <title>Torrent Stream Tests</title>
 
-<video id="video" controls></video>
+<video id="video" controls crossorigin="anonymous"></video>
 
 <script>
-    function app() {
+    async function app() {
         const params = new URLSearchParams(window.location.search);
 
         const ID = params.get('id');
@@ -18,7 +18,16 @@
         const source = document.getElementById('source');
         const video = document.getElementById('video');
 
-        fetch(`/api/v1/stream/video/download/${ID}/${RESOLUTION}`)
+        const informations = await fetch(`/api/v1/stream/video/${ID}`)
+            .then(res => res.json())
+            .catch(console.error);
+        if (!informations) {
+            return;
+        }
+        const { subtitles } = informations;
+        console.log('subtitles', subtitles);
+
+        await fetch(`/api/v1/stream/video/download/${ID}/${RESOLUTION}`)
             .then(res => res.text())
             .then(state => {
                 console.log('state =', state);
@@ -38,7 +47,7 @@
                 .then(state => {
                     if (['FIRST_CHUNKS_LOADED', 'LOADED'].includes(state)) {
                         addSource(
-                            `/video/chunks/${ID}/${RESOLUTION}`,
+                            `/api/v1/stream/video/chunks/${ID}/${RESOLUTION}`,
                             'video/mp4'
                         );
 
@@ -57,8 +66,17 @@
             source.type = type;
 
             video.appendChild(source);
+
+            for (const { url, langcode, lang } of subtitles) {
+                const track = document.createElement('track');
+                track.src = url;
+                track.label = lang;
+                track.srclang = langcode;
+
+                video.appendChild(track);
+            }
         }
     }
 
-    app();
+    app().catch(console.error);
 </script>

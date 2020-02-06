@@ -61,7 +61,6 @@ async function triggerVideoDownloading(req, res) {
     const {
         params: { id, resolution },
     } = req;
-    console.log('triggerVideoDownloading', id, resolution);
     if (!(id && resolution)) {
         send(res, 400);
         return;
@@ -145,7 +144,6 @@ async function getDownloadingStatus(req, res) {
     const {
         params: { id, resolution },
     } = req;
-    console.log('getDownloadingStatus', id, resolution);
     if (!id) {
         send(res, 400);
         return;

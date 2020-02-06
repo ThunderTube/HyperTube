@@ -9,16 +9,16 @@ const pipeline = promisify(stream.pipeline);
 
 class FSFile {
     constructor(path) {
-        this.path = join(__dirname, './movies', path);
+        this.ppath = join(__dirname, './movies', path);
         this.extension = extname(path).slice(1);
     }
 
     get path() {
-        return this.path;
+        return this.ppath;
     }
 
     pipe(writeStream) {
-        const readStream = fs.createReadStream(this.path);
+        const readStream = fs.createReadStream(this.ppath);
 
         return pipeline(this.transcode(readStream), writeStream);
     }

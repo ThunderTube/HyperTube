@@ -86,12 +86,9 @@ movieSchema.statics.getTorrentStatus = async function getTorrentStatus({
     imdbId,
     resolution,
 }) {
-    console.log('params =', imdbId, resolution, {
-        imdbId,
-        torrents: { $elemMatch: { resolution } },
-    });
-
-    const result = await this.findOne(
+    const {
+        torrents: [{ status }],
+    } = await this.findOne(
         {
             imdbId,
             torrents: { $elemMatch: { resolution } },
@@ -100,11 +97,6 @@ movieSchema.statics.getTorrentStatus = async function getTorrentStatus({
             'torrents.$': 1,
         }
     );
-    console.log('result =', result);
-
-    const {
-        torrents: [{ status }],
-    } = result;
 
     return status;
 };

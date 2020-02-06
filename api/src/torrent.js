@@ -4,17 +4,12 @@ const EventEmitter = require('events');
 
 const { TorrentFile } = require('./file');
 
-const MIN_STREAMING_AUTHORIZATION = 20;
-
 function lastContinuousElement(elements) {
     const sortedElements = [...elements].sort((a, b) => a - b);
     let last = 0;
 
-    for (
-        let i = 0, chunk = sortedElements[i];
-        i < sortedElements.length;
-        i += 1
-    ) {
+    for (let i = 0; i < sortedElements.length; i += 1) {
+        const chunk = sortedElements[i];
         last = chunk;
 
         if (!sortedElements.includes(chunk + 1)) return last;
@@ -25,7 +20,7 @@ function lastContinuousElement(elements) {
 class Torrent {
     constructor(magnetUrn) {
         this.engine = torrentStream(magnetUrn, {
-            path: join(__dirname, './movies'),
+            path: join(__dirname, '../movies'),
             trackers: [
                 'udp://open.demonii.com:1337/announce',
                 'udp://tracker.openbittorrent.com:80',
@@ -84,8 +79,12 @@ class Torrent {
 
                 const percent = (100 * lastEl) / piecesCount;
 
+                const MIN_FILE_BYTES_DOWNLOADED_PERCENT = 2;
+
                 if (
-                    lastEl >= MIN_STREAMING_AUTHORIZATION &&
+                    loadedBytes >=
+                        (this.file.size / 100) *
+                            MIN_FILE_BYTES_DOWNLOADED_PERCENT &&
                     !permittedDownloading
                 ) {
                     emitter.emit('launch');
