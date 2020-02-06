@@ -2,7 +2,11 @@
   <Slide>
     <router-link to="/movie" class="flex items-center mb-10">
       <div>
-        <img src="@/assets/img/avatar.jpg" alt="avatar" class="rounded-full w-12 h-12" />
+        <img
+          src="@/assets/img/avatar.jpg"
+          alt="avatar"
+          class="rounded-full w-12 h-12"
+        />
       </div>
       <div class="text-gray-500 ml-6 hover:text-gray-300">Brian</div>
     </router-link>
@@ -67,7 +71,13 @@
       <span>Originals</span>
     </router-link>
     <router-link to="/movie">
-      <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24" class="icon-cog">
+      <svg
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        class="icon-cog"
+      >
         <path
           class="primary"
           d="M6.8 3.45c.87-.52 1.82-.92 2.83-1.17a2.5 2.5 0 0 0 4.74 0c1.01.25 1.96.65 2.82 1.17a2.5 2.5 0 0 0 3.36 3.36c.52.86.92 1.8 1.17 2.82a2.5 2.5 0 0 0 0 4.74c-.25 1.01-.65 1.96-1.17 2.82a2.5 2.5 0 0 0-3.36 3.36c-.86.52-1.8.92-2.82 1.17a2.5 2.5 0 0 0-4.74 0c-1.01-.25-1.96-.65-2.82-1.17a2.5 2.5 0 0 0-3.36-3.36 9.94 9.94 0 0 1-1.17-2.82 2.5 2.5 0 0 0 0-4.74c.25-1.01.65-1.96 1.17-2.82a2.5 2.5 0 0 0 3.36-3.36zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
@@ -78,17 +88,19 @@
     </router-link>
 
     <div class="ml-8">
-      <h2 class="text-white font-bold uppercase font-serif text-2xl">Hypertube</h2>
+      <h2 class="text-white font-bold uppercase font-serif text-2xl">
+        Hypertube
+      </h2>
     </div>
   </Slide>
 </template>
 
 <script>
-import { Slide } from "vue-burger-menu";
+import { Slide } from 'vue-burger-menu'
 
 export default {
   components: {
     Slide
   }
-};
+}
 </script>
