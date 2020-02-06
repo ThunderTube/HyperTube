@@ -8,10 +8,9 @@
 
 <script>
 export default {
-    name: "MovieThumbnail"
+  name: 'MovieThumbnail'
 }
 </script>
-
 
 <style lang="css" scoped>
 .movie-thumbnail {

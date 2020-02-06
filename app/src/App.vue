@@ -10,13 +10,13 @@
 </template>
 
 <script>
-import AppMenu from "@/components/AppMenu";
+import AppMenu from '@/components/AppMenu'
 
 export default {
   components: {
     AppMenu
   }
-};
+}
 </script>
 
 <style lang="css" scoped>
