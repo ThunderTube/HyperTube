@@ -1,23 +1,30 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "Matcha backend",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "server": "nodemon index.js"
-  },
-  "author": "42",
-  "license": "MIT",
-  "dependencies": {
-    "bcrypt": "^3.0.7",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.8.9",
-    "morgan": "^1.9.1"
-  },
-  "devDependencies": {
-    "nodemon": "^1.18.11"
-  }
+    "name": "server",
+    "version": "1.0.0",
+    "description": "Matcha backend",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node -r dotenv/config src/index.js dotenv_config_path=./config/config.env",
+        "server": "nodemon -r dotenv/config src/index.js dotenv_config_path=./config/config.env",
+        "lint-fix": "prettier-eslint --write \"$PWD/src/**/*.js\""
+    },
+    "author": "42",
+    "license": "MIT",
+    "dependencies": {
+        "bcrypt": "^3.0.7",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.8.9",
+        "morgan": "^1.9.1"
+    },
+    "devDependencies": {
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-import": "^2.20.1",
+        "nodemon": "^1.18.11",
+        "prettier": "1.19.1",
+        "prettier-eslint-cli": "^5.0.0"
+    }
 }
