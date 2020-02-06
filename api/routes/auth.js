@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const {
   register,
   login,
@@ -8,17 +8,18 @@ const {
   updateDetails,
   updatePassword,
   logout
-} = require('../controllers/auth');
+} = require("../controllers/auth");
 
 const router = express.Router();
 
-router.post('/register', register);
-router.post('login', login);
-router.get('/me', getMe);
-router.post('/forgotpassword', forgotPassword);
-router.put('/resetpassword', resetPassword);
-router.put('/updatedetails', updateDetails);
-router.put('/updatepassword', updatePassword);
-router.get('/logout', logout);
+router
+  .post("/register", register)
+  .post("login", login)
+  .get("/me", getMe)
+  .post("/forgotpassword", forgotPassword)
+  .put("/resetpassword", resetPassword)
+  .put("/updatedetails", updateDetails)
+  .put("/updatepassword", updatePassword)
+  .get("/logout", logout);
 
 module.exports = router;

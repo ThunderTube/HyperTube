@@ -1,35 +1,33 @@
-const connectDB = require('./config/db');
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
+const connectDB = require("./config/db");
+const express = require("express");
+const morgan = require("morgan");
 
-// Load env vars
-dotenv.config({ path: './config/config.env' });
+const router = require("./routes");
 
-// Connect to database
-connectDB();
+async function app() {
+  // Connect to database
+  await connectDB();
 
-// Route files
-const auth = require('./routes/auth');
+  const app = express();
 
-const app = express();
+  // Body parser
+  app.use(express.json());
 
-// Body parser
-app.use(express.json());
-const app = express();
+  // Dev logging middleware
+  if (process.env.NODE_ENV === "development") {
+    app.use(morgan("dev"));
+  }
 
-// Dev logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+  app.use("/api/v1", router);
+
+  app.listen(process.env.PORT, err => {
+    if (err) {
+      return console.error("something bad happened", err);
+    }
+    console.log(
+      `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
+    );
+  });
 }
 
-app.use('/api/v1/auth', auth);
-
-app.listen(process.env.PORT, err => {
-  if (err) {
-    return console.log('something bad happened', err);
-  }
-  console.log(
-    `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
-  );
-});
+app().catch(console.error);

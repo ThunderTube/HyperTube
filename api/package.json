@@ -4,8 +4,8 @@
   "description": "Matcha backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "server": "nodemon index.js"
+    "start": "node -r dotenv/config index.js dotenv_config_path=./config/config.env",
+    "server": "nodemon -r dotenv/config index.js dotenv_config_path=./config/config.env"
   },
   "author": "42",
   "license": "MIT",
