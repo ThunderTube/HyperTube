@@ -1,6 +1,7 @@
 const express = require('express');
 
 const authRouter = require('./auth');
+const streamRouter = require('./stream');
 
 const router = express.Router();
 
@@ -10,6 +11,7 @@ router
     .get('/', (_req, res) => {
         res.end('Yo !');
     })
-    .use('/auth', authRouter);
+    .use('/auth', authRouter)
+    .use('/stream', streamRouter);
 
 module.exports = router;

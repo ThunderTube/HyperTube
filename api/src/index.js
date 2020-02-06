@@ -1,5 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
+const sirv = require('sirv');
+const { join } = require('path');
+
 const connectDB = require('./config/db');
 
 const router = require('./routes');
@@ -9,9 +12,10 @@ async function app() {
     await connectDB();
 
     const server = express();
+    const assets = sirv(join(__dirname, '../', 'public'));
 
     // Body parser
-    server.use(express.json());
+    server.use(express.json()).use(assets);
 
     // Dev logging middleware
     if (process.env.NODE_ENV === 'development') {
