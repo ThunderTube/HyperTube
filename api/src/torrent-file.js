@@ -30,11 +30,15 @@ class TorrentFile {
         this.size = file.length;
         this.finishedFSDownloading = false;
         this.fsPath = join(basePath, file.path);
-        this.extension = extname(file.path).slice(1);
+        this.originalExt = extname(file.path).slice(1);
     }
 
     get path() {
         return this.file.path;
+    }
+
+    get extension() {
+        return this.originalExt === 'mp4' ? this.originalExt : 'webm';
     }
 
     pipe(writeStream) {
@@ -52,12 +56,10 @@ class TorrentFile {
     }
 
     transcode(inputStream) {
-        return transcode(this.extension, inputStream);
+        return transcode(this.originalExt, inputStream);
     }
 
     async finishDownloading() {
-        // const { size: fileSize } = await stat(this.fsPath);
-
         this.finishedFSDownloading = true;
     }
 }

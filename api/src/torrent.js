@@ -1,5 +1,5 @@
 const torrentStream = require('torrent-stream');
-const { join } = require('path');
+const { join, extname } = require('path');
 const EventEmitter = require('events');
 
 const { TorrentFile } = require('./file');
@@ -35,6 +35,14 @@ class Torrent {
 
         this.AUTHORIZED_EXTENSIONS = ['.mp4', '.mkv', '.webm'];
         this.file = null;
+    }
+
+    get extension() {
+        if (this.file === null) return null;
+
+        const ext = extname(this.file.path).slice(1);
+
+        return ext === 'mp4' ? ext : 'webm';
     }
 
     download() {

@@ -6,12 +6,16 @@ const { pipeline } = require('./utils');
 
 class FSFile {
     constructor(path) {
-        this.ppath = join(__dirname, './movies', path);
-        this.extension = extname(path).slice(1);
+        this.ppath = join(__dirname, '../', './movies', path);
+        this.originalExt = extname(path).slice(1);
     }
 
     get path() {
         return this.ppath;
+    }
+
+    get extension() {
+        return this.originalExt === 'mp4' ? this.originalExt : 'webm';
     }
 
     pipe(writeStream) {
@@ -21,7 +25,7 @@ class FSFile {
     }
 
     transcode(inputStream) {
-        return transcode(this.extension, inputStream);
+        return transcode(this.originalExt, inputStream);
     }
 }
 

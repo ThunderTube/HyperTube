@@ -2,7 +2,7 @@
 
 <title>Torrent Stream Tests</title>
 
-<video id="video" controls crossorigin="anonymous"></video>
+<video id="video" controls></video>
 
 <script>
     async function app() {
@@ -10,7 +10,6 @@
 
         const ID = params.get('id');
         const RESOLUTION = params.get('resolution');
-        console.log(ID, RESOLUTION);
         if (!(ID && RESOLUTION)) {
             return;
         }
@@ -18,6 +17,7 @@
         const source = document.getElementById('source');
         const video = document.getElementById('video');
 
+        // Get informations about the video
         const informations = await fetch(`/api/v1/stream/video/${ID}`)
             .then(res => res.json())
             .catch(console.error);
@@ -25,18 +25,20 @@
             return;
         }
         const { subtitles } = informations;
-        console.log('subtitles', subtitles);
+        let videoMimeType = null;
 
+        // Request the downloading of the video
         await fetch(`/api/v1/stream/video/download/${ID}/${RESOLUTION}`)
-            .then(res => res.text())
-            .then(state => {
-                console.log('state =', state);
+            .then(res => res.json())
+            .then(({ status, mime }) => {
+                videoMimeType = mime;
             });
 
         const intervalId = setInterval(poll, 10_000);
         poll();
 
         function poll() {
+            // Get the status of the video downloading
             fetch(`/api/v1/stream/video/status/${ID}/${RESOLUTION}`)
                 .then(res => {
                     if (res.status !== 200) {
@@ -47,6 +49,7 @@
                 .then(state => {
                     if (['FIRST_CHUNKS_LOADED', 'LOADED'].includes(state)) {
                         addSource(
+                            // This URL streams the video to the client
                             `/api/v1/stream/video/chunks/${ID}/${RESOLUTION}`,
                             'video/mp4'
                         );

@@ -1,5 +1,6 @@
 const send = require('@polka/send-type');
 const srt2vtt = require('srt-to-vtt');
+const { extname } = require('path');
 
 const { Movie, TORRENT_STATUSES } = require('../models/Movie');
 const {
@@ -13,6 +14,11 @@ const { pipeline } = require('../utils');
 const STATE = {
     files: new Map(),
 };
+
+const MIME = new Map([
+    ['mp4', 'video/mp4'],
+    ['webm', 'video/webm'],
+]);
 
 function toFilesMapKey(id, resolution) {
     return `${id}|${resolution}`;
@@ -89,19 +95,26 @@ async function triggerVideoDownloading(req, res) {
         torrents: [torrent],
     } = movie;
     const { fsPath, status } = torrent;
+    const fsPathExtension = fsPath && extname(fsPath).slice(1);
+    const mime =
+        fsPath &&
+        MIME.get(fsPathExtension === 'mp4' ? fsPathExtension : 'webm');
 
     if (fsPath !== undefined && status === TORRENT_STATUSES.LOADED) {
         // Load the movie from the local file system.
-        send(res, 200, TORRENT_STATUSES.LOADED);
+        send(res, 200, {
+            status: TORRENT_STATUSES.LOADED,
+            mime,
+        });
         return;
     }
     if (status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) {
         // Can launch polling.
-        send(res, 200, TORRENT_STATUSES.FIRST_CHUNKS_LOADED);
+        send(res, 200, { status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED, mime });
         return;
     }
     if (status === TORRENT_STATUSES.LOADING) {
-        send(res, 200, TORRENT_STATUSES.LOADING);
+        send(res, 200, { status: TORRENT_STATUSES.LOADING });
         return;
     }
 
@@ -142,7 +155,10 @@ async function triggerVideoDownloading(req, res) {
         }
     });
 
-    send(res, 200, TORRENT_STATUSES.LOADING);
+    send(res, 200, {
+        status: TORRENT_STATUSES.LOADING,
+        mime: MIME.get(file.extension),
+    });
 }
 
 async function getDownloadingStatus(req, res) {
