@@ -1,16 +1,14 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
 const { join, extname } = require('path');
-const stream = require('stream');
-const { promisify } = require('util');
 
-const pipeline = promisify(stream.pipeline);
+const { pipeline } = require('./utils');
 
 const SUPPORTED_EXTENSIONS = new Set(['mp4', 'webm']);
 
 function transcode(extension, inputStream) {
     if (SUPPORTED_EXTENSIONS.has(extension)) {
-        return stream;
+        return inputStream;
     }
 
     // Transcode the video stream to a WebM stream
@@ -29,13 +27,18 @@ function transcode(extension, inputStream) {
 class TorrentFile {
     constructor(file, basePath) {
         this.file = file;
+        this.size = file.length;
         this.finishedFSDownloading = false;
         this.fsPath = join(basePath, file.path);
-        this.extension = extname(file.path).slice(1);
+        this.originalExt = extname(file.path).slice(1);
     }
 
     get path() {
         return this.file.path;
+    }
+
+    get extension() {
+        return this.originalExt === 'mp4' ? this.originalExt : 'webm';
     }
 
     pipe(writeStream) {
@@ -53,12 +56,10 @@ class TorrentFile {
     }
 
     transcode(inputStream) {
-        return transcode(this.extension, inputStream);
+        return transcode(this.originalExt, inputStream);
     }
 
     async finishDownloading() {
-        // const { size: fileSize } = await stat(this.fsPath);
-
         this.finishedFSDownloading = true;
     }
 }

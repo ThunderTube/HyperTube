@@ -6,6 +6,7 @@ const {
     triggerVideoDownloading,
     getDownloadingStatus,
     getVideoStream,
+    getSubtitleForVideoAndLangcode,
 } = require('../controllers/stream');
 
 const router = Router();
@@ -15,6 +16,7 @@ router
     .get('/video/:id', getVideoInformations)
     .get('/video/download/:id/:resolution', triggerVideoDownloading)
     .get('/video/status/:id/:resolution', getDownloadingStatus)
-    .get('/video/chunks/:id/:resolution', getVideoStream);
+    .get('/video/chunks/:id/:resolution', getVideoStream)
+    .get('/subtitles/:id-:langcode.vtt', getSubtitleForVideoAndLangcode);
 
 module.exports = router;
