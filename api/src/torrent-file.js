@@ -1,10 +1,8 @@
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
 const { join, extname } = require('path');
-const stream = require('stream');
-const { promisify } = require('util');
 
-const pipeline = promisify(stream.pipeline);
+const { pipeline } = require('./utils');
 
 const SUPPORTED_EXTENSIONS = new Set(['mp4', 'webm']);
 
@@ -29,7 +27,7 @@ function transcode(extension, inputStream) {
 class TorrentFile {
     constructor(file, basePath) {
         this.file = file;
-        this.size = file.length
+        this.size = file.length;
         this.finishedFSDownloading = false;
         this.fsPath = join(basePath, file.path);
         this.extension = extname(file.path).slice(1);

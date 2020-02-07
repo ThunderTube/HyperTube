@@ -1,11 +1,8 @@
 const fs = require('fs');
 const { join, extname } = require('path');
-const stream = require('stream');
-const { promisify } = require('util');
 
 const { transcode } = require('./torrent-file');
-
-const pipeline = promisify(stream.pipeline);
+const { pipeline } = require('./utils');
 
 class FSFile {
     constructor(path) {

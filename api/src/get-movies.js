@@ -2,11 +2,14 @@ const got = require('got');
 const popcorn = require('popcorn-api');
 const Joi = require('@hapi/joi');
 const OS = require('opensubtitles-api');
+const languages = require('@cospired/i18n-iso-languages');
 
 const MOVIES_ORIGINS = {
     POPCORN_TIME: 'POPCORN_TIME',
     YTS: 'YTS',
 };
+
+const OPENSUBTITLES_URL_PROPERTY = 'url';
 
 function formatMovieFromYTS({
     imdb_code: imdbId,
@@ -367,17 +370,42 @@ async function getSubtitles(id) {
         imdbid: id,
     });
 
-    return Object.values(subtitles).map(
-        ({ url, langcode, lang, encoding, score }) => ({
-            url,
+    return Object.values(subtitles)
+        .filter(({ [OPENSUBTITLES_URL_PROPERTY]: url }) => url !== undefined)
+        .map(({ langcode, lang, encoding, score }) => ({
+            url: `/api/v1/stream/subtitles/${id}-${langcode}.vtt`,
             langcode,
             lang,
             encoding,
             score,
-        })
-    );
+        }));
 }
 
-module.exports.MOVIES_ORIGINS = MOVIES_ORIGINS;
-module.exports.getMovies = getMovies;
-module.exports.getSubtitles = getSubtitles;
+async function streamSubtitleForMovieAndLangcode(id, langcode) {
+    const OpenSubtitles = new OS({
+        useragent: 'TemporaryUserAgent',
+        ssl: true,
+    });
+
+    const { [langcode]: subtitle } = await OpenSubtitles.search({
+        imdbid: id,
+        sublanguageid: languages.alpha2ToAlpha3B(langcode),
+    });
+    if (subtitle === undefined) {
+        return null;
+    }
+
+    console.log('subtitle', subtitle);
+
+    const { [OPENSUBTITLES_URL_PROPERTY]: url } = subtitle;
+    if (url === undefined) {
+        return null;
+    }
+
+    return got.stream(url);
+}
+
+exports.MOVIES_ORIGINS = MOVIES_ORIGINS;
+exports.getMovies = getMovies;
+exports.getSubtitles = getSubtitles;
+exports.streamSubtitleForMovieAndLangcode = streamSubtitleForMovieAndLangcode;

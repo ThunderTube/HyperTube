@@ -1,9 +1,14 @@
 const send = require('@polka/send-type');
+const srt2vtt = require('srt-to-vtt');
 
 const { Movie, TORRENT_STATUSES } = require('../models/Movie');
-const { getSubtitles } = require('../get-movies');
+const {
+    getSubtitles,
+    streamSubtitleForMovieAndLangcode,
+} = require('../get-movies');
 const { streamTorrent } = require('../stream');
 const { FSFile } = require('../file');
+const { pipeline } = require('../utils');
 
 const STATE = {
     files: new Map(),
@@ -204,10 +209,37 @@ async function getVideoStream(req, res) {
     }
 }
 
+async function getSubtitleForVideoAndLangcode(req, res) {
+    const {
+        params: { id, langcode },
+    } = req;
+
+    try {
+        const srtSubtitleStream = await streamSubtitleForMovieAndLangcode(
+            id,
+            langcode
+        );
+        if (srtSubtitleStream === null) {
+            send(res, 400);
+            return;
+        }
+
+        res.set('Content-Type', 'text/vtt');
+
+        await pipeline(srtSubtitleStream, srt2vtt(), res);
+
+        console.log('streamed successfully the subtitle');
+    } catch (e) {
+        console.error(e);
+        send(res, 500);
+    }
+}
+
 module.exports = {
     getVideos,
     getVideoInformations,
     triggerVideoDownloading,
     getDownloadingStatus,
     getVideoStream,
+    getSubtitleForVideoAndLangcode,
 };
