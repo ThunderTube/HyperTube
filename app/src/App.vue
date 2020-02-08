@@ -1,12 +1,13 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
     <auth-modal />
-    <app-menu v-show="isLoggedIn" />
-    <div v-show="isLoggedIn" class="w-full">
+    <div v-show="isLoggedIn" >
+      <app-menu />
+    <div class="w-full">
       <transition name="page" mode="out-in">
         <router-view />
       </transition>
-       <!--Modal-->
+    </div>
     </div>
   </div>
 </template>
