@@ -1,10 +1,12 @@
 <template>
-  <div id="app" class="bg-gray-900 text-white min-h-screen">
+  <div id="app" class="bg-gray-900 min-h-screen">
     <app-menu />
     <div class="w-full">
+
       <transition name="page" mode="out-in">
         <router-view />
       </transition>
+      <t-modal ref="modal">hello world</t-modal>
     </div>
   </div>
 </template>
@@ -14,7 +16,15 @@ import AppMenu from "@/components/AppMenu";
 
 export default {
   components: {
-    AppMenu
+    AppMenu,
+  },
+  data() {
+    return {
+      model:''
+    }
+  },
+  mounted() {
+    this.$refs.modal.show()
   }
 };
 </script>
