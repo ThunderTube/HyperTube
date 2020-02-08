@@ -1,30 +1,29 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
-    <app-menu />
-    <div class="w-full">
-
+    <auth-modal />
+    <app-menu v-show="isLoggedIn" />
+    <div v-show="isLoggedIn" class="w-full">
       <transition name="page" mode="out-in">
         <router-view />
       </transition>
-      <t-modal ref="modal">hello world</t-modal>
+       <!--Modal-->
     </div>
   </div>
 </template>
 
 <script>
 import AppMenu from '@/components/AppMenu'
+import AuthModal from '@/components/AuthModal'
 
 export default {
   components: {
     AppMenu,
+    AuthModal
   },
   data() {
     return {
-      model:''
+      isLoggedIn: false
     }
-  },
-  mounted() {
-    this.$refs.modal.show()
   }
 }
 </script>
@@ -40,4 +39,5 @@ export default {
   opacity: 0;
   transform: scale(1.1);
 }
+
 </style>

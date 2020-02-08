@@ -3,9 +3,16 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {},
-  modules: {}
-})
+import movies from './modules/movies/index'
+import user from './modules/user/index'
+
+const store = () => {
+    return new Vuex.Store({
+        modules: {
+            movies,
+            user
+        }
+    })
+}
+
+export default store

@@ -7,7 +7,6 @@
 <script>
     async function app() {
         const params = new URLSearchParams(window.location.search);
-
         const ID = params.get('id');
         const RESOLUTION = params.get('resolution');
         if (!(ID && RESOLUTION)) {

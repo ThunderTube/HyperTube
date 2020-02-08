@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev:install": "sh ./install-dev.sh",
-    "dev:up": "docker-compose -f docker/docker-compose.dev.yml up",
-    "dev:down": "docker-compose -f docker/docker-compose.dev.yml down",
-    "dev:uninstall": "docker-compose -f docker/docker-compose.dev.yml down --rmi all",
+    "dev:install": "sh ./docker/install-dev.sh",
+    "dev:up": "docker-compose -f ./docker/docker-compose.dev.yml up",
+    "dev:down": "docker-compose -f ./docker/docker-compose.dev.yml down",
+    "dev:uninstall": "docker-compose -f ./docker/docker-compose.dev.yml down --rmi all",
     "dev:connect:api": "docker exec -it api /bin/sh",
     "dev:connect:app": "docker exec -it app /bin/bash",
     "dev:connect:server": "docker exec -it server /bin/bash",
@@ -17,8 +17,5 @@
     "logs:mongo": "docker logs mongo"
   },
   "author": "42",
-  "license": "MIT",
-  "dependencies": {
-    "vue-burger-menu": "^2.0.3"
-  }
+  "license": "MIT"
 }
