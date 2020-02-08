@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import AppMenu from "@/components/AppMenu";
+import AppMenu from '@/components/AppMenu'
 
 export default {
   components: {
@@ -26,7 +26,7 @@ export default {
   mounted() {
     this.$refs.modal.show()
   }
-};
+}
 </script>
 
 <style lang="css" scoped>

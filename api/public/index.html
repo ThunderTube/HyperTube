@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<title>Torrent Stream Tests</title>
+
+<video id="video" controls></video>
+
+<script>
+    async function app() {
+        const params = new URLSearchParams(window.location.search);
+
+        const ID = params.get('id');
+        const RESOLUTION = params.get('resolution');
+        if (!(ID && RESOLUTION)) {
+            return;
+        }
+
+        const source = document.getElementById('source');
+        const video = document.getElementById('video');
+
+        // Get informations about the video
+        const informations = await fetch(`/api/v1/stream/video/${ID}`)
+            .then(res => res.json())
+            .catch(console.error);
+        if (!informations) {
+            return;
+        }
+        const { subtitles } = informations;
+        let videoMimeType = null;
+
+        // Request the downloading of the video
+        await fetch(`/api/v1/stream/video/download/${ID}/${RESOLUTION}`)
+            .then(res => res.json())
+            .then(({ status, mime }) => {
+                videoMimeType = mime;
+            });
+
+        const intervalId = setInterval(poll, 10_000);
+        poll();
+
+        function poll() {
+            // Get the status of the video downloading
+            fetch(`/api/v1/stream/video/status/${ID}/${RESOLUTION}`)
+                .then(res => {
+                    if (res.status !== 200) {
+                        throw new Error('Bad response');
+                    }
+                    return res.text();
+                })
+                .then(state => {
+                    if (['FIRST_CHUNKS_LOADED', 'LOADED'].includes(state)) {
+                        addSource(
+                            // This URL streams the video to the client
+                            `/api/v1/stream/video/chunks/${ID}/${RESOLUTION}`,
+                            'video/mp4'
+                        );
+
+                        clearInterval(intervalId);
+                        return;
+                    }
+
+                    console.log('poll state =', state);
+                })
+                .catch(console.error);
+        }
+
+        function addSource(url, type) {
+            const source = document.createElement('source');
+            source.src = url;
+            source.type = type;
+
+            video.appendChild(source);
+
+            for (const { url, langcode, lang } of subtitles) {
+                const track = document.createElement('track');
+                track.src = url;
+                track.label = lang;
+                track.srclang = langcode;
+
+                video.appendChild(track);
+            }
+        }
+    }
+
+    app().catch(console.error);
+</script>
