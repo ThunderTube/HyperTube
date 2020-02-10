@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
-    <auth-modal />
-    <div v-show="isLoggedIn" >
+    <auth-screen :is-logged-in="isLoggedIn"/>
+    <div v-show="isLoggedIn">
       <app-menu />
     <div class="w-full">
       <transition name="page" mode="out-in">
@@ -14,12 +14,12 @@
 
 <script>
 import AppMenu from '@/components/AppMenu'
-import AuthModal from '@/components/AuthModal'
+import AuthScreen from '@/components/AuthScreen'
 
 export default {
   components: {
     AppMenu,
-    AuthModal
+    AuthScreen
   },
   data() {
     return {

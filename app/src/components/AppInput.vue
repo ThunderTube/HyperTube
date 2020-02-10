@@ -1,10 +1,14 @@
 <template>
 <div class="my-3">
-    <label :for="name" class="capitalize font-bold">
+    <label 
+        :for="name" 
+        :class="[error ? 'text-red-600' : 'text-gray-900']"
+        class="capitalize font-bold">
             {{ name }}
     </label>
     <input
-        class="bg-white focus:outline-none focus:shadow-outline border border-gray-300 py-2 px-4 block w-full appearance-none leading-normal"
+        :class="[error ? 'border-red-600' : 'border-gray-300']"
+        class="bg-white focus:outline-none focus:shadow-outline border py-2 px-4 block w-full appearance-none leading-normal"
         @input="$emit('input', $event.target.value)"
         :type="type"
         :name="name"
@@ -13,7 +17,8 @@
         :value="value"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
-    >
+    autocomplete>
+    <p v-if="error" class="text-sm text-red-600">{{ message }}</p>
 </div>
 </template>
 
@@ -38,6 +43,16 @@ export default {
         value: {
             type: String,
             required: true
+        },
+        error: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        message: {
+            type: String,
+            required: false,
+            default: ""
         }
     }
 }
