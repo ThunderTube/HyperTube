@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node src/index.js",
         "server": "nodemon -r dotenv/config src/index.js dotenv_config_path=./src/config/config.env",
-        "lint-fix": "prettier-eslint --write \"$PWD/src/**/*.js\""
+        "lint-fix": "prettier-eslint --write \"$PWD/src/**/*.js\"",
+        "seed": "node -r dotenv/config src/seeder.js dotenv_config_path=./src/config/config.env"
     },
     "author": "42",
     "license": "MIT",
