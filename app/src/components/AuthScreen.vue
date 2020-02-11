@@ -11,20 +11,20 @@
       <div class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800">
         <div
           @click="selectAuthForm('login')"
-          class="w-1/2 h-full flex items-center justify-center"
+          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >Login</div>
         <div
           @click="selectAuthForm('register')"
-          class="w-1/2 h-full flex items-center justify-center"
+          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >Register</div>
       </div>
       <div class="py-4 text-left px-6">
         <form @submit.prevent="submitForm()">
           <div v-if="login.visible">
             <app-input 
-                v-model="login.form.username" 
+                v-model="login.form.login" 
                 name="login" 
-                placeholder="username or email" 
+                placeholder="login or email" 
             />
             <app-input
               v-model="login.form.password"
@@ -34,18 +34,16 @@
             />
           </div>
           <div v-else-if="register.visible">
-            <app-input v-model="test_login" name="login" placeholder="username or email" />
-            <app-input v-model="test_login" name="login" placeholder="username or email" />
-            <app-input v-model="test_login" name="login" placeholder="username or email" />
-            <app-input
-              v-model="test_register"
-              name="password"
-              type="password"
-              placeholder="********"
-            />
+            Register form
+          </div>
+          <div v-else-if="passwordForgot.visible">
+            <app-input v-model="passwordForgot.form.login" name="password-forgot" placeholder="Login" />
+          </div>
+          <div v-show="login.visible">
+            <a @click.prevent="selectAuthForm('password-forgot')" href="#" class="text-blue-600">Password forgot?</a>
           </div>
           <div class="flex justify-end py-2">
-            <button
+            <button @click="$emit('auth:login', true)"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >{{ formType }}</button>
           </div>
@@ -71,21 +69,25 @@ export default {
   },
   data() {
     return {
-      test_login: '',
-      test_register: '',
       formType: 'login',
       login: {
         visible: true,
         form: {
-          username: '',
+          login: '',
           password: ''
         }
       },
       register: {
         visible: false,
         form: {
-          username: '',
+          login: '',
           password: ''
+        }
+      },
+      passwordForgot: {
+        visible: false,
+        form: {
+          login: '',
         }
       }
     }
@@ -98,18 +100,38 @@ export default {
     showAuthForm() {
       if (this.formType === 'login') {
         this.register.visible = false
+        this.passwordForgot.visible = false
         this.register.form = {
-          username: '',
+          login: '',
           password: ''
+        }
+        this.passwordForgot.form = {
+          login: '',
         }
         this.login.visible = true
       } else if (this.formType === 'register') {
         this.login.visible = false
-         this.login.form = {
-          username: '',
+        this.passwordForgot.visible = false
+        this.login.form = {
+          login: '',
           password: ''
         }
+        this.passwordForgot.form = {
+          login: '',
+        }
         this.register.visible = true
+      } else if (this.formType === 'password-forgot') {
+        this.login.visible = false
+        this.register.visible = false
+        this.login.form = {
+          login: '',
+          password: ''
+        }
+        this.register.form = {
+          login: '',
+          password: ''
+        }
+        this.passwordForgot.visible = true
       }
     },
     submitForm() {
@@ -119,6 +141,9 @@ export default {
         } else if (this.register.visible) {
             // submit register form
             console.log('register')
+        } else if (this.passwordForgot.visible) {
+            // submit register form
+            console.log('password forgot')
         }
     }
   }

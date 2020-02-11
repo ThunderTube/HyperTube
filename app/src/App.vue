@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
-    <auth-screen :is-logged-in="isLoggedIn"/>
+    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
     <div v-show="isLoggedIn">
       <app-menu />
     <div class="w-full">
