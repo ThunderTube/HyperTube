@@ -166,5 +166,5 @@ movieSchema.statics.finishedUploading = function finishedUploading({
     );
 };
 
-module.exports.TORRENT_STATUSES = TORRENT_STATUSES;
-module.exports.Movie = mongoose.model('Movie', movieSchema);
+exports.TORRENT_STATUSES = TORRENT_STATUSES;
+exports.Movie = mongoose.model('Movie', movieSchema);
