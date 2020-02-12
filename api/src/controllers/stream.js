@@ -40,6 +40,44 @@ async function getVideos(req, res) {
 
     try {
         const movies = await Movie.find()
+            .sort({ peersAndSeedsCount: -1, rating: -1 })
+            .skip(Number(offset))
+            .limit(Number(limit));
+
+        send(res, 200, movies);
+    } catch (e) {
+        console.error(e);
+        send(res, 500);
+    }
+}
+
+async function searchVideos(req, res) {
+    try {
+        const {
+            params: { offset, limit },
+            body: { query, genre, year },
+        } = req;
+        if (typeof query !== 'string') {
+            send(res, 400);
+            return;
+        }
+
+        const conditions = { $text: { $search: query } };
+        if (typeof genre === 'string' && genre !== '') {
+            conditions.genres = genre;
+        }
+        const yearToNumber = Number(year);
+        if (
+            typeof year === 'string' &&
+            year !== '' &&
+            yearToNumber > 1850 &&
+            yearToNumber <= 2020
+        ) {
+            conditions.year = yearToNumber;
+        }
+
+        const movies = await Movie.find(conditions)
+            .sort({ title: 1 }) // sort the entries by the title, ascending
             .skip(Number(offset))
             .limit(Number(limit));
 
@@ -253,6 +291,7 @@ async function getSubtitleForVideoAndLangcode(req, res) {
 
 module.exports = {
     getVideos,
+    searchVideos,
     getVideoInformations,
     triggerVideoDownloading,
     getDownloadingStatus,
