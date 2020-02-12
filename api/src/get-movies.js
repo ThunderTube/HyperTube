@@ -11,6 +11,79 @@ const MOVIES_ORIGINS = {
 
 const OPENSUBTITLES_URL_PROPERTY = 'url';
 
+const NORMALIZED_GENDERS = new Map([
+    ['comedy', 'comedy'],
+    ['thriller', 'thriller'],
+    ['drama', 'drama'],
+    ['mystery', 'mystery'],
+    ['crime', 'crime'],
+    ['animation', 'animation'],
+    ['family', 'family'],
+    ['music', 'music'],
+    ['adventure', 'adventure'],
+    ['action', 'action'],
+    ['war', 'war'],
+    ['history', 'history'],
+    ['science-fiction', 'science-fiction'],
+    ['musical', 'musical'],
+    ['superhero', 'superhero'],
+    ['horror', 'horror'],
+    ['fantasy', 'fantasy'],
+    ['romance', 'romance'],
+    ['western', 'western'],
+    ['anime', 'anime'],
+    ['holiday', 'holiday'],
+    ['documentary', 'documentary'],
+    ['short', 'short'],
+    ['suspense', 'suspense'],
+    ['tv-movie', 'tv-movie'],
+
+    ['Action', 'action'],
+    ['Adventure', 'adventure'],
+    ['Animation', 'animation'],
+    ['Sci-Fi', 'science-fiction'],
+    ['Comedy', 'comedy'],
+    ['Crime', 'crime'],
+    ['Drama', 'drama'],
+    ['Film-Noir', 'film-noir'],
+    ['Romance', 'romance'],
+    ['Thriller', 'thriller'],
+    ['Horror', 'horror'],
+    ['History', 'history'],
+    ['Mystery', 'mystery'],
+    ['Music', 'music'],
+    ['Documentary', 'documentary'],
+    ['Sport', 'sport'],
+    ['War', 'war'],
+    ['Fantasy', 'fantasy'],
+    ['Musical', 'musical'],
+    ['Family', 'family'],
+    ['Biography', 'biography'],
+    ['Western', 'western'],
+    ['News', 'news'],
+    ['Reality-TV', 'reality-tv'],
+    ['Talk-Show', 'talk-show'],
+]);
+
+const POSSIBLE_GENRES = [...new Set([...NORMALIZED_GENDERS.values()])];
+
+/**
+ * return the genres formatted or null if at least one genre is unknown
+ * @param {string[]} genres
+ */
+function formatGenres(genres) {
+    const formattedGenres = [];
+
+    for (const genre of genres) {
+        const formattedGenre = NORMALIZED_GENDERS.get(genre);
+        if (formattedGenre === undefined) return null;
+
+        formattedGenres.push(formattedGenre);
+    }
+
+    return formattedGenres;
+}
+
 function formatMovieFromYTS({
     imdb_code: imdbId,
     title,
@@ -25,6 +98,8 @@ function formatMovieFromYTS({
     if (!Array.isArray(torrents) || torrents.length === 0) {
         return null;
     }
+    const formattedGenres = formatGenres(genres);
+    if (formattedGenres === null) return null;
 
     return {
         imdbId,
@@ -33,7 +108,7 @@ function formatMovieFromYTS({
         description: summary,
         language: language === 'English' ? 'en' : language,
         year,
-        genres,
+        genres: formattedGenres,
         image,
         runtime,
         torrents: torrents.map(
@@ -103,6 +178,8 @@ function formatMovieFromPopcornTime({
     if (poster === undefined) {
         console.error('Could not get the poster for', imdbID, images);
     }
+    const formattedGenres = formatGenres(genres);
+    if (formattedGenres === null) return null;
 
     const entries = Object.entries(englishTorrents);
 
@@ -127,7 +204,7 @@ function formatMovieFromPopcornTime({
         description: synopsis,
         language: 'en',
         year,
-        genres,
+        genres: formattedGenres,
         image: poster,
         rating: null,
         runtime: Number(runtime),
@@ -173,6 +250,16 @@ function toTMDBImage(path) {
     return `https://image.tmdb.org/t/p/w500${path}`;
 }
 
+function setPeersAndSeedsCount(torrents) {
+    let count = 0;
+
+    for (const { seeds, peers } of torrents) {
+        count += seeds + peers;
+    }
+
+    return count;
+}
+
 async function completeMovieInformations(movie) {
     try {
         const [
@@ -216,6 +303,7 @@ async function completeMovieInformations(movie) {
             ),
             crew: crew.map(({ name, job }) => ({ name, job })),
             image,
+            peersAndSeedsCount: setPeersAndSeedsCount(movie.torrents),
         };
     } catch (e) {
         if (e.response && e.response.statusCode === 404) {
@@ -274,7 +362,7 @@ function checkDBEntriesIntegrity(movies) {
                 language: 'en',
                 year: [null, Joi.number()],
                 genres: Joi.array()
-                    .items(Joi.string())
+                    .items(Joi.string().valid(...POSSIBLE_GENRES))
                     .required(),
                 crew: Joi.array()
                     .items(
@@ -306,6 +394,10 @@ function checkDBEntriesIntegrity(movies) {
                     .integer()
                     .min(0)
                     .required(), // movie duration
+                peersAndSeedsCount: Joi.number()
+                    .integer()
+                    .min(0)
+                    .required(),
                 torrents: Joi.array()
                     .items(
                         Joi.object({
@@ -406,6 +498,7 @@ async function streamSubtitleForMovieAndLangcode(id, langcode) {
 }
 
 exports.MOVIES_ORIGINS = MOVIES_ORIGINS;
+exports.POSSIBLE_GENRES = POSSIBLE_GENRES;
 exports.getMovies = getMovies;
 exports.getSubtitles = getSubtitles;
 exports.streamSubtitleForMovieAndLangcode = streamSubtitleForMovieAndLangcode;
