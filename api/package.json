@@ -16,6 +16,7 @@
         "@hapi/joi": "^17.1.0",
         "@polka/send-type": "^0.5.2",
         "bcrypt": "^3.0.7",
+        "cors": "^2.8.5",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "fluent-ffmpeg": "^2.1.2",
