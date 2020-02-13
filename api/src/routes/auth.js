@@ -20,6 +20,6 @@ router
     .put('/resetpassword', resetPassword)
     .put('/updatedetails', updateDetails)
     .put('/updatepassword', updatePassword)
-    .get('/logout', logout);
+    .post('/logout', logout);
 
 module.exports = router;
