@@ -1,6 +1,14 @@
 const User = require('../models/User');
+const uuid = require('uuid/v4');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
+
+const confirmationLinkUuid = uuid();
+
+function createRegisterMail(req, username, uuid, id) {
+    return `Bonjour ${username}, pour activer votre compte
+    : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
+}
 
 // @desc Register user
 // @route POST /api/v1/auth/register
@@ -23,7 +31,9 @@ exports.register = async (req, res) => {
             firstName,
             password,
             profilPicture,
+            confirmationLinkUuid,
         });
+
         try {
             await user.validate();
         } catch (e) {
@@ -32,11 +42,23 @@ exports.register = async (req, res) => {
             res.status(400).json({ success: false, error: msg });
             return;
         }
+
         const isUserUnique = await User.isUnique({ email, username });
 
         if (isUserUnique === true) {
             await user.save();
             const token = user.getSignedJwtToken();
+
+            res.locals.email.send({
+                to: user.email,
+                subject: 'coucou',
+                text: createRegisterMail(
+                    req,
+                    user.username,
+                    user.confirmationLinkUuid,
+                    user._id
+                ),
+            });
 
             res.cookie('cookie-id', token, {
                 httpOnly: true,
@@ -51,6 +73,24 @@ exports.register = async (req, res) => {
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
+    }
+};
+
+// @desc Get confirm user
+// @route GET /api/v1/auth/confirmAccount/:uuid/:id
+// @access Public
+exports.confirmAccount = async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
+        user.isConfirmed = true;
+        await user.save();
+        res.json({ success: true });
+    } else {
+        res.status(400).json({
+            success: false,
+            error: 'Wrong confirmation link',
+        });
     }
 };
 

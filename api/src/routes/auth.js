@@ -3,6 +3,7 @@ const {
     register,
     login,
     getMe,
+    confirmAccount,
     forgotPassword,
     resetPassword,
     updateDetails,
@@ -16,6 +17,7 @@ router
     .post('/register', register)
     .post('login', login)
     .get('/me', getMe)
+    .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword)
     .put('/resetpassword', resetPassword)
     .put('/updatedetails', updateDetails)

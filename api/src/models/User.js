@@ -51,6 +51,13 @@ const userSchema = new Schema({
         type: String,
         default: 'no-photo.jpg',
     },
+    confirmationLinkUuid: {
+        type: String,
+    },
+    isConfirmed: {
+        type: Boolean,
+        default: false,
+    },
     resetPwdToken: String,
     resetPwdExpire: Date,
 });

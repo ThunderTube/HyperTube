@@ -46,17 +46,15 @@ async function app() {
                 const rawJwt = req.signedCookies['cookie-id'];
                 if (rawJwt !== undefined) {
                     const { id } = await User.verifyJWT(rawJwt);
-
                     user = await User.findById(id);
                     if (user !== null) {
                         isAuthenticated = true;
                     }
                 }
-
                 res.locals = {
                     email,
-
                     isAuthenticated,
+                    authorizations: User.isConfirmed === true ? ['user'] : [],
                     user,
                 };
 
@@ -68,6 +66,14 @@ async function app() {
                 res.sendStatus(500);
             }
         })
+        // .use((req, { locals: { authorizations } }, next) => {
+        //     if (!authorizations.includes('user')) {
+        //         res.end();
+        //         return;
+        //     }
+
+        //     next();
+        // })
         .use('/api/v1', router)
         .listen(process.env.PORT, err => {
             if (err) {
