@@ -84,6 +84,7 @@ exports.confirmAccount = async (req, res) => {
 
     if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
         user.isConfirmed = true;
+        user.confirmationLinkUuid = null;
         await user.save();
         res.json({ success: true });
     } else {
