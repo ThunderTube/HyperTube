@@ -38,12 +38,14 @@ exports.register = async (req, res) => {
             await user.validate();
         } catch (e) {
             let msg = Object.values(e.errors).map(val => val.message);
-            // .toString();
             res.status(400).json({ success: false, error: msg });
             return;
         }
 
-        const isUserUnique = await User.isUnique({ email, username });
+        const isUserUnique = await User.isUnique({
+            email,
+            username,
+        });
 
         if (isUserUnique === true) {
             await user.save();
@@ -66,9 +68,15 @@ exports.register = async (req, res) => {
                 signed: true,
             }).json({ success: true });
         } else if (isUserUnique === 'username') {
-            res.status(400).json({ success: false, error: 'Username taken' });
+            res.status(400).json({
+                success: false,
+                error: 'Username taken',
+            });
         } else if (isUserUnique === 'email') {
-            res.status(400).json({ success: false, error: 'Email taken' });
+            res.status(400).json({
+                success: false,
+                error: 'Email taken',
+            });
         }
     } catch (e) {
         console.error(e);

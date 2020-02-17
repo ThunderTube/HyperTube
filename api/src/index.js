@@ -4,11 +4,12 @@ const morgan = require('morgan');
 const sirv = require('sirv');
 const { join } = require('path');
 const cors = require('cors');
+const passport = require('passport');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
 const User = require('./models/User');
-
+const setupPassport = require('./config/passport');
 const router = require('./routes');
 
 async function app() {
@@ -25,6 +26,8 @@ async function app() {
 
     const email = new Mail();
 
+    setupPassport();
+
     server
         .use(express.json())
         .use(assets)
@@ -35,45 +38,20 @@ async function app() {
             })
         )
         .use(cookieParser(process.env.COOKIE_SECRET))
-        .use(async (req, res, next) => {
+        .use(passport.initialize())
+        .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
+        .use((req, res, next) => {
             // This middleware sets the context
 
-            let isAuthenticated = false;
-            let user = null;
+            res.locals = {
+                email,
+                isAuthenticated: req.isAuthenticated(),
+                authorizations: User.isConfirmed === true ? ['user'] : [],
+                user: req.user || null,
+            };
 
-            try {
-                // const { 'cookie-id': jwt } = req.signedCookies;
-                const rawJwt = req.signedCookies['cookie-id'];
-                if (rawJwt !== undefined) {
-                    const { id } = await User.verifyJWT(rawJwt);
-                    user = await User.findById(id);
-                    if (user !== null) {
-                        isAuthenticated = true;
-                    }
-                }
-                res.locals = {
-                    email,
-                    isAuthenticated,
-                    authorizations: User.isConfirmed === true ? ['user'] : [],
-                    user,
-                };
-
-                next();
-            } catch (e) {
-                // An error occured, abort the request
-
-                console.error('an error occured', e);
-                res.sendStatus(500);
-            }
+            next();
         })
-        // .use((req, { locals: { authorizations } }, next) => {
-        //     if (!authorizations.includes('user')) {
-        //         res.end();
-        //         return;
-        //     }
-
-        //     next();
-        // })
         .use('/api/v1', router)
         .listen(process.env.PORT, err => {
             if (err) {
