@@ -17,7 +17,7 @@ module.exports = function setupPassport() {
             },
             async function(payload, done) {
                 try {
-                    console.log('payload =', payload);
+                    // console.log('payload =', payload);
 
                     const { id } = payload;
 

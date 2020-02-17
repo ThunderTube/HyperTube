@@ -1,4 +1,6 @@
 const express = require('express');
+const { isLoggedIn } = require('./utils');
+
 const {
     register,
     login,
@@ -16,12 +18,12 @@ const router = express.Router();
 router
     .post('/register', register)
     .post('login', login)
-    .get('/me', getMe)
+    .get('/me', isLoggedIn, getMe)
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword)
     .put('/resetpassword', resetPassword)
-    .put('/updatedetails', updateDetails)
-    .put('/updatepassword', updatePassword)
-    .post('/logout', logout);
+    .put('/updatedetails', isLoggedIn, updateDetails)
+    .put('/updatepassword', isLoggedIn, updatePassword)
+    .post('/logout', isLoggedIn, logout);
 
 module.exports = router;

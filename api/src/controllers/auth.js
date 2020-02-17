@@ -146,7 +146,7 @@ exports.updatePassword = async (req, res) => {
 };
 
 // @desc Logout user
-// @route GET /api/v1/auth/logout
+// @route POST /api/v1/auth/logout
 // @access Private
 exports.logout = async (req, res) => {
     res.clearCookie('cookie-id').json({ success: true });
