@@ -15,6 +15,8 @@ function createRegisterMail(req, username, uuid, id) {
 // @access Public
 exports.register = async (req, res) => {
     try {
+        console.log(req.file);
+
         const {
             username,
             email,
@@ -23,14 +25,13 @@ exports.register = async (req, res) => {
             password,
             profilPicture,
         } = req.body;
-
         const user = new User({
             username,
             email,
             lastName,
             firstName,
             password,
-            profilPicture,
+            profilPicture: req.file.path,
             confirmationLinkUuid,
         });
 
