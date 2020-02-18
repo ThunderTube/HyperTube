@@ -17,8 +17,6 @@ module.exports = function setupPassport() {
             },
             async function(payload, done) {
                 try {
-                    // console.log('payload =', payload);
-
                     const { id } = payload;
 
                     const user = await User.findById(id);

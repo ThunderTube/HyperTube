@@ -3,7 +3,7 @@ const multer = require('multer');
 const FileType = require('file-type');
 const uuid = require('uuid/v4');
 const {
-    promises: { writeFile, unlink },
+    promises: { writeFile, unlink, mkdir },
 } = require('fs');
 const { join } = require('path');
 
@@ -28,10 +28,10 @@ const IMAGE_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif'];
 router
     .post(
         '/register',
-        ...uploadAndVerifyFileTypeMiddleware('profile', IMAGE_MIMETYPES),
+        ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         register
     )
-    .post('login', login)
+    .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword)
@@ -48,11 +48,18 @@ function uploadAndVerifyFileTypeMiddleware(
         upload.single(fileProperty),
         async (req, res, next) => {
             try {
+                const UPLOAD_DIRECTORY_PATH = join(
+                    __dirname,
+                    '../..',
+                    'public/uploads'
+                );
+
+                await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
                 const {
                     file: { buffer },
                 } = req;
-
                 const metadata = await FileType.fromBuffer(buffer);
+                console.log(metadata);
                 if (metadata === undefined) {
                     // Could not identify the mimetype of the file
                     console.error(
@@ -72,9 +79,9 @@ function uploadAndVerifyFileTypeMiddleware(
                     return;
                 }
 
-                const fileName = `uploads/${uuid()}.${ext}`;
+                const fileName = `${uuid()}.${ext}`;
 
-                const pathToFile = join(__dirname, '../..', fileName);
+                const pathToFile = join(UPLOAD_DIRECTORY_PATH, fileName);
 
                 await writeFile(pathToFile, buffer, null);
 

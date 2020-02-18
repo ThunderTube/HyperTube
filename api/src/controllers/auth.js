@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const uuid = require('uuid/v4');
+const bcrypt = require('bcrypt');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
 
@@ -108,7 +109,33 @@ exports.confirmAccount = async (req, res) => {
 // @route POST /api/v1/auth/login
 // @access Public
 exports.login = async (req, res) => {
-    res.status(200).json({ success: true });
+    try {
+        const { username, password } = req.body;
+
+        const user = await User.findOne({ username }).lean();
+        if (user === null) {
+            // Could not find a user with this username
+            res.status(401).json({
+                success: false,
+                error: 'No user found',
+            });
+            return;
+        }
+
+        if (await bcrypt.compare(password, user.password)) {
+            res.status(400).json({
+                success: false,
+                error: 'Invalid password',
+            });
+
+            return;
+        }
+
+        res.json({ success: true, user, csrf: '' });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
 };
 
 // @desc Get current logged in user
