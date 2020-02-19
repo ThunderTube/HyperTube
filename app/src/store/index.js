@@ -3,14 +3,13 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-import movies from './modules/movies/index'
-import user from './modules/user/index'
+// import user from './modules/user'
+import auth from './modules/auth'
 
 const store = () => {
     return new Vuex.Store({
         modules: {
-            movies,
-            user
+            auth
         }
     })
 }
