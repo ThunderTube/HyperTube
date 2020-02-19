@@ -4,7 +4,7 @@
     class="z-50 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
   >
     <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
-    
+
     <div
       class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
     >
@@ -12,35 +12,35 @@
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >Login</div>
+        >{{ $t('loginscreen.login') }}</div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >Register</div>
+        >{{ $t('loginscreen.register') }}</div>
       </div>
       <div class="py-4 text-left px-6">
         <form @submit.prevent="submitForm()">
           <div v-if="login.visible">
-            <app-input 
-                v-model="login.form.login" 
-                name="login" 
-                placeholder="login or email" 
+            <app-input
+                v-model="login.form.login"
+                v-bind:name="$t('loginscreen.id')"
+                v-bind:placeholder="$t('loginscreen.id_placeholder')"
             />
             <app-input
               v-model="login.form.password"
-              name="password"
+              v-bind:name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
             />
           </div>
           <div v-else-if="register.visible">
-            Register form
+            {{ $t('loginscreen.register_form_title') }}
           </div>
           <div v-else-if="passwordForgot.visible">
             <app-input v-model="passwordForgot.form.login" name="password-forgot" placeholder="Login" />
           </div>
           <div v-show="login.visible">
-            <a @click.prevent="selectAuthForm('password-forgot')" href="#" class="text-blue-600">Password forgot?</a>
+            <a @click.prevent="selectAuthForm('password-forgot')" href="#" class="text-blue-600">{{ $t('loginscreen.forgot_password') }}</a>
           </div>
           <div class="flex justify-end py-2">
             <button @click="$emit('auth:login', true)"

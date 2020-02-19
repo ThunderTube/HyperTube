@@ -1,0 +1,27 @@
+{
+  "loginscreen": {
+      "login": "Login",
+      "register": "Register",
+      "id": "Login",
+      "id_placeholder": "login or email",
+      "password": "Password",
+      "forgot_password": "Password forgot?",
+      "register_input": "Register",
+      "register_form_title": "Register form"
+  },
+
+  "navbar": {
+      "search": "Search",
+      "home": "Home",
+      "watchlist": "Watchlist",
+      "movies": "Movies",
+      "series": "Series",
+      "originals": "Originals",
+      "settings": "Settings"
+  },
+
+  "movie": {
+      "play": "Play",
+      "watchlist_add": "Add to watchlist"
+  }
+}

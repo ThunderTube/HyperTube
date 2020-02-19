@@ -18,7 +18,7 @@
           d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
         />
       </svg>
-      <span>Search</span>
+      <span>{{ $t('navbar.search') }}</span>
     </router-link>
     <router-link to="/">
       <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
@@ -31,7 +31,7 @@
           d="M12.01 4.42l-8.3 8.3a1 1 0 1 1-1.42-1.41l9.02-9.02a1 1 0 0 1 1.41 0l8.99 9.02a1 1 0 0 1-1.42 1.41l-8.28-8.3z"
         />
       </svg>
-      <span>Home</span>
+      <span>{{ $t('navbar.home') }}</span>
     </router-link>
     <router-link to="/movie">
       <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
@@ -41,7 +41,7 @@
           d="M17 11a1 1 0 0 1 0 2h-4v4a1 1 0 0 1-2 0v-4H7a1 1 0 0 1 0-2h4V7a1 1 0 0 1 2 0v4h4z"
         />
       </svg>
-      <span>Watchlist</span>
+      <span>{{ $t('navbar.watchlist') }}</span>
     </router-link>
     <router-link to="/movie">
       <svg fill="currentColor" width="24" height="24" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@
         />
         <path d="M0 0h24v24H0z" fill="none" />
       </svg>
-      <span>Movies</span>
+      <span>{{ $t('navbar.movies') }}</span>
     </router-link>
     <router-link to="/movie">
       <svg fill="currentColor" width="24" height="24">
@@ -58,7 +58,7 @@
           d="M21 6h-8.586l2.293-2.293-1.414-1.414L10 5.586 6.707 2.293 5.293 3.707 7.586 6H3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-1 3v2h-2V9h2zm-2 4h2v2h-2v-2zM4 8h11v10H4V8z"
         />
       </svg>
-      <span>Series</span>
+      <span>{{ $t('navbar.series') }}</span>
     </router-link>
     <router-link to="/movie">
       <svg fill="currentColor" width="24" height="24" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@
         />
         <path d="M0 0h24v24H0z" fill="none" />
       </svg>
-      <span>Originals</span>
+      <span>{{ $t('navbar.originals') }}</span>
     </router-link>
     <router-link to="/movie">
       <svg
@@ -84,7 +84,7 @@
         />
         <circle cx="12" cy="12" r="2" class="secondary" />
       </svg>
-      <span>Settings</span>
+      <span>{{ $t('navbar.settings') }}</span>
     </router-link>
 
     <div class="ml-8">

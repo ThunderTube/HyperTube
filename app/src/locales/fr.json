@@ -1,0 +1,27 @@
+{
+    "loginscreen": {
+        "login": "Se connecter",
+        "register": "S'inscrire",
+        "id": "Identifiant",
+        "id_placeholder": "identifiant ou email",
+        "password": "Mot de pass",
+        "forgot_password": "Mot de pass oublié?",
+        "register_input": "S'enregistrer",
+        "register_form_title": "Formulaire d'inscription"
+    },
+
+    "navbar": {
+        "search": "Rechercher",
+        "home": "Accueil",
+        "watchlist": "Liste de visionnage",
+        "movies": "Films",
+        "series": "Series",
+        "originals": "Exclusivitées",
+        "settings": "Paramètres"
+    },
+
+    "movie": {
+        "play": "Lecture",
+        "watchlist_add": "Add to watchlist"
+    }
+  }
