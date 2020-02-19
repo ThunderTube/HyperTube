@@ -54,8 +54,12 @@
             >Password forgot?</a>
           </div>
           <div class="flex justify-end py-2">
-            <button
+            <!-- <button
               @click="$emit('auth:login', true)"
+              class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
+            >{{ formType }}</button> -->
+            <button
+              @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >{{ formType }}</button>
           </div>
@@ -66,7 +70,8 @@
 </template>
 
 <script>
-import AppInput from '../components/AppInput'
+import { mapActions } from 'vuex' 
+import AppInput from '@/components/AppInput'
 
 export default {
   name: 'AuthScreen',
@@ -108,6 +113,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      registerUser: "auth/registerUser",
+    }),
     selectAuthForm(formType) {
       this.formType = formType
       this.showAuthForm()
@@ -164,6 +172,7 @@ export default {
       } else if (this.register.visible) {
         // submit register form
         console.log('register')
+        this.registerUser(this.register.form)
       } else if (this.passwordForgot.visible) {
         // submit register form
         console.log('password forgot')

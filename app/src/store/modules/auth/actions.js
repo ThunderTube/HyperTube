@@ -1,6 +1,6 @@
 import { register } from '@/api/auth'
 
-export default async function registerUser({ commit }, data) {
+export const registerUser = async ({ commit }, data) => {
     try {
         const response = await register(data)
         this.setAuthData(commit, response.data);

@@ -1,10 +1,11 @@
-import axios from axios;
+import axios from 'axios';
 
 const instance = axios.create({
-    baseUrl: process.env.VUE_APP_BASE_URL,
+    timeout: 1500,
+    baseURL: 'http://localhost/api/v1',
     headers: {
         "Content-Type": "application/json",
     }
 });
 
-export default instance;
+export default instance;                                                          
