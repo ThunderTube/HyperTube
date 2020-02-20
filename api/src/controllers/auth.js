@@ -16,13 +16,10 @@ function createRegisterMail(req, username, uuid, id) {
 exports.register = async (req, res) => {
     try {
         const { csrf } = res.locals;
-        console.log(req.file);
 
         const csrfSecret = await csrf.secret();
 
         const { username, email, lastName, firstName, password } = req.body;
-
-        console.log(csrfSecret);
 
         const user = new User({
             username,
@@ -159,7 +156,7 @@ exports.getMe = async (req, res) => {
 // @route GET /user/:id
 // @access Private
 exports.getUser = async (req, res) => {
-    const user = await User.findById(req.params.id);
+    const user = req.user;
     const {
         isConfirmed,
         password,
@@ -229,7 +226,17 @@ exports.updateDetails = async (req, res) => {
 // @route PUT /api/v1/auth/updatepassword
 // @access Private
 exports.updatePassword = async (req, res) => {
-    res.status(200).json({ success: true });
+    try {
+        const user = req.user;
+
+        user.password = req.body.password;
+        await user.save();
+        res.json({ success: true });
+    } catch (e) {
+        let msg = Object.values(e.errors).map(val => val.message);
+        res.status(400).json({ success: false, error: msg });
+        return;
+    }
 };
 
 // @desc Logout user
