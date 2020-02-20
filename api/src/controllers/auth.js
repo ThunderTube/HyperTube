@@ -155,8 +155,20 @@ exports.getMe = async (req, res) => {
     res.json({ success: true, user: props });
 };
 
+// @desc Get an user by id
+// @route GET /user/:id
+// @access Private
 exports.getUser = async (req, res) => {
-    res.json({ success: true });
+    const user = await User.findById(req.params.id);
+    const {
+        isConfirmed,
+        password,
+        confirmationLinkUuid,
+        csrfSecret,
+        ...props
+    } = user._doc;
+
+    res.json({ success: true, props });
 };
 // @desc Forgot password
 // @route POST /api/v1/auth/forgotPassword
