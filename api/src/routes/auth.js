@@ -32,12 +32,13 @@ router
         register
     )
     .post('/login', login)
-    .get('/me', isLoggedIn, getMe)
+    .get('/me', isLoggedIn, getMe) // iscia
+    .get('/user/:id') // iscia
     .get('/confirmaccount/:uuid/:id', confirmAccount)
-    .post('/forgotpassword', forgotPassword)
-    .put('/resetpassword', resetPassword)
-    .put('/updatedetails', isLoggedIn, updateDetails)
-    .put('/updatepassword', isLoggedIn, updatePassword)
+    .post('/forgotpassword', forgotPassword) // baptiste
+    .put('/resetpassword', resetPassword) // baptiste
+    .put('/updatedetails', isLoggedIn, updateDetails) // baptiste
+    .put('/updatepassword', isLoggedIn, updatePassword) // iscia
     .post('/logout', isLoggedIn, logout);
 
 function uploadAndVerifyFileTypeMiddleware(
