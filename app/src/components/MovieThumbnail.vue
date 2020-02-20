@@ -1,6 +1,6 @@
 <template>
   <div class="shadow-xl m-2">
-    <router-link to="/movie">
+    <router-link :to="`/${$i18n.locale}/movie`">
       <img class="movie-thumbnail" src="@/assets/img/star_wars.jpg" alt />
     </router-link>
   </div>
