@@ -5,6 +5,7 @@ const sirv = require('sirv');
 const { join } = require('path');
 const cors = require('cors');
 const passport = require('passport');
+const Tokens = require('csrf');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
@@ -25,6 +26,7 @@ async function app() {
     }
 
     const email = new Mail();
+    const csrf = new Tokens();
 
     setupPassport();
 
@@ -45,6 +47,7 @@ async function app() {
 
             res.locals = {
                 email,
+                csrf,
                 isAuthenticated: req.isAuthenticated(),
                 authorizations: User.isConfirmed === true ? ['user'] : [],
                 user: req.user || null,

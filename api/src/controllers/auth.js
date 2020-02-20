@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const uuid = require('uuid/v4');
 const bcrypt = require('bcrypt');
-
 const YEAR_IN_MILLISECONDES = 3.154e10;
 
 const confirmationLinkUuid = uuid();
@@ -16,7 +15,10 @@ function createRegisterMail(req, username, uuid, id) {
 // @access Public
 exports.register = async (req, res) => {
     try {
+        const { csrf } = res.locals;
         console.log(req.file);
+
+        const csrfSecret = await csrf.secret();
 
         const {
             username,
@@ -26,6 +28,9 @@ exports.register = async (req, res) => {
             password,
             profilPicture,
         } = req.body;
+
+        console.log(csrfSecret);
+
         const user = new User({
             username,
             email,
@@ -34,6 +39,7 @@ exports.register = async (req, res) => {
             password,
             profilPicture: req.file.path,
             confirmationLinkUuid,
+            csrfSecret,
         });
 
         try {
@@ -50,6 +56,8 @@ exports.register = async (req, res) => {
         });
 
         if (isUserUnique === true) {
+            const csrfToken = csrf.create(csrfSecret);
+
             await user.save();
             const token = user.getSignedJwtToken();
 
@@ -63,12 +71,11 @@ exports.register = async (req, res) => {
                     user._id
                 ),
             });
-
             res.cookie('cookie-id', token, {
                 httpOnly: true,
                 expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
                 signed: true,
-            }).json({ success: true });
+            }).json({ success: true, csrfToken });
         } else if (isUserUnique === 'username') {
             res.status(400).json({
                 success: false,
@@ -111,6 +118,7 @@ exports.confirmAccount = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
+        const { csrf } = res.locals;
 
         const user = await User.findOne({ username }).lean();
         if (user === null) {
@@ -122,7 +130,7 @@ exports.login = async (req, res) => {
             return;
         }
 
-        if (await bcrypt.compare(password, user.password)) {
+        if (!(await bcrypt.compare(password, user.password))) {
             res.status(400).json({
                 success: false,
                 error: 'Invalid password',
@@ -130,8 +138,9 @@ exports.login = async (req, res) => {
 
             return;
         }
+        const csrfToken = csrf.create(user.csrfSecret);
 
-        res.json({ success: true, user, csrf: '' });
+        res.json({ success: true, user, csrfToken });
     } catch (e) {
         console.error(e);
         res.sendStatus(500);

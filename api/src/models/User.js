@@ -49,7 +49,10 @@ const userSchema = new Schema({
     },
     profilPicture: {
         type: String,
-        default: 'no-photo.jpg',
+        required: [true, 'Please add a profile picture'],
+    },
+    csrfSecret: {
+        type: String,
     },
     confirmationLinkUuid: {
         type: String,
