@@ -47,7 +47,7 @@ const userSchema = new Schema({
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
         ],
     },
-    profilPicture: {
+    profilePicture: {
         type: String,
         required: [true, 'Please add a profile picture'],
     },

@@ -37,18 +37,29 @@ router
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword) // baptiste
     .put('/resetpassword', resetPassword) // baptiste
-    .put('/updatedetails', isLoggedIn, updateDetails) // baptiste
+    .put(
+        '/updatedetails',
+        isLoggedIn,
+        ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
+        updateDetails
+    ) // baptiste
     .put('/updatepassword', isLoggedIn, updatePassword) // iscia
     .post('/logout', isLoggedIn, logout);
 
 function uploadAndVerifyFileTypeMiddleware(
     fileProperty,
-    authorizedMimeTypes = IMAGE_MIMETYPES
+    authorizedMimeTypes = IMAGE_MIMETYPES,
+    optional = true
 ) {
     return [
         upload.single(fileProperty),
         async (req, res, next) => {
             try {
+                if (req.file === undefined && optional === true) {
+                    next();
+                    return;
+                }
+
                 const UPLOAD_DIRECTORY_PATH = join(
                     __dirname,
                     '../..',

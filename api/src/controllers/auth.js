@@ -20,14 +20,7 @@ exports.register = async (req, res) => {
 
         const csrfSecret = await csrf.secret();
 
-        const {
-            username,
-            email,
-            lastName,
-            firstName,
-            password,
-            profilPicture,
-        } = req.body;
+        const { username, email, lastName, firstName, password } = req.body;
 
         console.log(csrfSecret);
 
@@ -37,7 +30,7 @@ exports.register = async (req, res) => {
             lastName,
             firstName,
             password,
-            profilPicture: req.file.path,
+            profilePicture: req.file.path,
             confirmationLinkUuid,
             csrfSecret,
         });
@@ -172,6 +165,40 @@ exports.resetPassword = async (req, res) => {
 // @route PUT /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = async (req, res) => {
+    const {
+        user,
+        body: { email, username, firstName, lastName },
+        file: profilePicture,
+    } = req;
+
+    const availableProperties = [
+        ['email', email],
+        ['username', username],
+        ['firstName', firstName],
+        ['lastName', lastName],
+        [
+            'profilePicture',
+            profilePicture ? profilePicture.path : profilePicture,
+        ],
+    ];
+
+    for (const [key, value] of availableProperties) {
+        console.log(value);
+
+        if (value) {
+            user[key] = value;
+        }
+    }
+
+    // save the modifications
+    try {
+        await user.save();
+    } catch (e) {
+        let msg = Object.values(e.errors).map(val => val.message);
+        res.status(400).json({ success: false, error: msg });
+        return;
+    }
+
     res.status(200).json({ success: true });
 };
 
