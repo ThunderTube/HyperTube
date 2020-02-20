@@ -7,7 +7,7 @@ const {
 } = require('fs');
 const { join } = require('path');
 
-const { isLoggedIn } = require('./utils');
+const { isLoggedIn, validCSRF } = require('./utils');
 const {
     register,
     login,
@@ -36,16 +36,17 @@ router
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
     .get('/confirmaccount/:uuid/:id', confirmAccount)
-    .post('/forgotpassword', forgotPassword) // baptiste
-    .put('/resetpassword/:token', resetPassword) // baptiste
+    .post('/forgotpassword', forgotPassword)
+    .put('/resetpassword', resetPassword)
     .put(
         '/updatedetails',
         isLoggedIn,
+        validCSRF,
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         updateDetails
     )
-    .put('/updatepassword', isLoggedIn, updatePassword)
-    .post('/logout', isLoggedIn, logout);
+    .put('/updatepassword', isLoggedIn, validCSRF, updatePassword)
+    .post('/logout', isLoggedIn, validCSRF, logout);
 
 function uploadAndVerifyFileTypeMiddleware(
     fileProperty,

@@ -3,8 +3,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const ms = require('ms');
 
-const User = require('../models/User');
-const { validPasswordRegex } = require('../models/User');
+const { User, validPasswordRegex } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
 
@@ -200,10 +199,7 @@ exports.forgotPassword = async (req, res) => {
         }
 
         const guid = uuid();
-        const hashedGuid = crypto
-            .createHmac('sha512', process.env.HMAC_SECRET)
-            .update(guid)
-            .digest('hex');
+        const hashedGuid = hashSha512ToHex(guid);
 
         user.passwordResets = [
             ...user.passwordResets.filter(
@@ -241,22 +237,54 @@ ${link}
 // @route PUT /api/v1/auth/resetpassword
 // @access Private
 exports.resetPassword = async (req, res) => {
-    const {
-        body: { username, password },
-    } = req;
-    if (!validPasswordRegex.test(password)) {
-        res.status(400).json({ error: ['Invalid password/username'] });
-        return;
-    }
+    try {
+        const {
+            body: { username, password, token },
+        } = req;
+        if (!validPasswordRegex.test(password)) {
+            res.status(400).json({ error: ['Invalid password/username'] });
+            return;
+        }
 
-    const user = await User.findOne({ username });
-    if (user === null) {
-        res.status(400).json({ error: ['Invalid password/username'] });
-        return;
-    }
+        const user = await User.findOne({ username });
+        if (user === null) {
+            res.status(400).json({ error: ['Invalid password/username'] });
+            return;
+        }
 
-    res.status(200).json({ success: true });
+        if (!isLinkValid(user, token)) {
+            res.status(400).json({ error: ['Invalid link'] });
+            return;
+        }
+
+        user.password = password;
+        await user.save();
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
 };
+
+function isLinkValid(user, token) {
+    const hashedGuid = hashSha512ToHex(token);
+    let index = 0;
+
+    for (const { token, expiresAt } of user.passwordResets) {
+        if (expiresAt.getTime() < new Date().getTime()) continue;
+
+        if (token === hashedGuid) {
+            // A link can be used only once
+            user.passwordResets.splice(index, 1);
+            return true;
+        }
+
+        index++;
+    }
+
+    return false;
+}
 
 // @desc Update user's details
 // @route PUT /api/v1/auth/updatedetails
@@ -322,3 +350,10 @@ exports.updatePassword = async (req, res) => {
 exports.logout = async (req, res) => {
     res.clearCookie('cookie-id').json({ success: true });
 };
+
+function hashSha512ToHex(text) {
+    return crypto
+        .createHmac('sha512', process.env.HMAC_SECRET)
+        .update(text)
+        .digest('hex');
+}

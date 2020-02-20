@@ -9,7 +9,7 @@ const Tokens = require('csrf');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
-const User = require('./models/User');
+const { User } = require('./models/User');
 const setupPassport = require('./config/passport');
 const router = require('./routes');
 

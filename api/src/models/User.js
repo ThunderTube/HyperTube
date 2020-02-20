@@ -116,6 +116,6 @@ function hashPassword(password) {
     });
 }
 
-module.exports = mongoose.model('User', userSchema);
+exports.User = mongoose.model('User', userSchema);
 exports.validPasswordRegex = validPasswordRegex;
 exports.hashPassword = hashPassword;
