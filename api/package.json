@@ -1,7 +1,7 @@
 {
     "name": "server",
     "version": "1.0.0",
-    "description": "Matcha backend",
+    "description": "Hypertube backend",
     "main": "src/index.js",
     "scripts": {
         "start": "node src/index.js",
@@ -15,7 +15,7 @@
         "@cospired/i18n-iso-languages": "^2.1.1",
         "@hapi/joi": "^17.1.0",
         "@polka/send-type": "^0.5.2",
-        "bcrypt": "^3.0.7",
+        "bcrypt": "^3.0.8",
         "cookie-parser": "^1.4.4",
         "cors": "^2.8.5",
         "csrf": "^3.1.0",
