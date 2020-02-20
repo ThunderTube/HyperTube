@@ -144,9 +144,20 @@ exports.login = async (req, res) => {
 // @route GET /api/v1/auth/me
 // @access Private
 exports.getMe = async (req, res) => {
-    res.status(200).json({ success: true });
+    const {
+        isConfirmed,
+        password,
+        confirmationLinkUuid,
+        csrfSecret,
+        ...props
+    } = req.user;
+
+    res.json({ success: true, user: props });
 };
 
+exports.getUser = async (req, res) => {
+    res.json({ success: true });
+};
 // @desc Forgot password
 // @route POST /api/v1/auth/forgotPassword
 // @access Public

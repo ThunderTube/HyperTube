@@ -12,6 +12,7 @@ const {
     register,
     login,
     getMe,
+    getUser,
     confirmAccount,
     forgotPassword,
     resetPassword,
@@ -33,7 +34,7 @@ router
     )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe) // iscia
-    .get('/user/:id') // iscia
+    .get('/user/:id', getUser) // iscia
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword) // baptiste
     .put('/resetpassword', resetPassword) // baptiste
