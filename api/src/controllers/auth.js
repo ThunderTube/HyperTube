@@ -1,9 +1,12 @@
-const User = require('../models/User');
 const uuid = require('uuid/v4');
 const bcrypt = require('bcrypt');
-const YEAR_IN_MILLISECONDES = 3.154e10;
+const crypto = require('crypto');
+const ms = require('ms');
 
-const confirmationLinkUuid = uuid();
+const User = require('../models/User');
+const { validPasswordRegex } = require('../models/User');
+
+const YEAR_IN_MILLISECONDES = 3.154e10;
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
@@ -17,6 +20,7 @@ exports.register = async (req, res) => {
     try {
         const { csrf } = res.locals;
 
+        const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
 
         const { username, email, lastName, firstName, password } = req.body;
@@ -167,17 +171,90 @@ exports.getUser = async (req, res) => {
 
     res.json({ success: true, props });
 };
+
 // @desc Forgot password
 // @route POST /api/v1/auth/forgotPassword
 // @access Public
 exports.forgotPassword = async (req, res) => {
-    res.status(200).json({ success: true });
+    const LINK_VALIDITY_DURATION = ms('15 minutes');
+
+    /**
+     * 1. generate a token
+     * 2. send an email containing this token
+     * 3. the user has to click on the link
+     * 4. the user is redirected to the frontend with the token in a query param
+     * 5. the front makes a request to effectively reset the password
+     */
+    try {
+        const {
+            body: { username },
+        } = req;
+        const {
+            locals: { email },
+        } = res;
+
+        const user = await User.findOne({ username });
+        if (user === null) {
+            res.status(400).json({ error: ['Unknown account'] });
+            return;
+        }
+
+        const guid = uuid();
+        const hashedGuid = crypto
+            .createHmac('sha512', process.env.HMAC_SECRET)
+            .update(guid)
+            .digest('hex');
+
+        user.passwordResets = [
+            ...user.passwordResets.filter(
+                ({ expiresAt }) => expiresAt.getTime() > new Date().getTime()
+            ),
+            {
+                token: hashedGuid,
+                expiresAt: new Date(Date.now() + LINK_VALIDITY_DURATION),
+            },
+        ];
+        await user.save();
+
+        // send a link with the plain guid
+        const link = `${process.env.FRONT_URI}/password-reset?token=${guid}`;
+
+        email.send({
+            to: user.email,
+            text: `
+Bonjour,
+Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe.
+
+${link}
+`,
+            subject: 'Remise à zéro du mot de passe',
+        });
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
 };
 
 // @desc Reset password
 // @route PUT /api/v1/auth/resetpassword
 // @access Private
 exports.resetPassword = async (req, res) => {
+    const {
+        body: { username, password },
+    } = req;
+    if (!validPasswordRegex.test(password)) {
+        res.status(400).json({ error: ['Invalid password/username'] });
+        return;
+    }
+
+    const user = await User.findOne({ username });
+    if (user === null) {
+        res.status(400).json({ error: ['Invalid password/username'] });
+        return;
+    }
+
     res.status(200).json({ success: true });
 };
 

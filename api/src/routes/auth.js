@@ -33,18 +33,18 @@ router
         register
     )
     .post('/login', login)
-    .get('/me', isLoggedIn, getMe) // iscia
-    .get('/user/:id', getUser) // iscia
+    .get('/me', isLoggedIn, getMe)
+    .get('/user/:id', getUser)
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword) // baptiste
-    .put('/resetpassword', resetPassword) // baptiste
+    .put('/resetpassword/:token', resetPassword) // baptiste
     .put(
         '/updatedetails',
         isLoggedIn,
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         updateDetails
-    ) // baptiste
-    .put('/updatepassword', isLoggedIn, updatePassword) // iscia
+    )
+    .put('/updatepassword', isLoggedIn, updatePassword)
     .post('/logout', isLoggedIn, logout);
 
 function uploadAndVerifyFileTypeMiddleware(
