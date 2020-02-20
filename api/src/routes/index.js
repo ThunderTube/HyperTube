@@ -2,6 +2,7 @@ const express = require('express');
 
 const authRouter = require('./auth');
 const streamRouter = require('./stream');
+const { isLoggedIn } = require('./utils');
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router
         res.end('Yo !');
     })
     .use('/auth', authRouter)
-    .use('/stream', streamRouter);
+    .use('/stream', isLoggedIn, streamRouter);
 
 module.exports = router;

@@ -8,8 +8,11 @@ const SUPPORTED_EXTENSIONS = new Set(['mp4', 'webm']);
 
 function transcode(extension, inputStream) {
     if (SUPPORTED_EXTENSIONS.has(extension)) {
+        console.log('do not need to transcode the movie');
         return inputStream;
     }
+
+    console.log('need to transcode the movie');
 
     // Transcode the video stream to a WebM stream
     // Cf. https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/274

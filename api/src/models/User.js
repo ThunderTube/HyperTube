@@ -1,9 +1,10 @@
-// const crypto = require('crypto');
 const mongoose = require('mongoose');
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const { Schema } = mongoose;
+
+const validPasswordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
 
 const userSchema = new Schema({
     username: {
@@ -44,16 +45,77 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'Please add a password'],
         match: [
-            /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/,
+            validPasswordRegex,
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
         ],
     },
-    profilPicture: {
+    profilePicture: {
         type: String,
-        default: 'no-photo.jpg',
+        required: [true, 'Please add a profile picture'],
     },
-    resetPwdToken: String,
-    resetPwdExpire: Date,
+    csrfSecret: {
+        type: String,
+    },
+    confirmationLinkUuid: {
+        type: String,
+    },
+    isConfirmed: {
+        type: Boolean,
+        default: false,
+    },
+    passwordResets: {
+        type: [{ token: String, expiresAt: Date }],
+        default() {
+            return [];
+        },
+    },
 });
 
-module.exports = mongoose.model('User', userSchema);
+userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE,
+    });
+};
+
+// Encrypt password using bcrypt
+userSchema.pre('save', async function(next) {
+    this.password = await hashPassword(this.password);
+    next();
+});
+
+// Verify if username and email is unique
+userSchema.statics.isUnique = async function isUnique({ email, username }) {
+    if ((await this.countDocuments({ email })) !== 0) {
+        return 'email';
+    }
+    if ((await this.countDocuments({ username })) !== 0) {
+        return 'username';
+    }
+    return true;
+};
+
+userSchema.statics.verifyJWT = function verifyJWT(rawJwt) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(rawJwt, process.env.JWT_SECRET, (err, decoded) => {
+            if (err !== null) {
+                reject(err);
+                return;
+            }
+
+            resolve(decoded);
+        });
+    });
+};
+
+function hashPassword(password) {
+    return new Promise((resolve, reject) => {
+        bcrypt.hash(password, 10, function(err, hash) {
+            if (err) reject(err);
+            resolve(hash);
+        });
+    });
+}
+
+exports.User = mongoose.model('User', userSchema);
+exports.validPasswordRegex = validPasswordRegex;
+exports.hashPassword = hashPassword;

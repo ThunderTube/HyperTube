@@ -1,11 +1,16 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const sirv = require('sirv');
 const { join } = require('path');
 const cors = require('cors');
+const passport = require('passport');
+const Tokens = require('csrf');
 
 const connectDB = require('./config/db');
-
+const Mail = require('./email');
+const { User } = require('./models/User');
+const setupPassport = require('./config/passport');
 const router = require('./routes');
 
 async function app() {
@@ -20,6 +25,11 @@ async function app() {
         server.use(morgan('dev'));
     }
 
+    const email = new Mail();
+    const csrf = new Tokens();
+
+    setupPassport();
+
     server
         .use(express.json())
         .use(assets)
@@ -29,6 +39,22 @@ async function app() {
                 origin: true,
             })
         )
+        .use(cookieParser(process.env.COOKIE_SECRET))
+        .use(passport.initialize())
+        .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
+        .use((req, res, next) => {
+            // This middleware sets the context
+
+            res.locals = {
+                email,
+                csrf,
+                isAuthenticated: req.isAuthenticated(),
+                authorizations: User.isConfirmed === true ? ['user'] : [],
+                user: req.user || null,
+            };
+
+            next();
+        })
         .use('/api/v1', router)
         .listen(process.env.PORT, err => {
             if (err) {
