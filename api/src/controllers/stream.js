@@ -24,9 +24,23 @@ function toFilesMapKey(id, resolution) {
     return `${id}|${resolution}`;
 }
 
+function hasWatchedTheMovie({ _id }) {
+    const userId = _id.toString();
+
+    return movie => {
+        const { watchedBy, ...props } = movie.toObject();
+
+        return {
+            ...props,
+            watched: watchedBy.some(objectId => objectId.toString() === userId),
+        };
+    };
+}
+
 async function getVideos(req, res) {
     const {
         params: { offset, limit },
+        user,
     } = req;
     if (
         offset === undefined ||
@@ -44,7 +58,7 @@ async function getVideos(req, res) {
             .skip(Number(offset))
             .limit(Number(limit));
 
-        send(res, 200, movies);
+        send(res, 200, movies.map(hasWatchedTheMovie(user)));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -56,6 +70,7 @@ async function searchVideos(req, res) {
         const {
             params: { offset, limit },
             body: { query, genre, year },
+            user,
         } = req;
         if (typeof query !== 'string') {
             send(res, 400);
@@ -81,7 +96,7 @@ async function searchVideos(req, res) {
             .skip(Number(offset))
             .limit(Number(limit));
 
-        send(res, 200, movies);
+        send(res, 200, movies.map(hasWatchedTheMovie(user)));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -97,8 +112,8 @@ async function getVideoInformations(req, res) {
         }
 
         send(res, 200, {
-            ...movie.toObject(),
-            subtitles: await getSubtitles(movie.imdbId),
+            ...hasWatchedTheMovie(req.user)(movie),
+            // subtitles: await getSubtitles(movie.imdbId),
         });
     } catch (e) {
         console.error(e);
