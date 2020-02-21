@@ -17,12 +17,20 @@ function createRegisterMail(req, username, uuid, id) {
 // @access Public
 exports.register = async (req, res) => {
     try {
+        const {
+            body: { username, email, lastName, firstName, password },
+            file,
+        } = req;
         const { csrf } = res.locals;
+        if (file === undefined) {
+            res.status(400).json({
+                error: 'Invalid file',
+            });
+            return;
+        }
 
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
-
-        const { username, email, lastName, firstName, password } = req.body;
 
         const user = new User({
             username,
@@ -30,7 +38,7 @@ exports.register = async (req, res) => {
             lastName,
             firstName,
             password,
-            profilePicture: req.file.path,
+            profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
         });

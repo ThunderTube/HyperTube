@@ -243,6 +243,7 @@ async function getMovieStream(id, resolution) {
 async function getVideoStream(req, res) {
     const {
         params: { id, resolution },
+        user,
     } = req;
 
     try {
@@ -251,6 +252,12 @@ async function getVideoStream(req, res) {
             send(res, 404);
             return;
         }
+
+        // save that the user has watched this movie
+        await Movie.addUserToWatchedBySet({
+            imdbId: id,
+            userId: user._id,
+        });
 
         await file.pipe(res);
     } catch (e) {

@@ -1,5 +1,5 @@
 function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated) {
+    if (res.locals.isAuthenticated) {
         next();
         return;
     }
