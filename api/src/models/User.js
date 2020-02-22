@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const { Schema } = mongoose;
+
+const validPasswordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/;
 
 const userSchema = new Schema({
     username: {
@@ -43,13 +45,16 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'Please add a password'],
         match: [
-            /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/,
+            validPasswordRegex,
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
         ],
     },
-    profilPicture: {
+    profilePicture: {
         type: String,
-        default: 'no-photo.jpg',
+        required: [true, 'Please add a profile picture'],
+    },
+    csrfSecret: {
+        type: String,
     },
     confirmationLinkUuid: {
         type: String,
@@ -58,8 +63,12 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    resetPwdToken: String,
-    resetPwdExpire: Date,
+    passwordResets: {
+        type: [{ token: String, expiresAt: Date }],
+        default() {
+            return [];
+        },
+    },
 });
 
 userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
@@ -70,12 +79,7 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
-    this.password = await new Promise((resolve, reject) => {
-        bcrypt.hash(this.password, 10, function(err, hash) {
-            if (err) reject(err);
-            resolve(hash);
-        });
-    });
+    this.password = await hashPassword(this.password);
     next();
 });
 
@@ -103,4 +107,15 @@ userSchema.statics.verifyJWT = function verifyJWT(rawJwt) {
     });
 };
 
-module.exports = mongoose.model('User', userSchema);
+function hashPassword(password) {
+    return new Promise((resolve, reject) => {
+        bcrypt.hash(password, 10, function(err, hash) {
+            if (err) reject(err);
+            resolve(hash);
+        });
+    });
+}
+
+exports.User = mongoose.model('User', userSchema);
+exports.validPasswordRegex = validPasswordRegex;
+exports.hashPassword = hashPassword;

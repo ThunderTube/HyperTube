@@ -19,7 +19,7 @@
             <path d="M8 5v14l11-7z" />
             <path d="M0 0h24v24H0z" fill="none" />
           </svg>
-          <span class="pl-1">Play</span>
+          <span class="pl-1">{{ $t('movie.play') }}</span>
         </button>
       </div>
 

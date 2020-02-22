@@ -5,10 +5,11 @@ const sirv = require('sirv');
 const { join } = require('path');
 const cors = require('cors');
 const passport = require('passport');
+const Tokens = require('csrf');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
-const User = require('./models/User');
+const { User } = require('./models/User');
 const setupPassport = require('./config/passport');
 const router = require('./routes');
 
@@ -25,6 +26,7 @@ async function app() {
     }
 
     const email = new Mail();
+    const csrf = new Tokens();
 
     setupPassport();
 
@@ -34,7 +36,7 @@ async function app() {
         .use(
             cors({
                 credentials: true,
-                origin: true,
+                origin: 'http://localhost',
             })
         )
         .use(cookieParser(process.env.COOKIE_SECRET))
@@ -45,6 +47,7 @@ async function app() {
 
             res.locals = {
                 email,
+                csrf,
                 isAuthenticated: req.isAuthenticated(),
                 authorizations: User.isConfirmed === true ? ['user'] : [],
                 user: req.user || null,
@@ -52,7 +55,7 @@ async function app() {
 
             next();
         })
-        .use('/api/v1', router)
+        .use('/v1', router)
         .listen(process.env.PORT, err => {
             if (err) {
                 console.error('something bad happened', err);

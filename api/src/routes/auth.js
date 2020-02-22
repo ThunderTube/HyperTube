@@ -7,11 +7,12 @@ const {
 } = require('fs');
 const { join } = require('path');
 
-const { isLoggedIn } = require('./utils');
+const { isLoggedIn, validCSRF } = require('./utils');
 const {
     register,
     login,
     getMe,
+    getUser,
     confirmAccount,
     forgotPassword,
     resetPassword,
@@ -33,21 +34,34 @@ router
     )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
+    .get('/user/:id', getUser)
     .get('/confirmaccount/:uuid/:id', confirmAccount)
     .post('/forgotpassword', forgotPassword)
     .put('/resetpassword', resetPassword)
-    .put('/updatedetails', isLoggedIn, updateDetails)
-    .put('/updatepassword', isLoggedIn, updatePassword)
-    .post('/logout', isLoggedIn, logout);
+    .put(
+        '/updatedetails',
+        isLoggedIn,
+        validCSRF,
+        ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
+        updateDetails
+    )
+    .put('/updatepassword', isLoggedIn, validCSRF, updatePassword)
+    .post('/logout', isLoggedIn, validCSRF, logout);
 
 function uploadAndVerifyFileTypeMiddleware(
     fileProperty,
-    authorizedMimeTypes = IMAGE_MIMETYPES
+    authorizedMimeTypes = IMAGE_MIMETYPES,
+    optional = true
 ) {
     return [
         upload.single(fileProperty),
         async (req, res, next) => {
             try {
+                if (req.file === undefined && optional === true) {
+                    next();
+                    return;
+                }
+
                 const UPLOAD_DIRECTORY_PATH = join(
                     __dirname,
                     '../..',

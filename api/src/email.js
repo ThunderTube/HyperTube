@@ -1,5 +1,4 @@
 const { createTransport } = require('nodemailer');
-const Mailer = require('nodemailer/lib/mailer');
 
 const DEFAULT_EMAIL_ADDRESS = 'no-reply@thundertube.app';
 
