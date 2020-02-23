@@ -94,6 +94,13 @@ exports.register = async (req, res) => {
     }
 };
 
+// @desc Register user with 42 strategy
+// @route POST /api/v1/auth/42
+// @access Public
+exports.fortyTwoRegister = async (req, res) => {
+    res.json({ success: true });
+};
+
 // @desc Get confirm user
 // @route GET /api/v1/auth/confirmAccount/:uuid/:id
 // @access Public
