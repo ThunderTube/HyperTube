@@ -82,6 +82,35 @@ const movieSchema = new mongoose.Schema({
             },
         },
     ],
+    watchedBy: {
+        type: [mongoose.Types.ObjectId],
+        default() {
+            return [];
+        },
+    },
+    comments: {
+        type: [
+            {
+                userId: {
+                    type: mongoose.Types.ObjectId,
+                    required: true,
+                },
+                comment: {
+                    type: String,
+                    required: true,
+                },
+                createdAt: {
+                    type: Date,
+                    default() {
+                        return new Date();
+                    },
+                },
+            },
+        ],
+        default() {
+            return [];
+        },
+    },
 });
 
 // Create a text index to speed up searchs by `title` field.
@@ -169,6 +198,13 @@ movieSchema.statics.finishedUploading = function finishedUploading({
             },
         }
     );
+};
+
+movieSchema.statics.addUserToWatchedBySet = function addUserToWatchedBySet({
+    imdbId,
+    userId,
+}) {
+    return this.updateOne({ imdbId }, { $addToSet: { watchedBy: userId } });
 };
 
 exports.TORRENT_STATUSES = TORRENT_STATUSES;

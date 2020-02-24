@@ -4,8 +4,8 @@
         "register": "S'inscrire",
         "id": "Identifiant",
         "id_placeholder": "identifiant ou email",
-        "password": "Mot de pass",
-        "forgot_password": "Mot de pass oublié?",
+        "password": "Mot de passe",
+        "forgot_password": "Mot de passe oublié?",
         "register_input": "S'enregistrer",
         "register_form_title": "Formulaire d'inscription"
     },

@@ -23,18 +23,41 @@
           <div v-if="login.visible">
             <app-input
                 v-model="login.form.login"
-                v-bind:name="$t('loginscreen.id')"
-                v-bind:placeholder="$t('loginscreen.id_placeholder')"
+                :name="$t('loginscreen.id')"
+                :placeholder="$t('loginscreen.id_placeholder')"
             />
             <app-input
               v-model="login.form.password"
-              v-bind:name="$t('loginscreen.password')"
+              :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
             />
           </div>
           <div v-else-if="register.visible">
             {{ $t('loginscreen.register_form_title') }}
+            <app-input 
+              v-model="register.form.login" 
+              name="username" 
+              placeholder="username" />
+            <app-input 
+              v-model="register.form.email" 
+              type="email" 
+              name="email" 
+              placeholder="email" />
+            <app-input 
+              v-model="register.form.firstName" 
+              name="firstName" 
+              placeholder="first name" />
+            <app-input 
+              v-model="register.form.lastName" 
+              name="lastName" 
+              placeholder="last name" />
+            <app-input
+              v-model="register.form.password"
+              name="password"
+              type="password"
+              placeholder="********"
+            />
           </div>
           <div v-else-if="passwordForgot.visible">
             <app-input v-model="passwordForgot.form.login" name="password-forgot" placeholder="Login" />
@@ -43,7 +66,7 @@
             <a @click.prevent="selectAuthForm('password-forgot')" href="#" class="text-blue-600">{{ $t('loginscreen.forgot_password') }}</a>
           </div>
           <div class="flex justify-end py-2">
-            <button @click="$emit('auth:login', true)"
+            <button @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >{{ formType }}</button>
           </div>
@@ -54,6 +77,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import AppInput from '../components/AppInput'
 
 export default {
@@ -81,7 +105,10 @@ export default {
         visible: false,
         form: {
           login: '',
-          password: ''
+          email: '',
+          lastName: '',
+          firstName: '',
+          password: '',
         }
       },
       passwordForgot: {
@@ -93,6 +120,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      registerUser: "auth/registerUser"
+    }),
     selectAuthForm(formType) {
       this.formType = formType
       this.showAuthForm()
@@ -141,6 +171,7 @@ export default {
         } else if (this.register.visible) {
             // submit register form
             console.log('register')
+            this.registerUser(this.register.form)
         } else if (this.passwordForgot.visible) {
             // submit register form
             console.log('password forgot')

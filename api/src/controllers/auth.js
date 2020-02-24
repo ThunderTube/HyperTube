@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const ms = require('ms');
 
@@ -17,12 +17,20 @@ function createRegisterMail(req, username, uuid, id) {
 // @access Public
 exports.register = async (req, res) => {
     try {
+        const {
+            body: { username, email, lastName, firstName, password },
+            file,
+        } = req;
         const { csrf } = res.locals;
+        if (file === undefined) {
+            res.status(400).json({
+                error: 'Invalid file',
+            });
+            return;
+        }
 
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
-
-        const { username, email, lastName, firstName, password } = req.body;
 
         const user = new User({
             username,
@@ -30,7 +38,7 @@ exports.register = async (req, res) => {
             lastName,
             firstName,
             password,
-            profilePicture: req.file.path,
+            profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
         });
@@ -84,6 +92,13 @@ exports.register = async (req, res) => {
         console.error(e);
         res.sendStatus(500);
     }
+};
+
+// @desc Register user with 42 strategy
+// @route POST /api/v1/auth/42
+// @access Public
+exports.fortyTwoRegister = async (req, res) => {
+    res.json({ success: true });
 };
 
 // @desc Get confirm user

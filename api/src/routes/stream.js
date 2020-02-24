@@ -8,6 +8,8 @@ const {
     getDownloadingStatus,
     getVideoStream,
     getSubtitleForVideoAndLangcode,
+    commentMovie,
+    getMovieComments,
 } = require('../controllers/stream');
 const { POSSIBLE_GENRES } = require('../get-movies');
 
@@ -18,6 +20,8 @@ router
     .get('/videos/:offset/:limit', getVideos)
     .post('/videos/search/:offset/:limit', searchVideos)
     .get('/video/:id', getVideoInformations)
+    .post('/video/:id/comment', commentMovie)
+    .get('/video/:id/comments', getMovieComments)
     .get('/video/download/:id/:resolution', triggerVideoDownloading)
     .get('/video/status/:id/:resolution', getDownloadingStatus)
     .get('/video/chunks/:id/:resolution', getVideoStream)
