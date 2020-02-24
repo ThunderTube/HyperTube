@@ -36,7 +36,7 @@ async function app() {
         .use(
             cors({
                 credentials: true,
-                origin: true,
+                origin: 'http://localhost',
             })
         )
         .use(cookieParser(process.env.COOKIE_SECRET))
@@ -55,7 +55,7 @@ async function app() {
 
             next();
         })
-        .use('/api/v1', router)
+        .use('/v1', router)
         .listen(process.env.PORT, err => {
             if (err) {
                 console.error('something bad happened', err);
