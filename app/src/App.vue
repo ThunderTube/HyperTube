@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
 
@@ -21,10 +22,10 @@ export default {
     AppMenu,
     AuthScreen
   },
-  data() {
-    return {
-      isLoggedIn: false
-    }
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn'
+    })
   }
 }
 </script>

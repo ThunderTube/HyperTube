@@ -43,14 +43,14 @@
               type="password"
               placeholder="********"
             />
-            <div class="block">
+            <!-- <div class="block"> -->
               <!-- <app-input
                 ref="file"
                 name="file"
                 type="file"
               />-->
-              <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" />
-            </div>
+              <!-- <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" />
+            </div> -->
           </div>
           <div v-else-if="passwordForgot.visible">
             <app-input
