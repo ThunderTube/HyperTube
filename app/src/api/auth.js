@@ -4,7 +4,7 @@ const AUTH = '/auth'
 
 const register = (data) => axios.post(`${AUTH}/register`, data)
 
-const login = (data) => axios.post(`${AUTH}/login`, { data })
+const login = (data) => axios.post(`${AUTH}/login`, data)
 
 // const me = (data) => axios.get(`${AUTH}/me`, { data });
 
@@ -12,7 +12,7 @@ const login = (data) => axios.post(`${AUTH}/login`, { data })
 
 // const getUser = (id, data) => axios.get(`${AUTH}/user/${id}`, { data });
 
-const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, { data })
+const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, data)
 
 // const resetPassword = (data) => axios.put(`${AUTH}/resetpassword`, { data });
 

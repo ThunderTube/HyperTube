@@ -130,7 +130,9 @@ exports.confirmAccount = async (req, res) => {
 // @access Public
 exports.login = async (req, res) => {
     try {
-        const { username, password } = req.body.data;
+        const {
+            body: { username, password },
+        } = req;
         const { csrf } = res.locals;
 
         const user = await User.findOne({ username });
@@ -210,7 +212,9 @@ exports.forgotPassword = async (req, res) => {
      * 5. the front makes a request to effectively reset the password
      */
     try {
-        const { username } = req.body.data;
+        const {
+            body: { username },
+        } = req;
         const {
             locals: { email },
         } = res;
