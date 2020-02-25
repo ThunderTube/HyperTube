@@ -24,9 +24,23 @@ function toFilesMapKey(id, resolution) {
     return `${id}|${resolution}`;
 }
 
+function hasWatchedTheMovie({ _id }) {
+    const userId = _id.toString();
+
+    return movie => {
+        const { watchedBy, ...props } = movie.toObject();
+
+        return {
+            ...props,
+            watched: watchedBy.some(objectId => objectId.toString() === userId),
+        };
+    };
+}
+
 async function getVideos(req, res) {
     const {
         params: { offset, limit },
+        user,
     } = req;
     if (
         offset === undefined ||
@@ -44,7 +58,7 @@ async function getVideos(req, res) {
             .skip(Number(offset))
             .limit(Number(limit));
 
-        send(res, 200, movies);
+        send(res, 200, movies.map(hasWatchedTheMovie(user)));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -56,6 +70,7 @@ async function searchVideos(req, res) {
         const {
             params: { offset, limit },
             body: { query, genre, year },
+            user,
         } = req;
         if (typeof query !== 'string') {
             send(res, 400);
@@ -81,7 +96,7 @@ async function searchVideos(req, res) {
             .skip(Number(offset))
             .limit(Number(limit));
 
-        send(res, 200, movies);
+        send(res, 200, movies.map(hasWatchedTheMovie(user)));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -90,15 +105,20 @@ async function searchVideos(req, res) {
 
 async function getVideoInformations(req, res) {
     try {
-        const movie = await Movie.findOne({ imdbId: req.params.id });
+        const {
+            params: { id: imdbId },
+            user,
+        } = req;
+
+        const movie = await Movie.findOne({ imdbId });
         if (!movie) {
             send(res, 404);
             return;
         }
 
         send(res, 200, {
-            ...movie.toObject(),
-            subtitles: await getSubtitles(movie.imdbId),
+            ...hasWatchedTheMovie(user)(movie),
+            // subtitles: await getSubtitles(movie.imdbId),
         });
     } catch (e) {
         console.error(e);
@@ -296,6 +316,73 @@ async function getSubtitleForVideoAndLangcode(req, res) {
     }
 }
 
+async function commentMovie(req, res) {
+    try {
+        const {
+            body: { comment },
+            params: { id: imdbId },
+            user: { _id: userId },
+        } = req;
+        if (!(typeof comment === 'string' && comment.length > 0)) {
+            send(res, 400, {
+                error: 'The comment is not valid',
+            });
+            return;
+        }
+
+        const movie = await Movie.findOne({ imdbId });
+        if (movie === null) {
+            send(res, 404, {
+                error: 'This movie does not exist',
+            });
+            return;
+        }
+
+        movie.comments.push({
+            userId,
+            comment,
+        });
+
+        await movie.save();
+
+        send(res, 200, {
+            success: true,
+            message: 'The comment has been saved successfully',
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured during comment saving',
+        });
+    }
+}
+
+async function getMovieComments(req, res) {
+    try {
+        const {
+            params: { id: imdbId },
+        } = req;
+
+        const movie = await Movie.findOne({ imdbId }).sort({ createdAt: -1 });
+        if (movie === null) {
+            send(res, 404, {
+                error: 'Could not get comments for this movie',
+            });
+            return;
+        }
+
+        send(res, 200, {
+            imdbId,
+            comments: movie.toObject().comments,
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured during comments getting',
+        });
+    }
+}
+
 module.exports = {
     getVideos,
     searchVideos,
@@ -304,4 +391,6 @@ module.exports = {
     getDownloadingStatus,
     getVideoStream,
     getSubtitleForVideoAndLangcode,
+    commentMovie,
+    getMovieComments,
 };

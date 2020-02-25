@@ -12,14 +12,27 @@ function createRegisterMail(req, username, uuid, id) {
     : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
 }
 
+function createCookie(res, token) {
+    res.cookie('cookie-id', token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
+        signed: true,
+    });
+
+    return res;
+}
+
 // @desc Register user
 // @route POST /api/v1/auth/register
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const { 
-            
-            username, email, lastName, firstName, password 
+        const {
+            username,
+            email,
+            lastName,
+            firstName,
+            password,
             //file,
         } = req.body.data;
 
@@ -30,10 +43,10 @@ exports.register = async (req, res) => {
         //     });
         //     return;
         // }
-        
+
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
-        
+
         const user = new User({
             username,
             email,
@@ -44,7 +57,7 @@ exports.register = async (req, res) => {
             confirmationLinkUuid,
             csrfSecret,
         });
-        
+
         try {
             await user.validate();
         } catch (e) {
@@ -52,18 +65,18 @@ exports.register = async (req, res) => {
             res.status(200).json({ success: false, error: msg });
             return;
         }
-        
+
         const isUserUnique = await User.isUnique({
             email,
             username,
         });
-        
+
         if (isUserUnique === true) {
             const csrfToken = csrf.create(csrfSecret);
-            
+
             await user.save();
             const token = user.getSignedJwtToken();
-            
+
             res.locals.email.send({
                 to: user.email,
                 subject: 'coucou',
@@ -72,15 +85,12 @@ exports.register = async (req, res) => {
                     user.username,
                     user.confirmationLinkUuid,
                     user._id
-                    ),
-                });
-                res.cookie('cookie-id', token, {
-                    httpOnly: true,
-                    expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
-                    signed: true,
-                }).json({ success: true, csrfToken });
-            } else if (isUserUnique === 'username') {
-                res.status(200).json({
+                ),
+            });
+
+            createCookie(res, token).json({ success: true, csrfToken });
+        } else if (isUserUnique === 'username') {
+            res.status(200).json({
                 success: false,
                 error: 'Username taken',
             });
@@ -94,6 +104,13 @@ exports.register = async (req, res) => {
         console.error(e);
         res.sendStatus(500);
     }
+};
+
+// @desc Register user with 42 strategy
+// @route POST /api/v1/auth/42
+// @access Public
+exports.fortyTwoRegister = async (req, res) => {
+    res.json({ success: true });
 };
 
 // @desc Get confirm user
@@ -123,7 +140,7 @@ exports.login = async (req, res) => {
         const { username, password } = req.body.data;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username }).lean();
+        const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
             res.status(200).json({
@@ -141,9 +158,14 @@ exports.login = async (req, res) => {
 
             return;
         }
+        const cookieToken = user.getSignedJwtToken();
         const csrfToken = csrf.create(user.csrfSecret);
 
-        res.json({ success: true, user, csrfToken });
+        createCookie(res, cookieToken).json({
+            success: true,
+            user: user.toObject(),
+            csrfToken,
+        });
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
@@ -195,9 +217,7 @@ exports.forgotPassword = async (req, res) => {
      * 5. the front makes a request to effectively reset the password
      */
     try {
-        const {
-            username
-        } = req.body.data;
+        const { username } = req.body.data;
         const {
             locals: { email },
         } = res;

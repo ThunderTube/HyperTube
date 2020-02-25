@@ -6,6 +6,7 @@ const {
     promises: { writeFile, unlink, mkdir },
 } = require('fs');
 const { join } = require('path');
+const passport = require('passport');
 
 const { isLoggedIn, validCSRF } = require('./utils');
 const {
@@ -19,6 +20,8 @@ const {
     updateDetails,
     updatePassword,
     logout,
+    fortyTwoRegister,
+    // fortyTwoCallback,
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -32,6 +35,12 @@ router
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         register
     )
+    .post(
+        '/42',
+        passport.authenticate('42', { failureRedirect: '/login' }),
+        fortyTwoRegister
+    )
+    // .post('/42/callback', passport.authenticate('42'), fortyTwoCallback)
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)

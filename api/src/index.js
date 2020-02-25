@@ -35,8 +35,8 @@ async function app() {
         .use(assets)
         .use(
             cors({
-                //credentials: true,
-                origin: 'http://localhost',
+                credentials: true,
+                origin: ['http://localhost', 'http://localhost:3000'],
             })
         )
         .use(cookieParser(process.env.COOKIE_SECRET))

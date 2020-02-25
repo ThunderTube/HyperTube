@@ -1,18 +1,6 @@
-version: '3'
+version: "3"
 
 services:
-  server:
-    container_name: server
-    build:
-      context: ../.
-      dockerfile: docker/server/Dockerfile.dev
-    image: hypertube-server
-    ports:
-      - '80:80'
-    links:
-      - api:api
-      - app:app
-
   app:
     container_name: app
     build:
@@ -22,13 +10,13 @@ services:
     environment:
       - NODE_ENV=development
       - TZ=Europe/Paris
-      - VUE_APP_BASE_URL=http://localhost/api/v1
+      - VUE_APP_BASE_URL=http://localhost:8080/v1
       - VUE_APP_I18N_LOCALE=en
       - VUE_APP_I18N_FALLBACK_LOCALE=en
     volumes:
       - ./../app:/usr/src/app
     ports:
-      - '3000:3000'
+      - "3000:3000"
 
   api:
     container_name: api
@@ -41,11 +29,11 @@ services:
     volumes:
       - ./../api:/usr/src/api
     ports:
-      - '8080:8080'
+      - "8080:8080"
     links:
       - mongo:mongo
     depends_on:
-      - 'mongo'
+      - "mongo"
 
   mongo:
     container_name: mongo
@@ -56,4 +44,4 @@ services:
     volumes:
       - ./mongo/data/db:/data/db
     ports:
-      - 27017:27017
+      - "27017:27017"
