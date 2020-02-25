@@ -31,7 +31,7 @@ exports.register = async (req, res) => {
             body: { username, email, lastName, firstName, password },
             file,
         } = req;
-        const { csrf } = res.locals;
+        const { csrf, email } = res.locals;
         if (file === undefined) {
             res.status(400).json({
                 error: 'Invalid file',
@@ -70,9 +70,9 @@ exports.register = async (req, res) => {
             await user.save();
             const token = user.getSignedJwtToken();
 
-            res.locals.email.send({
+            email.send({
                 to: user.email,
-                subject: 'coucou',
+                subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
                     req,
                     user.username,
