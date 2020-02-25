@@ -196,15 +196,15 @@ exports.forgotPassword = async (req, res) => {
      */
     try {
         const {
-            body: { username },
-        } = req;
+            username
+        } = req.body.data;
         const {
             locals: { email },
         } = res;
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Unknown account'] });
+            res.status(200).json({ success: false, error: 'Unknown account' });
             return;
         }
 

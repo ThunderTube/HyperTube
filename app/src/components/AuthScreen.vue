@@ -32,7 +32,7 @@
             />
           </div>
           <div v-else-if="register.visible">
-            {{ $t('loginscreen.register_form_title') }}
+            <!-- {{ $t('loginscreen.register_form_title') }} -->
             <app-input v-model="register.form.username" name="username" placeholder="username" />
             <app-input v-model="register.form.email" type="email" name="email" placeholder="email" />
             <app-input v-model="register.form.firstName" name="firstName" placeholder="first name" />
@@ -44,13 +44,13 @@
               placeholder="********"
             />
             <!-- <div class="block"> -->
-              <!-- <app-input
+            <!-- <app-input
                 ref="file"
                 name="file"
                 type="file"
-              />-->
-              <!-- <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" />
-            </div> -->
+            />-->
+            <!-- <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" />
+            </div>-->
           </div>
           <div v-else-if="passwordForgot.visible">
             <app-input
@@ -79,7 +79,7 @@
 </template>
 
 <script>
- import axios from 'axios'
+import axios from 'axios'
 import { mapActions } from 'vuex'
 import AppInput from '../components/AppInput'
 
@@ -104,7 +104,6 @@ export default {
           password: ''
         }
       },
-      file: '',
       register: {
         visible: false,
         form: {
@@ -112,7 +111,7 @@ export default {
           email: '',
           lastName: '',
           firstName: '',
-          password: '',
+          password: ''
         }
       },
       passwordForgot: {
@@ -124,12 +123,13 @@ export default {
     }
   },
   methods: {
-    handleFileUpload(){
-    this.file = this.$refs.file.files[0];
-  },
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0]
+    },
     ...mapActions({
-      registerUser: "auth/registerUser",
-      loginUser: "auth/loginUser"
+      registerUser: 'auth/registerUser',
+      loginUser: 'auth/loginUser',
+      forgotUserPassword: 'auth/forgotUserPassword'
     }),
     selectAuthForm(formType) {
       this.formType = formType
@@ -144,7 +144,7 @@ export default {
           password: '',
           email: '',
           lastName: '',
-          firstName: '',
+          firstName: ''
         }
         this.passwordForgot.form = {
           username: ''
@@ -173,46 +173,45 @@ export default {
           password: '',
           email: '',
           lastName: '',
-          firstName: '',
+          firstName: ''
         }
         this.passwordForgot.visible = true
       }
     },
-    getRegisterFormData() {
-        const formData = new FormData()
-        // formData.append("file", this.file)
-        formData.append("username", this.register.form.username)
-        formData.append("password", this.register.form.password)
-        formData.append("email", this.register.form.email)
-        formData.append("lastName", this.register.form.lastName)
-        formData.append("firstName", this.register.form.email)
-
-        return formData
-    },
-    // uploadImage(event) {
-    //   let data = new FormData();
-    //   data.append('file', event.target.files[0]); 
-    //   this.file = data
-    // },
-    async submitForm() {        
+    async submitForm() {
+      try {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
-            if (!res.data.success)
-                return console.log('login !res.data.success show error message ', res.data)
-            // Logged in user path
+          if (!res.data.success)
+            return console.log(
+              'login !res.data.success show error message ',
+              res.data
+            )
         } else if (this.register.visible) {
-            const res = await this.registerUser(this.register.form)
-            if (!res.data.success)
-                return console.log('register !res.data.success show error message ', res.data)
-            this.formType = 'login'
-            this.login.form.username = this.register.form.username
-            this.login.form.password = this.register.form.password
-            this.showAuthForm()
+          const res = await this.registerUser(this.register.form)
+          if (!res.data.success)
+            return console.log(
+              'register !res.data.success show error message ',
+              res.data
+            )
+          this.formType = 'login'
+          this.login.form.username = this.register.form.username
+          this.login.form.password = this.register.form.password
+          this.showAuthForm()
         } else if (this.passwordForgot.visible) {
-          // submit register form
-            console.log('password forgot')
+          console.log('password forgot')
+          const res = await this.forgotUserPassword(this.passwordForgot.form)
+          if (!res.data.success)
+            return console.log(
+              'forgotPassword !res.data.success show error message ',
+              res.data
+            )
+          console.log(res)
         }
+      } catch (error) {
+        console.log('error in submitForm ', error)
       }
+    }
   }
 }
 </script>
