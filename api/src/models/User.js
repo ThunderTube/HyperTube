@@ -51,7 +51,8 @@ const userSchema = new Schema({
     },
     profilePicture: {
         type: String,
-        required: [true, 'Please add a profile picture'],
+        required: false
+        //required: [false, 'Please add a profile picture'],
     },
     csrfSecret: {
         type: String,

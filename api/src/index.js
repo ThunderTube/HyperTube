@@ -35,7 +35,7 @@ async function app() {
         .use(assets)
         .use(
             cors({
-                credentials: true,
+                //credentials: true,
                 origin: 'http://localhost',
             })
         )

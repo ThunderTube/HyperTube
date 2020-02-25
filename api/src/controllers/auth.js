@@ -17,51 +17,53 @@ function createRegisterMail(req, username, uuid, id) {
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const {
-            body: { username, email, lastName, firstName, password },
-            file,
-        } = req;
-        const { csrf } = res.locals;
-        if (file === undefined) {
-            res.status(400).json({
-                error: 'Invalid file',
-            });
-            return;
-        }
+        const { 
+            
+            username, email, lastName, firstName, password 
+            //file,
+        } = req.body.data;
 
+        const { csrf } = res.locals;
+        // if (file === undefined) {
+        //     res.status(400).json({
+        //         error: 'Invalid file',
+        //     });
+        //     return;
+        // }
+        
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
-
+        
         const user = new User({
             username,
             email,
             lastName,
             firstName,
             password,
-            profilePicture: file.path,
+            // profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
         });
-
+        
         try {
             await user.validate();
         } catch (e) {
             let msg = Object.values(e.errors).map(val => val.message);
-            res.status(400).json({ success: false, error: msg });
+            res.status(200).json({ success: false, error: msg });
             return;
         }
-
+        
         const isUserUnique = await User.isUnique({
             email,
             username,
         });
-
+        
         if (isUserUnique === true) {
             const csrfToken = csrf.create(csrfSecret);
-
+            
             await user.save();
             const token = user.getSignedJwtToken();
-
+            
             res.locals.email.send({
                 to: user.email,
                 subject: 'coucou',
@@ -70,20 +72,20 @@ exports.register = async (req, res) => {
                     user.username,
                     user.confirmationLinkUuid,
                     user._id
-                ),
-            });
-            res.cookie('cookie-id', token, {
-                httpOnly: true,
-                expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
-                signed: true,
-            }).json({ success: true, csrfToken });
-        } else if (isUserUnique === 'username') {
-            res.status(400).json({
+                    ),
+                });
+                res.cookie('cookie-id', token, {
+                    httpOnly: true,
+                    expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
+                    signed: true,
+                }).json({ success: true, csrfToken });
+            } else if (isUserUnique === 'username') {
+                res.status(200).json({
                 success: false,
                 error: 'Username taken',
             });
         } else if (isUserUnique === 'email') {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Email taken',
             });
@@ -118,13 +120,13 @@ exports.confirmAccount = async (req, res) => {
 // @access Public
 exports.login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password } = req.body.data;
         const { csrf } = res.locals;
 
         const user = await User.findOne({ username }).lean();
         if (user === null) {
             // Could not find a user with this username
-            res.status(401).json({
+            res.status(200).json({
                 success: false,
                 error: 'No user found',
             });
@@ -132,7 +134,7 @@ exports.login = async (req, res) => {
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Invalid password',
             });
