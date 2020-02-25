@@ -9,7 +9,7 @@ const YEAR_IN_MILLISECONDES = 3.154e10;
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
+    : ${req.protocol}://${req.hostname}:3000/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
@@ -118,7 +118,7 @@ exports.confirmAccount = async (req, res) => {
         await user.save();
         res.json({ success: true });
     } else {
-        res.status(400).json({
+        res.status(200).json({
             success: false,
             error: 'Wrong confirmation link',
         });

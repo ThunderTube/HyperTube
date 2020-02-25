@@ -8,7 +8,7 @@ const login = (data) => axios.post(`${AUTH}/login`, data)
 
 // const me = (data) => axios.get(`${AUTH}/me`, { data });
 
-// const confirmAccount = (uuid, id, data) => axios.get(`${AUTH}/confirmaccount/${uuid}/${id}`, { data });
+const confirmAccount = (uuid, id) => axios.get(`${AUTH}/confirmaccount/${uuid}/${id}`);
 
 // const getUser = (id, data) => axios.get(`${AUTH}/user/${id}`, { data });
 
@@ -26,7 +26,7 @@ export {
   register,
   login,
   // me,
-  // confirmAccount,
+  confirmAccount,
   // getUser,
   forgotPassword
   // resetPassword,

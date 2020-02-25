@@ -2,13 +2,21 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
+import { confirmAccount } from '../api/auth'
 
 Vue.use(Router)
 
-export default new Router({
+const router =  new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
+    {
+      path: '/confirmaccount/:uuid/:id',
+      name: 'account_confirmation',
+      beforeEnter: requireHash,
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/UserConfirmation.vue')
+    },
     {
       path: '/',
       redirect: `/${i18n.locale}`
@@ -27,9 +35,6 @@ export default new Router({
         {
           path: 'movie',
           name: 'movie',
-          // route level code-splitting
-          // this generates a separate chunk (about.[hash].js) for this route
-          // which is lazy-loaded when the route is visited.
           component: () =>
             import(/* webpackChunkName: "movie" */ '../views/Movie.vue')
         }
@@ -37,3 +42,24 @@ export default new Router({
     }
   ]
 })
+
+async function requireHash(to, from, next) {
+  try {
+    const uuid = to.params.uuid
+    const id = to.params.id
+    if (!id || !uuid)
+      next('/')
+    const result = await confirmAccount(uuid, id)
+    if (!result.data.success) {
+      console.log('confirmation failed')
+      return next('/')
+    }
+    console.log('confirmation success')
+    return next('/')
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
+export default router
