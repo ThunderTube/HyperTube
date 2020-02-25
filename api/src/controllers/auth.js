@@ -12,6 +12,16 @@ function createRegisterMail(req, username, uuid, id) {
     : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
 }
 
+function createCookie(res, token) {
+    res.cookie('cookie-id', token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
+        signed: true,
+    });
+
+    return res;
+}
+
 // @desc Register user
 // @route POST /api/v1/auth/register
 // @access Public
@@ -72,11 +82,8 @@ exports.register = async (req, res) => {
                     user._id
                 ),
             });
-            res.cookie('cookie-id', token, {
-                httpOnly: true,
-                expires: new Date(Date.now() + YEAR_IN_MILLISECONDES),
-                signed: true,
-            }).json({ success: true, csrfToken });
+
+            createCookie(res, token).json({ success: true, csrfToken });
         } else if (isUserUnique === 'username') {
             res.status(400).json({
                 success: false,
@@ -128,7 +135,7 @@ exports.login = async (req, res) => {
         const { username, password } = req.body;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username }).lean();
+        const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
             res.status(401).json({
@@ -146,9 +153,14 @@ exports.login = async (req, res) => {
 
             return;
         }
+        const cookieToken = user.getSignedJwtToken();
         const csrfToken = csrf.create(user.csrfSecret);
 
-        res.json({ success: true, user, csrfToken });
+        createCookie(res, cookieToken).json({
+            success: true,
+            user: user.toObject(),
+            csrfToken,
+        });
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
