@@ -1,10 +1,10 @@
-import axios from './axios';
+import axios from './axios'
 
-const AUTH = '/auth';
+const AUTH = '/auth'
 
-const register = (data) => axios.post(`${AUTH}/register`, { data });
+const register = (data) => axios.post(`${AUTH}/register`, data)
 
-const login = (data) => axios.post(`${AUTH}/login`, { data });
+const login = (data) => axios.post(`${AUTH}/login`, { data })
 
 // const me = (data) => axios.get(`${AUTH}/me`, { data });
 
@@ -12,7 +12,7 @@ const login = (data) => axios.post(`${AUTH}/login`, { data });
 
 // const getUser = (id, data) => axios.get(`${AUTH}/user/${id}`, { data });
 
-const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, { data });
+const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, { data })
 
 // const resetPassword = (data) => axios.put(`${AUTH}/resetpassword`, { data });
 
@@ -23,14 +23,14 @@ const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, { data });
 // const logout = (data) => axios.post(`${AUTH}/logout`, { data });
 
 export {
-    register,
-    login,
-    // me,
-    // confirmAccount,
-    // getUser,
-    forgotPassword,
-    // resetPassword,
-    // updateDetails,
-    // updatePassword,
-    // logout
+  register,
+  login,
+  // me,
+  // confirmAccount,
+  // getUser,
+  forgotPassword
+  // resetPassword,
+  // updateDetails,
+  // updatePassword,
+  // logout
 }

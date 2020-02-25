@@ -28,21 +28,16 @@ function createCookie(res, token) {
 exports.register = async (req, res) => {
     try {
         const {
-            username,
-            email,
-            lastName,
-            firstName,
-            password,
-            //file,
-        } = req.body.data;
-
+            body: { username, email, lastName, firstName, password },
+            file,
+        } = req;
         const { csrf } = res.locals;
-        // if (file === undefined) {
-        //     res.status(400).json({
-        //         error: 'Invalid file',
-        //     });
-        //     return;
-        // }
+        if (file === undefined) {
+            res.status(400).json({
+                error: 'Invalid file',
+            });
+            return;
+        }
 
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
@@ -53,7 +48,7 @@ exports.register = async (req, res) => {
             lastName,
             firstName,
             password,
-            // profilePicture: file.path,
+            profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
         });
@@ -72,8 +67,6 @@ exports.register = async (req, res) => {
         });
 
         if (isUserUnique === true) {
-            const csrfToken = csrf.create(csrfSecret);
-
             await user.save();
             const token = user.getSignedJwtToken();
 
@@ -88,7 +81,7 @@ exports.register = async (req, res) => {
                 ),
             });
 
-            createCookie(res, token).json({ success: true, csrfToken });
+            createCookie(res, token).json({ success: true });
         } else if (isUserUnique === 'username') {
             res.status(200).json({
                 success: false,
