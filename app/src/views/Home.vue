@@ -1,30 +1,32 @@
 <template>
-  <div class="w-full container overflow-hidden mx-auto min-h-screen">
-    <div class="px-2">
-      <div class="flex flex-wrap -mx-2">
-        <div
-          v-for="i in number_of_movies"
-          :key="i"
-          class="w-full md:w-1/3 lg:w-1/5 p-2"
-        >
-          <movie-thumbnail />
-        </div>
+  <div class="w-full container overflow-hidden mx-auto h-screen pt-8 relative">
+    <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">Search</h1>
+
+    <movies-search-bar class="mb-4" />
+
+    <movies-container>
+      <div v-for="i in number_of_movies" :key="i" class="w-full md:w-1/3 lg:w-1/5 p-2">
+        <movie-thumbnail />
       </div>
-    </div>
+    </movies-container>
   </div>
 </template>
 
 <script>
+import MoviesSearchBar from '@/components/MoviesSearchBar.vue'
+import MoviesContainer from '@/components/MoviesContainer.vue'
 import MovieThumbnail from '@/components/MovieThumbnail.vue'
 
 export default {
   name: 'home',
   components: {
-    MovieThumbnail
+    MovieThumbnail,
+    MoviesSearchBar,
+    MoviesContainer
   },
   data() {
     return {
-      number_of_movies: 50
+      number_of_movies: 100
     }
   }
 }
