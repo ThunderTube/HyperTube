@@ -26,7 +26,7 @@ function createCookie(res, token) {
 
     return res;
 }
-exports.controllerFortyTwo = async (req, res, next) => {
+exports.controllerFortyTwo = async (req, res) => {
     try {
         const { user: passportUser } = req;
         const { csrf } = res.locals;
@@ -78,17 +78,10 @@ exports.controllerFortyTwo = async (req, res, next) => {
                 `http://localhost:3000/?token=${csrfToken}`
             );
         } else if (isUserUnique === 'username') {
-            res.status(400).json({
-                success: false,
-                error: 'Username taken',
-            });
+            res.status(400).redirect('/?error=username'); // Error for email already taken
         } else if (isUserUnique === 'email') {
-            res.status(400).json({
-                success: false,
-                error: 'Email taken',
-            });
+            res.status(400).redirect('/?error=email'); // Error for username already taken
         }
-        next();
     } catch (e) {
         console.error(e);
     }

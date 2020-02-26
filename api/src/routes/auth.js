@@ -47,15 +47,7 @@ router
             next();
         }
     )
-    .get(
-        '/42/callback',
-        passport.authenticate('42'),
-        controllerFortyTwo
-        // (req, res) => {
-        //     console.log('YOLOOO');
-        //     res.redirect('/');
-        // }
-    )
+    .get('/42/callback', passport.authenticate('42'), controllerFortyTwo)
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
