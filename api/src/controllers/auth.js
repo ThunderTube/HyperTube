@@ -72,7 +72,7 @@ exports.register = async (req, res) => {
 
             res.locals.email.send({
                 to: user.email,
-                subject: 'coucou',
+                subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
                     req,
                     user.username,
