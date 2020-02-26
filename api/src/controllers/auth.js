@@ -14,7 +14,7 @@ const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
 // const { createUploadPathIfNotExist } = require('../routes/auth');
 
-const YEAR_IN_MILLISECONDES = 3.154e10;
+const YEAR_IN_MILLISECONDES = ms('1 year');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
