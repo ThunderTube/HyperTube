@@ -43,7 +43,7 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please add a password'],
+        // required: [true, 'Please add a password'],
         match: [
             validPasswordRegex,
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
@@ -51,7 +51,7 @@ const userSchema = new Schema({
     },
     profilePicture: {
         type: String,
-        required: [true, 'Please add a profile picture'],
+        // required: [true, 'Please add a profile picture'],
     },
     csrfSecret: {
         type: String,
@@ -79,7 +79,10 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
-    this.password = await hashPassword(this.password);
+    if (this.password) {
+        this.password = await hashPassword(this.password);
+        next();
+    }
     next();
 });
 

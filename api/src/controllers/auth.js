@@ -1,8 +1,13 @@
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const stream = require('stream');
+const fs = require('fs');
 const ms = require('ms');
+const got = require('got');
+const { extname, join } = require('path');
 
+const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
@@ -21,16 +26,93 @@ function createCookie(res, token) {
 
     return res;
 }
+exports.controllerFortyTwo = async (req, res, next) => {
+    try {
+        const { user: passportUser } = req;
+        const { csrf } = res.locals;
+        const isUserUnique = await User.isUnique({
+            email: passportUser.email,
+            username: passportUser.username,
+        });
+        console.log('User unique : ', isUserUnique);
+
+        if (isUserUnique === true) {
+            const {
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture,
+            } = passportUser;
+
+            const fileExtension = extname(profilePicture).slice(1);
+            const filename = `${uuid()}.${fileExtension}`;
+
+            // We fetch the file and save it locally
+            await pipeline(
+                got.stream(profilePicture),
+                fs.createWriteStream(
+                    join(__dirname, '../../public/uploads', filename)
+                )
+            );
+
+            const csrfSecret = await csrf.secret();
+
+            const user = new User({
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture: filename,
+                isConfirmed: true,
+                csrfSecret,
+            });
+            await user.save();
+
+            const csrfToken = csrf.create(csrfSecret);
+            const token = user.getSignedJwtToken();
+
+            createCookie(res, token).redirect(
+                `http://localhost:3000/?token=${csrfToken}`
+            );
+        } else if (isUserUnique === 'username') {
+            res.status(400).json({
+                success: false,
+                error: 'Username taken',
+            });
+        } else if (isUserUnique === 'email') {
+            res.status(400).json({
+                success: false,
+                error: 'Email taken',
+            });
+        }
+        next();
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+function trimObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => [key, value.trim()])
+        .reduce((agg, [key, value]) => {
+            agg[key] = value;
+
+            return agg;
+        }, {});
+}
 
 // @desc Register user
 // @route POST /api/v1/auth/register
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const {
-            body: { username, email, lastName, firstName, password },
-            file,
-        } = req;
+        const { file } = req;
+        const { username, email, lastName, firstName, password } = trimObject(
+            req.body
+        );
         const { csrf } = res.locals;
         if (file === undefined) {
             res.status(400).json({
@@ -102,7 +184,7 @@ exports.register = async (req, res) => {
 };
 
 // @desc Register user with 42 strategy
-// @route POST /api/v1/auth/42
+// @route GET /api/v1/auth/42
 // @access Public
 exports.fortyTwoRegister = async (req, res) => {
     res.json({ success: true });

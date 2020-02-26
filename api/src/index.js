@@ -6,6 +6,7 @@ const { join } = require('path');
 const cors = require('cors');
 const passport = require('passport');
 const Tokens = require('csrf');
+const session = require('express-session');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
@@ -28,10 +29,12 @@ async function app() {
     const email = new Mail();
     const csrf = new Tokens();
 
-    setupPassport();
+    setupPassport(csrf);
 
     server
+        .use(cookieParser(process.env.COOKIE_SECRET))
         .use(express.json())
+        .use(express.urlencoded({ extended: false }))
         .use(assets)
         .use(
             cors({
@@ -39,12 +42,18 @@ async function app() {
                 origin: ['http://localhost', 'http://localhost:3000'],
             })
         )
-        .use(cookieParser(process.env.COOKIE_SECRET))
+        .use(
+            session({
+                secret: 'test',
+                saveUninitialized: false,
+                resave: false,
+            })
+        )
         .use(passport.initialize())
-        .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
+        .use(passport.session())
+        .use(passport.authenticate(['jwt', 'anonymous']))
         .use((req, res, next) => {
             // This middleware sets the context
-
             res.locals = {
                 email,
                 csrf,

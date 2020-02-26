@@ -2,16 +2,21 @@ const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const AnonymousStrategy = require('passport-anonymous');
 const FortyTwoStrategy = require('passport-42').Strategy;
+const stream = require('stream');
+const { promisify } = require('util');
+const fs = require('fs');
+const got = require('got');
+const uuid = require('uuid/v4');
 
 const { User } = require('../models/User');
 
-module.exports = async function setupFortyTwoStrategy() {
+module.exports = function setupPassport(csrf) {
     passport.use(
         new FortyTwoStrategy(
             {
                 clientID: process.env.FORTYTWO_CLIENT_ID,
                 clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-                callbackURL: 'http://localhost:3000/api/v1/auth/42/callback',
+                callbackURL: 'http://localhost:3000/v1/auth/42/callback',
                 profileFields: {
                     id(obj) {
                         return String(obj.id);
@@ -23,30 +28,12 @@ module.exports = async function setupFortyTwoStrategy() {
                     profilePicture: 'image_url',
                 },
             },
-            async function(accessToken, refreshToken, profile, cb) {
-                const isUserUnique = await User.isUnique({
-                    email: profile.email,
-                    username: profile.username,
-                });
-                if (isUserUnique === true) {
-                    console.log('User is unique');
-                    const user = new User({
-                        username,
-                        email,
-                        lastName,
-                        firstName,
-                        password,
-                        profilePicture: file.path,
-                        confirmationLinkUuid,
-                        csrfSecret,
-                    });
-                }
+            (accessToken, refreshToken, profile, cb) => {
+                cb(null, profile);
             }
         )
     );
-};
 
-module.exports = function setupPassport() {
     passport.use(
         new JwtStrategy(
             {
@@ -73,4 +60,15 @@ module.exports = function setupPassport() {
     );
 
     passport.use(new AnonymousStrategy());
+
+    passport.serializeUser(function(user, cb) {
+        console.log('serialize');
+
+        cb(null, user);
+    });
+
+    passport.deserializeUser(function(obj, cb) {
+        console.log('deserialize');
+        cb(null, obj);
+    });
 };

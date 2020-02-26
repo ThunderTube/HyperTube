@@ -20,6 +20,7 @@ const {
     updateDetails,
     updatePassword,
     logout,
+    controllerFortyTwo,
     fortyTwoRegister,
     // fortyTwoCallback,
 } = require('../controllers/auth');
@@ -35,12 +36,26 @@ router
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         register
     )
-    .post(
+    .get(
         '/42',
-        passport.authenticate('42', { failureRedirect: '/login' }),
-        fortyTwoRegister
+        passport.authenticate('42', {
+            failureRedirect: `$(proccess.env.FRONT_URI)`,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
     )
-    // .post('/42/callback', passport.authenticate('42'), fortyTwoCallback)
+    .get(
+        '/42/callback',
+        passport.authenticate('42'),
+        controllerFortyTwo
+        // (req, res) => {
+        //     console.log('YOLOOO');
+        //     res.redirect('/');
+        // }
+    )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
