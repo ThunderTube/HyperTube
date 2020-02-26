@@ -86,6 +86,9 @@
       </svg>
       <span>{{ $t('navbar.settings') }}</span>
     </router-link>
+    <a href="#">
+      Logout
+    </a>
 
     <div class="ml-8">
       <h2 class="text-white font-bold uppercase font-serif text-2xl">

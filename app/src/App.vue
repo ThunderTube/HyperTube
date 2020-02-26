@@ -41,7 +41,6 @@ export default {
   },
   async created() {
     try {
-      this.me()
       const res = await this.me()
       if (!res)
         return this.loading = false
