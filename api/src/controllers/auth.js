@@ -33,7 +33,8 @@ exports.register = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
         if (file === undefined) {
-            res.status(400).json({
+            res.status(200).json({
+                success: false,
                 error: 'Invalid file',
             });
             return;

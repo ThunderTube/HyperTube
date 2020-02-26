@@ -42,8 +42,10 @@ export default {
   async created() {
     try {
       const res = await this.me()
-      if (!res)
+      if (!res) {
+        this.$toast.open({ message: 'Please login or register an account', type: 'info'})
         return this.loading = false
+      }
       if (res.data.success)
         this.hasCookie = true
       setTimeout(() => {
@@ -52,9 +54,6 @@ export default {
     } catch (error) {
       console.log('app created ', error.message)
     }
-  },
-  mounted() {
-
   },
   methods: {
     ...mapActions({

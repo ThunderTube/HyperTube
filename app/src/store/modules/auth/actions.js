@@ -43,7 +43,7 @@ export const getCurrentUser = async ({ dispatch }) => {
     }
     return res
   } catch (error) {
-    // console.log('getCurrentUser ', error.message)
+    console.log('getCurrentUser ', error.message)
   }
 }
 

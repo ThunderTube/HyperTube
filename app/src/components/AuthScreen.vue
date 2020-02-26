@@ -83,7 +83,8 @@
                 type="file"
                 id="file"
                 ref="file"
-                v-on:change="handleFileUpload()"
+                accept="image/*"
+                @change="handleFileUpload()"
               />
             </div>
           </div>
@@ -222,38 +223,25 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success)
-            return console.log(
-              'login !res.data.success show error message ',
-              res.data
-            )
+            return this.$toast.open({ message: res.data.error, type: 'error'});
         } else if (this.register.visible) {
           const formData = new FormData()
-
           const registrationFormFields = Object.entries(this.register.form)
-
           registrationFormFields.forEach(([key, value]) => {
             formData.append(key, value)
           })
-
           const res = await this.registerUser(formData)
-
-          if (!res.data.success)
-            return console.log(
-              'register !res.data.success show error message ',
-              res.data
-            )
+          if (res.data.error || !res.data.success)
+            return this.$toast.open({ message: res.data.error, type: 'error'});
           this.formType = 'login'
           this.login.form.username = this.register.form.username
           this.login.form.password = this.register.form.password
           this.showAuthForm()
+          this.$toast.open({ message: "Please confirm your account", type: 'success'});
         } else if (this.passwordForgot.visible) {
-          console.log('password forgot')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
-            return console.log(
-              'forgotPassword !res.data.success show error message ',
-              res.data
-            )
+            return this.$toast.open({ message: res.data.error, type: 'error'});
           console.log(res)
         }
       } catch (error) {

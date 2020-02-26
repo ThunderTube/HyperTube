@@ -20,7 +20,7 @@ const router =  new Router({
     {
       path: '/password-reset?token=:guid`',
       name: 'password_reset',
-      beforeEnter: requireHash,
+      // beforeEnter: requireGuid,
       component: () =>
         import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
     },
@@ -58,10 +58,11 @@ async function requireHash(to, from, next) {
       next('/')
     const result = await confirmAccount(uuid, id)
     if (!result.data.success) {
-      console.log('confirmation failed')
+      // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
+      // console.log('confirmation failed')
       return next('/')
     }
-    console.log('confirmation success')
+    this.$toast.open({ message: 'Confirmation success', type: 'success'});
     return next('/')
   } catch (e) {
     console.log('confirmation error catch ', e)
