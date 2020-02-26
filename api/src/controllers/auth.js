@@ -26,6 +26,83 @@ function createCookie(res, token) {
 
     return res;
 }
+exports.controllerFortyTwo = async (req, res, next) => {
+    try {
+        const { user: passportUser } = req;
+        const { csrf } = res.locals;
+        const isUserUnique = await User.isUnique({
+            email: passportUser.email,
+            username: passportUser.username,
+        });
+        console.log('User unique : ', isUserUnique);
+
+        if (isUserUnique === true) {
+            const {
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture,
+            } = passportUser;
+
+            const fileExtension = extname(profilePicture).slice(1);
+            const filename = `${uuid()}.${fileExtension}`;
+
+            // We fetch the file and save it locally
+            await pipeline(
+                got.stream(profilePicture),
+                fs.createWriteStream(
+                    join(__dirname, '../../public/uploads', filename)
+                )
+            );
+
+            const csrfSecret = await csrf.secret();
+
+            const user = new User({
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture: filename,
+                isConfirmed: true,
+                csrfSecret,
+            });
+            await user.save();
+
+            const csrfToken = csrf.create(csrfSecret);
+            const token = user.getSignedJwtToken();
+
+            createCookie(res, token).redirect(
+                `http://localhost:3000/?token=${csrfToken}`
+            );
+        } else if (isUserUnique === 'username') {
+            res.status(400).json({
+                success: false,
+                error: 'Username taken',
+            });
+        } else if (isUserUnique === 'email') {
+            res.status(400).json({
+                success: false,
+                error: 'Email taken',
+            });
+        }
+        next();
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+function trimObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => [key, value.trim()])
+        .reduce((agg, [key, value]) => {
+            agg[key] = value;
+
+            return agg;
+        }, {});
+}
 
 async function isUserOAuth(property, value) {
     const count = await User.countDocuments({
