@@ -3,14 +3,15 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-import auth from './modules/auth'
+import { auth, movies } from './modules'
 
 const store = () => {
-    return new Vuex.Store({
-        modules: {
-            auth,
-        }
-    })
+  return new Vuex.Store({
+    modules: {
+      auth,
+      movies
+    }
+  })
 }
 
 export default store
