@@ -1,16 +1,8 @@
-import { register, login, forgotPassword } from '@/api/auth'
+import { register, login, forgotPassword, me } from '@/api/auth'
 
 export const registerUser = async ({ commit }, data) => {
   try {
     const res = await register(data)
-    // CSRF not necessary in the register phase because you give it back
-    // on the login
-    // also when do we confirm the account ?
-    // whats the user auth path
-    // no image upload is needed in correction
-    // what does the me endpoint do ?
-    // if (res.data.success)
-    //     setAuthCSRF(commit, res.data.csrfToken)
     return res
   } catch (error) {
     console.log('registerUser ', error)
@@ -30,13 +22,28 @@ export const loginUser = async ({ dispatch }, data) => {
   try {
     const res = await login(data)
     if (res.data.success) {
-      dispatch('setAuthCSRF', res.data.csrfToken)
+      // dispatch('setAuthCSRF', res.data.csrfToken)
+      // dispatch('setAuthIsLoggedIn', true)
+      // dispatch('setAuthData', res.data.user)
+        dispatch('getCurrentUser')
+    }
+    return res
+  } catch (error) {
+    console.log('loginUser ', error)
+  }
+}
+
+export const getCurrentUser = async ({ dispatch }) => {
+  try {
+    const res = await me()
+    if (res.data.success) {
+      // dispatch('setAuthCSRF', res.data.csrfToken)
       dispatch('setAuthIsLoggedIn', true)
       dispatch('setAuthData', res.data.user)
     }
     return res
   } catch (error) {
-    console.log('loginUser ', error)
+    // console.log('getCurrentUser ', error.message)
   }
 }
 

@@ -18,6 +18,13 @@ const router =  new Router({
         import(/* webpackChunkName: "movie" */ '../views/UserConfirmation.vue')
     },
     {
+      path: '/password-reset?token=:guid`',
+      name: 'password_reset',
+      beforeEnter: requireHash,
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
+    },
+    {
       path: '/',
       redirect: `/${i18n.locale}`
     },

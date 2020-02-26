@@ -9,7 +9,7 @@ const YEAR_IN_MILLISECONDES = 3.154e10;
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${req.protocol}://${req.hostname}:3000/confirmaccount/${uuid}/${id}`;
+    : ${process.env.FRONT_URI}/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
