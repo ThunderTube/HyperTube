@@ -118,7 +118,7 @@ async function getVideoInformations(req, res) {
 
         send(res, 200, {
             ...hasWatchedTheMovie(user)(movie),
-            // subtitles: await getSubtitles(movie.imdbId),
+            subtitles: await getSubtitles(movie.imdbId),
         });
     } catch (e) {
         console.error(e);
