@@ -77,22 +77,31 @@ async function searchVideos(req, res) {
             return;
         }
 
-        const conditions = { $text: { $search: query } };
-        if (typeof genre === 'string' && genre !== '') {
-            conditions.genres = genre;
-        }
-        const yearToNumber = Number(year);
-        if (
-            typeof year === 'string' &&
-            year !== '' &&
-            yearToNumber > 1850 &&
-            yearToNumber <= 2020
-        ) {
-            conditions.year = yearToNumber;
+        let sortBy = { title: 1 };
+
+        let conditions = { $text: { $search: query } };
+        if (!(query || genre || year)) {
+            // No one field has been filled
+
+            conditions = {};
+            sortBy = { peersAndSeedsCount: -1, rating: -1 };
+        } else {
+            if (typeof genre === 'string' && genre !== '') {
+                conditions.genres = genre;
+            }
+            const yearToNumber = Number(year);
+            if (
+                typeof year === 'string' &&
+                year !== '' &&
+                yearToNumber > 1850 &&
+                yearToNumber <= 2020
+            ) {
+                conditions.year = yearToNumber;
+            }
         }
 
         const movies = await Movie.find(conditions)
-            .sort({ title: 1 }) // sort the entries by the title, ascending
+            .sort(sortBy) // sort the entries by the title, ascending
             .skip(Number(offset))
             .limit(Number(limit));
 
