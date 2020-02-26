@@ -1,11 +1,22 @@
 <template>
   <div class="w-full container overflow-hidden mx-auto h-screen pt-8 relative">
-    <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">Search</h1>
+    <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">
+      Search
+    </h1>
 
-    <movies-search-bar class="mb-4" />
+    <movies-search-bar
+      :search-query.sync="searchQuery"
+      :genre.sync="genre"
+      :year.sync="year"
+      class="mb-4"
+    />
 
     <movies-container>
-      <div v-for="i in number_of_movies" :key="i" class="w-full md:w-1/3 lg:w-1/5 p-2">
+      <div
+        v-for="i in number_of_movies"
+        :key="i"
+        class="w-full md:w-1/3 lg:w-1/5 p-2"
+      >
         <movie-thumbnail />
       </div>
     </movies-container>
@@ -26,10 +37,11 @@ export default {
   },
   data() {
     return {
-      number_of_movies: 100
+      number_of_movies: 100,
+      searchQuery: undefined,
+      genre: undefined,
+      year: undefined
     }
   }
 }
 </script>
-
-<style lang="css" scoped></style>
