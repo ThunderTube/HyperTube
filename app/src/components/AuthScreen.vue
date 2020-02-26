@@ -33,12 +33,14 @@
               v-model="login.form.username"
               :name="$t('loginscreen.id')"
               :placeholder="$t('loginscreen.id_placeholder')"
+              autocomplete="username"
             />
             <app-input
               v-model="login.form.password"
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
+              autocomplete="password"
             />
           </div>
           <div v-else-if="register.visible">
