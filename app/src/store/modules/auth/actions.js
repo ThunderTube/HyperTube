@@ -59,6 +59,10 @@ export const setAuthData = ({ commit }, data) => {
   commit('SET_AUTH_DATA', data)
 }
 
+export const setPasswordResetToken = ({ commit }, token) => {
+  commit('SET_AUTH_DATA', data)
+}
+
 export const clearAuthData = ({ commit }) => {
   commit('CLEAR_AUTH_DATA')
 }

@@ -18,9 +18,9 @@ const router =  new Router({
         import(/* webpackChunkName: "movie" */ '../views/UserConfirmation.vue')
     },
     {
-      path: '/password-reset?token=:guid`',
+      path: '/password-reset/:guid',
       name: 'password_reset',
-      // beforeEnter: requireGuid,
+      beforeEnter: requireToken,
       component: () =>
         import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
     },
@@ -62,6 +62,29 @@ async function requireHash(to, from, next) {
       // console.log('confirmation failed')
       return next('/')
     }
+    this.$toast.open({ message: 'Confirmation success', type: 'success'});
+    return next('/')
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
+async function requireToken(to, from, next) {
+  try {
+    const guid = to.params.guid
+    const token = to.params.token
+   console.log(guid)
+   console.log(token)
+   
+    // if (!id || !uuid)
+    //   next('/')
+    // const result = await confirmAccount(uuid, id)
+    // if (!result.data.success) {
+    //   // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
+    //   // console.log('confirmation failed')
+    //   return next('/')
+    // }
     this.$toast.open({ message: 'Confirmation success', type: 'success'});
     return next('/')
   } catch (e) {

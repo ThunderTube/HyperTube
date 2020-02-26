@@ -9,3 +9,7 @@ export const getAuthCSRF = (state) => {
 export const isLoggedIn = (state) => {
     return state.isLoggedIn
 }
+
+export const getPasswordResetToken = (state) => {
+    return state.passwordResetToken
+}

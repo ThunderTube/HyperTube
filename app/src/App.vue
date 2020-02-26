@@ -43,7 +43,7 @@ export default {
     try {
       const res = await this.me()
       if (!res) {
-        this.$toast.open({ message: 'Please login or register an account', type: 'info'})
+        // this.$toast.open({ message: 'Please login or register an account', type: 'info'})
         return this.loading = false
       }
       if (res.data.success)

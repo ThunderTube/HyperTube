@@ -241,7 +241,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // send a link with the plain guid
-        const link = `${process.env.FRONT_URI}/password-reset?token=${guid}`;
+        const link = `${process.env.FRONT_URI}/password-reset/${guid}`;
 
         email.send({
             to: user.email,
