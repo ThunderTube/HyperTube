@@ -3,6 +3,7 @@
     <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn" />
     <div v-show="isLoggedIn">
       <app-menu />
+      <app-switch-lang />
       <div class="w-full">
         <transition name="page" mode="out-in">
           <router-view />
@@ -15,11 +16,13 @@
 <script>
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
+import AppSwitchLang from '@/components/AppSwitchLang.vue'
 
 export default {
   components: {
     AppMenu,
-    AuthScreen
+    AuthScreen,
+    AppSwitchLang
   },
   computed: {
     isLoggedIn: {
