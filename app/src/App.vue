@@ -1,7 +1,15 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
-    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
-    <div v-show="isLoggedIn">
+    <div v-if="loading" class="flex justify-center items-center min-h-screen">
+      <atom-spinner
+        :animation-duration="500"
+        :size="120"
+        :color="'#ffffff'"
+      />
+    </div>
+    <div v-else>
+    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="hasCookie || isLoggedIn"/>
+    <div v-show="hasCookie || isLoggedIn">
       <app-menu />
     <div class="w-full">
       <transition name="page" mode="out-in">
@@ -9,10 +17,12 @@
       </transition>
     </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script>
+import {AtomSpinner} from 'epic-spinners'
 import { mapGetters, mapActions } from 'vuex'
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
@@ -20,10 +30,32 @@ import AuthScreen from '@/components/AuthScreen'
 export default {
   components: {
     AppMenu,
-    AuthScreen
+    AuthScreen,
+    AtomSpinner
+  },
+  data() {
+    return {
+      loading: true,
+      hasCookie: false
+    }
+  },
+  async created() {
+    try {
+      this.me()
+      const res = await this.me()
+      if (!res)
+        return this.loading = false
+      if (res.data.success)
+        this.hasCookie = true
+      setTimeout(() => {
+        this.loading = false
+      }, 500)
+    } catch (error) {
+      console.log('app created ', error.message)
+    }
   },
   mounted() {
-    this.me()
+
   },
   methods: {
     ...mapActions({

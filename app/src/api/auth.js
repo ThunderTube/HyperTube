@@ -6,7 +6,7 @@ const register = (data) => axios.post(`${AUTH}/register`, data)
 
 const login = (data) => axios.post(`${AUTH}/login`, data)
 
-const me = (data) => axios.get(`${AUTH}/me`, { withCredentials: true });
+const me = () => axios.get(`${AUTH}/me`);
 
 const confirmAccount = (uuid, id) => axios.get(`${AUTH}/confirmaccount/${uuid}/${id}`);
 
