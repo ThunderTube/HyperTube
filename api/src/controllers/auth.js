@@ -56,7 +56,7 @@ exports.register = async (req, res) => {
         try {
             await user.validate();
         } catch (e) {
-            let msg = Object.values(e.errors).map(val => val.message);
+            const msg = Object.values(e.errors).map(val => val.message);
             res.status(400).json({ success: false, error: msg });
             return;
         }
@@ -186,7 +186,7 @@ exports.getMe = async (req, res) => {
 // @route GET /user/:id
 // @access Private
 exports.getUser = async (req, res) => {
-    const user = req.user;
+    const { user } = req;
     const {
         isConfirmed,
         password,
@@ -346,7 +346,7 @@ exports.updateDetails = async (req, res) => {
     try {
         await user.save();
     } catch (e) {
-        let msg = Object.values(e.errors).map(val => val.message);
+        const msg = Object.values(e.errors).map(val => val.message);
         res.status(400).json({ success: false, error: msg });
         return;
     }
@@ -359,15 +359,14 @@ exports.updateDetails = async (req, res) => {
 // @access Private
 exports.updatePassword = async (req, res) => {
     try {
-        const user = req.user;
+        const { user } = req;
 
         user.password = req.body.password;
         await user.save();
         res.json({ success: true });
     } catch (e) {
-        let msg = Object.values(e.errors).map(val => val.message);
+        const msg = Object.values(e.errors).map(val => val.message);
         res.status(400).json({ success: false, error: msg });
-        return;
     }
 };
 
