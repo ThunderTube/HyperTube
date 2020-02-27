@@ -70,10 +70,12 @@ async function getVideos(req, res) {
 async function searchVideos(req, res) {
     try {
         const {
-            params: { offset, limit },
+            params: { offset: offsetString, limit: limitString },
             body: { query, genre, year },
             user,
         } = req;
+        const offset = Number(offsetString);
+        const limit = Number(limitString);
         if (typeof query !== 'string') {
             send(res, 400);
             return;
@@ -101,21 +103,23 @@ async function searchVideos(req, res) {
                 yearToNumber > 1850 &&
                 yearToNumber <= 2020
             ) {
-                conditions.year = Number(yearToNumber);
+                conditions.year = yearToNumber;
             }
         }
 
-        console.log('conditions =', conditions);
-
         const moviesMoreOne = await Movie.find(conditions)
             .sort(sortBy) // sort the entries by the title, ascending
-            .skip(Number(offset))
-            .limit(Number(limit) + 1);
+            .skip(offset)
+            .limit(limit + 1);
 
-        const hasMore = moviesMoreOne.length === Number(limit) + 1;
+        const hasMore = moviesMoreOne.length === limit + 1;
+        const movies =
+            moviesMoreOne.length > limit
+                ? moviesMoreOne.slice(0, -1)
+                : moviesMoreOne;
 
         send(res, 200, {
-            data: moviesMoreOne.slice(0, -1).map(hasWatchedTheMovie(user)),
+            data: movies.map(hasWatchedTheMovie(user)),
             hasMore,
         });
     } catch (e) {
