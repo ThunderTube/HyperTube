@@ -1,7 +1,7 @@
 <template>
   <section
     ref="scroll-container"
-    class="overflow-y-auto overflow-x-hidden h-full p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 movies-container"
+    class="overflow-y-auto overflow-x-hidden h-full p-2 m-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 movies-container"
   >
     <template v-if="items.length > 0">
       <template v-for="item in items">
