@@ -498,6 +498,7 @@ async function streamSubtitleForMovieAndLangcode(id, langcode) {
 }
 
 exports.MOVIES_ORIGINS = MOVIES_ORIGINS;
+exports.NORMALIZED_GENDERS = NORMALIZED_GENDERS;
 exports.POSSIBLE_GENRES = POSSIBLE_GENRES;
 exports.getMovies = getMovies;
 exports.getSubtitles = getSubtitles;

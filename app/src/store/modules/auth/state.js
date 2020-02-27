@@ -1,4 +1,4 @@
 export default {
-    data: null,
-    isLoggedIn: false
-  }
+  data: null,
+  isLoggedIn: true
+}

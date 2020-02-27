@@ -1,8 +1,9 @@
-const { User } = require('../models/User');
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const AnonymousStrategy = require('passport-anonymous');
 const FortyTwoStrategy = require('passport-42').Strategy;
+
+const { User } = require('../models/User');
 
 module.exports = async function setupFortyTwoStrategy() {
     passport.use(

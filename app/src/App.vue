@@ -1,13 +1,13 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
-    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
+    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn" />
     <div v-show="isLoggedIn">
       <app-menu />
-    <div class="w-full">
-      <transition name="page" mode="out-in">
-        <router-view />
-      </transition>
-    </div>
+      <div class="w-full">
+        <transition name="page" mode="out-in">
+          <router-view />
+        </transition>
+      </div>
     </div>
   </div>
 </template>
@@ -21,9 +21,12 @@ export default {
     AppMenu,
     AuthScreen
   },
-  data() {
-    return {
-      isLoggedIn: false
+  computed: {
+    isLoggedIn: {
+      get() {
+        return this.$store.getters['auth/isLoggedIn']
+      },
+      set() {}
     }
   }
 }
@@ -40,5 +43,4 @@ export default {
   opacity: 0;
   transform: scale(1.1);
 }
-
 </style>
