@@ -1,7 +1,9 @@
 <template>
-  <div class="w-full container overflow-hidden mx-auto h-screen pt-8 relative">
+  <div
+    class="w-full container overflow-hidden mx-auto h-screen pt-8 relative flex flex-col"
+  >
     <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">
-      Search
+      Movies
     </h1>
 
     <movies-search-bar
@@ -11,14 +13,19 @@
       class="mb-4"
     />
 
-    <movies-container>
-      <div
-        v-for="i in number_of_movies"
-        :key="i"
-        class="w-full md:w-1/3 lg:w-1/5 p-2"
-      >
-        <movie-thumbnail />
-      </div>
+    <movies-container
+      :items="movies"
+      :loading="loading"
+      :has-more="hasMore"
+      @fetch-more="fetchMore"
+    >
+      <template #movie="movie">
+        <movie-thumbnail
+          :key="movie.id"
+          class="w-full md:w-1/2 lg:w-1/4 p-2"
+          v-bind="movie"
+        />
+      </template>
     </movies-container>
   </div>
 </template>
@@ -37,11 +44,22 @@ export default {
   },
   data() {
     return {
-      number_of_movies: 100,
       searchQuery: undefined,
       genre: undefined,
-      year: undefined
+      year: undefined,
+
+      hasMore: true,
+      loading: false,
+      movies: Array.from({ length: 100 }).map((_, index) => ({ id: index }))
     }
+  },
+  methods: {
+    fetchMore() {}
+  },
+  watch: {
+    searchQuery() {},
+    genre() {},
+    year() {}
   }
 }
 </script>
