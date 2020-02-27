@@ -67,16 +67,16 @@ export default {
   grid-auto-rows: max-content;
 
   &::-webkit-scrollbar-track {
-    background-color: theme('colors.gray.400');
+    background-color: theme('colors.gray.700');
   }
 
   &::-webkit-scrollbar {
     width: 6px;
-    background-color: theme('colors.gray.400');
+    background-color: theme('colors.gray.700');
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: theme('colors.gray.700');
+    background-color: theme('colors.gray.400');
   }
 }
 </style>
