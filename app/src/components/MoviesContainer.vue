@@ -1,14 +1,27 @@
 <template>
   <section
-    class="overflow-y-auto overflow-x-hidden h-full flex flex-wrap justify-around p-2"
+    ref="scroll-container"
+    class="overflow-y-auto overflow-x-hidden h-full p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 movies-container"
   >
-    <template v-for="item in items">
-      <slot name="movie" v-bind="item" />
+    <template v-if="items.length > 0">
+      <template v-for="item in items">
+        <slot name="movie" v-bind="item" />
+      </template>
     </template>
+    <movies-container-empty-list v-else-if="!loading" />
 
-    <infinite-scroll v-if="hasMore" :loading="loading" :handler="fetchMore">
+    <infinite-scroll
+      v-if="hasMore || loading"
+      scroll-container="scroll-container"
+      :loading="loading"
+      :handler="fetchMore"
+      style="grid-column: 1/-1"
+      class="py-5"
+    >
       <slot name="loader">
-        <loading-spinner />
+        <div class="h-full w-full flex justify-center items-center">
+          <loading-spinner />
+        </div>
       </slot>
     </infinite-scroll>
   </section>
@@ -18,12 +31,14 @@
 import InfiniteScroll from 'vue-mugen-scroll'
 
 import LoadingSpinner from './LoadingSpinner.vue'
+import MoviesContainerEmptyList from './MoviesContainerEmptyList.vue'
 
 export default {
   name: 'MoviesContainer',
   components: {
     InfiniteScroll,
-    LoadingSpinner
+    LoadingSpinner,
+    MoviesContainerEmptyList
   },
   props: {
     items: {
@@ -46,3 +61,22 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.movies-container {
+  grid-auto-rows: max-content;
+
+  &::-webkit-scrollbar-track {
+    background-color: theme('colors.gray.400');
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    background-color: theme('colors.gray.400');
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: theme('colors.gray.700');
+  }
+}
+</style>

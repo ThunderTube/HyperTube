@@ -6,6 +6,7 @@ const { Movie, TORRENT_STATUSES } = require('../models/Movie');
 const {
     getSubtitles,
     streamSubtitleForMovieAndLangcode,
+    NORMALIZED_GENDERS,
 } = require('../get-movies');
 const { streamTorrent } = require('../stream');
 const { FSFile } = require('../file');
@@ -28,10 +29,11 @@ function hasWatchedTheMovie({ _id }) {
     const userId = _id.toString();
 
     return movie => {
-        const { watchedBy, ...props } = movie.toObject();
+        const { _id, watchedBy, ...props } = movie.toObject();
 
         return {
             ...props,
+            id: _id,
             watched: watchedBy.some(objectId => objectId.toString() === userId),
         };
     };
@@ -79,15 +81,18 @@ async function searchVideos(req, res) {
 
         let sortBy = { title: 1 };
 
-        let conditions = { $text: { $search: query } };
+        let conditions = {};
         if (!(query || genre || year)) {
             // No one field has been filled
 
             conditions = {};
             sortBy = { peersAndSeedsCount: -1, rating: -1 };
         } else {
+            if (typeof query === 'string' && query !== '') {
+                conditions.$text = { $search: query };
+            }
             if (typeof genre === 'string' && genre !== '') {
-                conditions.genres = genre;
+                conditions.genres = NORMALIZED_GENDERS.get(genre);
             }
             const yearToNumber = Number(year);
             if (
@@ -96,16 +101,23 @@ async function searchVideos(req, res) {
                 yearToNumber > 1850 &&
                 yearToNumber <= 2020
             ) {
-                conditions.year = yearToNumber;
+                conditions.year = Number(yearToNumber);
             }
         }
 
-        const movies = await Movie.find(conditions)
+        console.log('conditions =', conditions);
+
+        const moviesMoreOne = await Movie.find(conditions)
             .sort(sortBy) // sort the entries by the title, ascending
             .skip(Number(offset))
-            .limit(Number(limit));
+            .limit(Number(limit) + 1);
 
-        send(res, 200, movies.map(hasWatchedTheMovie(user)));
+        const hasMore = moviesMoreOne.length === Number(limit) + 1;
+
+        send(res, 200, {
+            data: moviesMoreOne.slice(0, -1).map(hasWatchedTheMovie(user)),
+            hasMore,
+        });
     } catch (e) {
         console.error(e);
         send(res, 500);

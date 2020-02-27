@@ -20,20 +20,19 @@
       @fetch-more="fetchMore"
     >
       <template #movie="movie">
-        <movie-thumbnail
-          :key="movie.id"
-          class="w-full md:w-1/2 lg:w-1/4 p-2"
-          v-bind="movie"
-        />
+        <movie-thumbnail :key="movie.id" v-bind="movie" />
       </template>
     </movies-container>
   </div>
 </template>
 
 <script>
+import debounce from 'lodash.debounce'
+
 import MoviesSearchBar from '@/components/MoviesSearchBar.vue'
 import MoviesContainer from '@/components/MoviesContainer.vue'
 import MovieThumbnail from '@/components/MovieThumbnail.vue'
+import axios from '@/api/axios.js'
 
 export default {
   name: 'home',
@@ -48,18 +47,57 @@ export default {
       genre: undefined,
       year: undefined,
 
+      initialLoad: true,
+
+      offset: 0,
       hasMore: true,
-      loading: false,
-      movies: Array.from({ length: 100 }).map((_, index) => ({ id: index }))
+      loading: true,
+      movies: []
     }
   },
+  created() {
+    this.fetchMore()
+  },
   methods: {
-    fetchMore() {}
+    fetchMore: debounce(function fetchMore() {
+      const LIMIT = 30
+
+      this.loading = true
+      this.initialLoad = false
+
+      axios
+        .post(`/stream/videos/search/${this.offset}/${LIMIT}`, {
+          query: this.searchQuery || '',
+          genre: this.genre || '',
+          year: this.year || ''
+        })
+        .then(({ data: { data: movies, hasMore } }) => {
+          this.movies.push(...movies)
+          this.hasMore = hasMore
+          this.offset += movies.length
+        })
+        .catch(console.error)
+        .finally(() => {
+          this.loading = false
+        })
+    }, 500),
+    resetThenFetch() {
+      this.offset = 0
+      this.movies = []
+      this.loading = true
+      return this.fetchMore()
+    }
   },
   watch: {
-    searchQuery() {},
-    genre() {},
-    year() {}
+    searchQuery() {
+      this.resetThenFetch()
+    },
+    genre() {
+      this.resetThenFetch()
+    },
+    year() {
+      this.resetThenFetch()
+    }
   }
 }
 </script>

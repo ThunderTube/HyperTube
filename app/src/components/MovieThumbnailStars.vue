@@ -19,7 +19,7 @@ export default {
   computed: {
     config() {
       return {
-        rating: this.rating / 2, // our rating is between 0 and 10, the lib rating is between 0 and 5.
+        rating: Number((this.rating / 2).toFixed(1)), // our rating is between 0 and 10, the lib rating is between 0 and 5.
         starStyle: {
           fullStarColor: '#ed8a19',
           emptyStarColor: '#737373',
