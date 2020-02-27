@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="w-full container overflow-hidden mx-auto h-screen pt-8 relative flex flex-col"
-  >
-    <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">
-      Movies
-    </h1>
+  <div class="w-full container overflow-hidden mx-auto h-screen pt-8 relative flex flex-col">
+    <h1 class="text-white text-2xl text-center mb-4 uppercase tracking-wider">Movies</h1>
 
     <movies-search-bar
       :search-query.sync="searchQuery"
