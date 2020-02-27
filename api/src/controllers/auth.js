@@ -26,15 +26,45 @@ function createCookie(res, token) {
 
     return res;
 }
+
+async function isUserOAuth(property, value) {
+    const count = await User.countDocuments({
+        [property]: value,
+        registeredUsingOAuth: true,
+    });
+    console.log('count = ', count);
+    return count > 0;
+}
+
+function trimObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => [key, value.trim()])
+        .reduce((agg, [key, value]) => {
+            agg[key] = value;
+
+            return agg;
+        }, {});
+}
+
+/** Verify if username and email are unique.
+ *  If it's unique user is save in DB.
+ *  Otherwise we verify if user had already an OAuth account.
+ *  In this case we logged in the user.
+ *  Or we chech what field is duplicate,
+ *  and we return to the front the specified error.
+ *  */
+
 exports.controllerFortyTwo = async (req, res) => {
     try {
         const { user: passportUser } = req;
+
         const { csrf } = res.locals;
         const isUserUnique = await User.isUnique({
             email: passportUser.email,
             username: passportUser.username,
         });
-        console.log('User unique : ', isUserUnique);
+
+        const csrfSecret = await csrf.secret();
 
         if (isUserUnique === true) {
             const {
@@ -57,8 +87,6 @@ exports.controllerFortyTwo = async (req, res) => {
                 )
             );
 
-            const csrfSecret = await csrf.secret();
-
             const user = new User({
                 username,
                 email,
@@ -68,6 +96,7 @@ exports.controllerFortyTwo = async (req, res) => {
                 profilePicture: filename,
                 isConfirmed: true,
                 csrfSecret,
+                oAuth: true,
             });
             await user.save();
 
@@ -75,27 +104,40 @@ exports.controllerFortyTwo = async (req, res) => {
             const token = user.getSignedJwtToken();
 
             createCookie(res, token).redirect(
-                `http://localhost:3000/?token=${csrfToken}`
+                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
             );
-        } else if (isUserUnique === 'username') {
-            res.status(400).redirect('/?error=username'); // Error for email already taken
-        } else if (isUserUnique === 'email') {
-            res.status(400).redirect('/?error=email'); // Error for username already taken
+        } else {
+            const duplicateField = isUserUnique;
+
+            const userRegisteredUsingOAuth = await isUserOAuth(
+                duplicateField,
+                passportUser[duplicateField]
+            );
+            if (userRegisteredUsingOAuth > 0) {
+                const username = req.user.username;
+                const user = await User.findOne({ username });
+
+                const token = user.getSignedJwtToken();
+                const csrfToken = csrf.create(csrfSecret);
+
+                createCookie(res, token).redirect(
+                    `http://localhost:3000/?token=${encodeURIComponent(
+                        csrfToken
+                    )}`
+                );
+            } else {
+                if (duplicateField === 'username') {
+                    res.status(400).redirect('/?error=username'); // Error for email already taken
+                }
+                if (duplicateField === 'email') {
+                    res.status(400).redirect('/?error=email'); // Error for username already taken
+                }
+            }
         }
     } catch (e) {
         console.error(e);
     }
 };
-
-function trimObject(obj) {
-    return Object.entries(obj)
-        .map(([key, value]) => [key, value.trim()])
-        .reduce((agg, [key, value]) => {
-            agg[key] = value;
-
-            return agg;
-        }, {});
-}
 
 // @desc Register user
 // @route POST /api/v1/auth/register

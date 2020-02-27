@@ -63,6 +63,10 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    registeredUsingOAuth: {
+        type: Boolean,
+        default: false,
+    },
     passwordResets: {
         type: [{ token: String, expiresAt: Date }],
         default() {
