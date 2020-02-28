@@ -27,10 +27,13 @@
 </template>
 
 <script>
-import Tag from '@/components/Tag.vue'
+import Tag from './Tag.vue'
 
 export default {
   name: 'MovieViewer',
+  components: {
+    Tag
+  },
   props: {
     title: {
       type: String,
