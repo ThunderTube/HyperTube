@@ -6,7 +6,7 @@
 
     <video
       preload="none"
-      poster="http://image.tmdb.org/t/p/w500/AtsgWhDnHTq68L0lLsUrCnM7TjG.jpg"
+      v-bind:poster="image"
       class="w-full object-cover object-top player"
     ></video>
 
@@ -53,6 +53,10 @@ export default {
     },
     genres: {
       type: Array,
+      required: true
+    },
+    image: {
+      type: String,
       required: true
     }
   },

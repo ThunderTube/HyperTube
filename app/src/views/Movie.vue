@@ -76,6 +76,9 @@ export default {
       const minutes = this.runtime % 60
 
       return `${hours.toFixed(0)}h${minutes.toFixed(0)}`
+    },
+    id() {
+      return this.$route.params.id
     }
   }
 }
