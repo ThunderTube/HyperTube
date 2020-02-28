@@ -17,7 +17,6 @@ class Mail {
 
     send(args) {
         const { to, from = DEFAULT_EMAIL_ADDRESS, subject, text } = args;
-
         return this.mailer.sendMail({
             to,
             from,

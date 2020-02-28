@@ -1,7 +1,7 @@
 <template>
   <article>
     <router-link
-      :to="`/${$i18n.locale}/movie/${id}`"
+      :to="`/${$i18n.locale}/movie/${imdbId}`"
       :title="title"
       class="h-full flex flex-col bg-gray-800 text-gray-200 shadow-xl rounded transition-transform duration-300 transform hover:scale-95"
     >
@@ -48,8 +48,8 @@ export default {
     MovieThumbnailStars
   },
   props: {
-    id: {
-      type: [Number, String],
+    imdbId: {
+      type: String,
       required: true
     },
     title: {

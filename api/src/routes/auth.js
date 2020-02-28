@@ -20,7 +20,9 @@ const {
     updateDetails,
     updatePassword,
     logout,
+    OAuthcontroller,
     fortyTwoRegister,
+    createUploadPathIfNotExist,
     // fortyTwoCallback,
 } = require('../controllers/auth');
 
@@ -35,12 +37,72 @@ router
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         register
     )
-    .post(
+    .get(
         '/42',
-        passport.authenticate('42', { failureRedirect: '/login' }),
-        fortyTwoRegister
+        passport.authenticate('42', {
+            failureRedirect: process.env.FRONT_URI,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
     )
-    // .post('/42/callback', passport.authenticate('42'), fortyTwoCallback)
+    .get('/42/callback', passport.authenticate('42'), OAuthcontroller)
+    .get(
+        '/github',
+        passport.authenticate('github', {
+            failureRedirect: process.env.FRONT_URI,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get('/github/callback', passport.authenticate('github'), OAuthcontroller)
+    .get(
+        '/facebook',
+        passport.authenticate(
+            'facebook',
+            {
+                failureRedirect: process.env.FRONT_URI,
+            },
+            { scope: 'user_friends' }
+        ),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get(
+        '/facebook/callback',
+        passport.authenticate('facebook', {
+            failureRedirect: process.env.FRONT_URI,
+        }),
+        OAuthcontroller
+    )
+    .get(
+        '/google',
+        passport.authenticate('google', {
+            scope: ['profile', 'email'],
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get('/google/callback', passport.authenticate('google'), OAuthcontroller)
+    .get(
+        '/reddit',
+        passport.authenticate('reddit', { state: true, duration: 'permanent' }),
+        (req, res, next) => {
+            next();
+        }
+    )
+    .get('/reddit/callback', passport.authenticate('reddit'), OAuthcontroller)
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
@@ -70,14 +132,6 @@ function uploadAndVerifyFileTypeMiddleware(
                     next();
                     return;
                 }
-
-                const UPLOAD_DIRECTORY_PATH = join(
-                    __dirname,
-                    '../..',
-                    'public/uploads'
-                );
-
-                await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
                 const {
                     file: { buffer },
                 } = req;
@@ -88,23 +142,30 @@ function uploadAndVerifyFileTypeMiddleware(
                     console.error(
                         'Could not identify the mimetype of the file'
                     );
-                    res.status(400).json({
+                    res.status(200).json({
+                        success: false,
                         error: 'Could not identify the mimetype of the file',
+                        translationKey: 'wrong_file_type'
                     });
                     return;
                 }
                 const { ext, mime } = metadata;
                 if (!authorizedMimeTypes.includes(mime)) {
                     // Not supported mimetype
-                    res.status(400).json({
+                    res.status(200).json({
+                        success: false,
                         error: 'Mimetype not supported',
+                        translationKey: 'wrong_file_type'
                     });
                     return;
                 }
 
                 const fileName = `${uuid()}.${ext}`;
 
-                const pathToFile = join(UPLOAD_DIRECTORY_PATH, fileName);
+                const pathToFile = join(
+                    await createUploadPathIfNotExist(),
+                    fileName
+                );
 
                 await writeFile(pathToFile, buffer, null);
 
@@ -122,7 +183,7 @@ function uploadAndVerifyFileTypeMiddleware(
                 next();
             } catch (e) {
                 console.error(e);
-                res.status(400).json({ error: 'Explosion' });
+                res.status(200).json({ error: 'Explosion' });
             }
         },
     ];

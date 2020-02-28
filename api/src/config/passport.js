@@ -1,17 +1,26 @@
 const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
 const AnonymousStrategy = require('passport-anonymous');
+const JwtStrategy = require('passport-jwt').Strategy;
 const FortyTwoStrategy = require('passport-42').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const GithubStrategy = require('passport-github').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const RedditStrategy = require('passport-reddit').Strategy;
+const stream = require('stream');
+const { promisify } = require('util');
+const fs = require('fs');
+const got = require('got');
+const { v4: uuid } = require('uuid');
 
 const { User } = require('../models/User');
 
-module.exports = async function setupFortyTwoStrategy() {
+module.exports = function setupPassport(csrf) {
     passport.use(
         new FortyTwoStrategy(
             {
                 clientID: process.env.FORTYTWO_CLIENT_ID,
                 clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-                callbackURL: 'http://localhost:3000/api/v1/auth/42/callback',
+                callbackURL: `${process.env.BACK_URI}/v1/auth/42/callback`,
                 profileFields: {
                     id(obj) {
                         return String(obj.id);
@@ -23,30 +32,108 @@ module.exports = async function setupFortyTwoStrategy() {
                     profilePicture: 'image_url',
                 },
             },
-            async function(accessToken, refreshToken, profile, cb) {
-                const isUserUnique = await User.isUnique({
-                    email: profile.email,
-                    username: profile.username,
-                });
-                if (isUserUnique === true) {
-                    console.log('User is unique');
-                    const user = new User({
-                        username,
-                        email,
-                        lastName,
-                        firstName,
-                        password,
-                        profilePicture: file.path,
-                        confirmationLinkUuid,
-                        csrfSecret,
-                    });
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    cb(null, profile);
+                } catch (e) {
+                    cb(e, null);
                 }
             }
         )
     );
-};
+    passport.use(
+        new FacebookStrategy(
+            {
+                clientID: process.env.FACEBOOK_APP_ID,
+                clientSecret: process.env.FACEBOOK_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
+                profileFields: ['id', 'first_name', 'last_name', 'picture'],
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { provider, name, id } = profile;
+                    const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
 
-module.exports = function setupPassport() {
+                    console.log('profile picture = ', profilePicture);
+
+                    cb(null, {
+                        provider,
+                        profilePicture,
+                        firstName: name.givenName,
+                        lastName: name.familyName,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
+    passport.use(
+        new GithubStrategy(
+            {
+                clientID: process.env.GITHUB_APP_ID,
+                clientSecret: process.env.GITHUB_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/github/callback`,
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { username, displayName, photos, provider } = profile;
+
+                    cb(null, {
+                        username,
+                        firstName: displayName,
+                        profilePicture: photos[0].value,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
+    passport.use(
+        new GoogleStrategy(
+            {
+                clientID: process.env.GOOGLE_APP_ID,
+                clientSecret: process.env.GOOGLE_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/google/callback`,
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { name, photos, provider } = profile;
+
+                    cb(null, {
+                        firstName: name.givenName,
+                        lastName: name.familyName,
+                        profilePicture: photos[0].value,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
+    passport.use(
+        new RedditStrategy(
+            {
+                clientID: process.env.REDDIT_APP_ID,
+                clientSecret: process.env.REDDIT_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/reddit/callback`,
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { provider, name } = profile;
+                    cb(null, {
+                        username: name,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
     passport.use(
         new JwtStrategy(
             {
@@ -73,4 +160,12 @@ module.exports = function setupPassport() {
     );
 
     passport.use(new AnonymousStrategy());
+
+    passport.serializeUser(function(user, cb) {
+        cb(null, user);
+    });
+
+    passport.deserializeUser(function(obj, cb) {
+        cb(null, obj);
+    });
 };

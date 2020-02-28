@@ -1,15 +1,24 @@
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const fs = require('fs');
 const ms = require('ms');
+const got = require('got');
+const foid = require('foid');
+const { extname, join } = require('path');
+const {
+    promises: { mkdir },
+} = require('fs');
+const send = require('@polka/send-type');
 
-const { User, validPasswordRegex } = require('../models/User');
+const { pipeline } = require('../utils');
+const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
-const YEAR_IN_MILLISECONDES = 3.154e10;
+const YEAR_IN_MILLISECONDES = ms('1 year');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
+    : ${process.env.FRONT_URI}/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
@@ -22,19 +31,192 @@ function createCookie(res, token) {
     return res;
 }
 
+function trimObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => [key, value.trim()])
+        .reduce((agg, [key, value]) => {
+            agg[key] = value;
+
+            return agg;
+        }, {});
+}
+1;
+function sanitizeUserDocument(doc) {
+    const {
+        isConfirmed,
+        password,
+        confirmationLinkUuid,
+        csrfSecret,
+        ...props
+    } = doc.toObject();
+
+    return props;
+}
+
+async function isUserOAuth(provider, property, value) {
+    const count = await User.countDocuments({
+        [property]: value,
+        OAuthProvider: provider,
+    });
+    return count > 0;
+}
+
+async function createUploadPathIfNotExist() {
+    const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
+
+    await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
+
+    return UPLOAD_DIRECTORY_PATH;
+}
+
+function createUsernameIfNotExist(username, firstName, lastName) {
+    if (username === undefined) {
+        if (firstName === undefined && lastName === undefined) {
+            return foid(4);
+        }
+
+        if (firstName === undefined || lastName === undefined) {
+            return firstName || lastName;
+        }
+
+        return firstName.concat(lastName);
+    }
+
+    return username;
+}
+
+/**
+ * Verify if username and email are unique.
+ * If it's unique user is save in DB.
+ * Otherwise we verify if user had already an OAuth account.
+ * In this case we logged in the user.
+ * Or we check what fiseld is duplicate,
+ * and we return to the front the specified error.
+ * */
+
+exports.OAuthcontroller = async (req, res) => {
+    try {
+        const { user: passportUser } = req;
+
+        const { csrf } = res.locals;
+
+        let username = createUsernameIfNotExist(
+            passportUser.username,
+            passportUser.firstName,
+            passportUser.lastName
+        );
+
+        const isUserUnique = await User.isUnique({
+            email: passportUser.email,
+            username,
+        });
+
+        if (isUserUnique === true) {
+            const {
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture,
+                provider,
+            } = passportUser;
+
+            let filename;
+            if (profilePicture !== undefined) {
+                const fileExtension = extname(profilePicture).slice(1);
+                filename = `${uuid()}.${fileExtension}`;
+
+                await createUploadPathIfNotExist();
+
+                // We fetch the file and save it locally
+                await pipeline(
+                    got.stream(profilePicture),
+                    fs.createWriteStream(
+                        join(__dirname, '../../public/uploads', filename)
+                    )
+                );
+            } else {
+                filename = 'default-user.jpg';
+            }
+
+            const csrfSecret = await csrf.secret();
+
+            const user = new User({
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture: filename,
+                isConfirmed: true,
+                csrfSecret,
+                OAuthProvider: provider,
+            });
+            await user.save();
+
+            const csrfToken = csrf.create(csrfSecret);
+            const token = user.getSignedJwtToken();
+            console.log(csrfToken);
+            createCookie(res, token).redirect(
+                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
+            );
+        } else {
+            const duplicateField = isUserUnique;
+            const { provider } = req.user;
+
+            const userRegisteredUsingOAuth = await isUserOAuth(
+                provider,
+                duplicateField,
+                passportUser[duplicateField] || username
+            );
+
+            if (userRegisteredUsingOAuth) {
+                username = req.user.username || username;
+                const user = await User.findOne({ username });
+
+                const token = user.getSignedJwtToken();
+                const csrfToken = csrf.create(user.csrfSecret);
+
+                console.log(csrfToken);
+                createCookie(res, token).redirect(
+                    `http://localhost:3000/?token=${encodeURIComponent(
+                        csrfToken
+                    )}`
+                );
+            } else {
+                if (duplicateField === 'username') {
+                    res.status(400).redirect(
+                        `${process.env.FRONT_URI}/?error=username`
+                    ); // Error for username already taken
+                }
+                if (duplicateField === 'email') {
+                    res.status(400).redirect(
+                        `${process.env.FRONT_URI}/?error=email`
+                    ); // Error for email already taken
+                }
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 // @desc Register user
 // @route POST /api/v1/auth/register
 // @access Public
 exports.register = async (req, res) => {
     try {
         const {
-            body: { username, email, lastName, firstName, password },
             file,
+            body: { password },
         } = req;
-        const { csrf } = res.locals;
+        const { username, email, lastName, firstName } = trimObject(req.body);
+        const { csrf, email: emailSender } = res.locals;
         if (file === undefined) {
-            res.status(400).json({
+            send(res, 200, {
+                success: false,
                 error: 'Invalid file',
+                translationKey: 'wrong_file_type'
             });
             return;
         }
@@ -47,7 +229,7 @@ exports.register = async (req, res) => {
             email,
             lastName,
             firstName,
-            password,
+            password: await hashPassword(password),
             profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
@@ -57,7 +239,7 @@ exports.register = async (req, res) => {
             await user.validate();
         } catch (e) {
             const msg = Object.values(e.errors).map(val => val.message);
-            res.status(400).json({ success: false, error: msg });
+            send(res, 200, { success: false, error: msg, translationKey: 'missing_user_inputs' });
             return;
         }
 
@@ -67,14 +249,11 @@ exports.register = async (req, res) => {
         });
 
         if (isUserUnique === true) {
-            const csrfToken = csrf.create(csrfSecret);
-
             await user.save();
-            const token = user.getSignedJwtToken();
 
-            res.locals.email.send({
+            emailSender.send({
                 to: user.email,
-                subject: 'coucou',
+                subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
                     req,
                     user.username,
@@ -83,26 +262,38 @@ exports.register = async (req, res) => {
                 ),
             });
 
-            createCookie(res, token).json({ success: true, csrfToken });
-        } else if (isUserUnique === 'username') {
-            res.status(400).json({
+            send(res, 200, { success: true });
+            return;
+        }
+
+        if (isUserUnique === 'username') {
+            send(res, 200, {
                 success: false,
                 error: 'Username taken',
+                translationKey: 'username_taken'
             });
-        } else if (isUserUnique === 'email') {
-            res.status(400).json({
+            return;
+        }
+
+        if (isUserUnique === 'email') {
+            send(res, 200, {
                 success: false,
                 error: 'Email taken',
+                translationKey: 'email_taken'
             });
         }
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured during registering',
+        });
     }
 };
 
 // @desc Register user with 42 strategy
-// @route POST /api/v1/auth/42
+// @route GET /api/v1/auth/42
 // @access Public
 exports.fortyTwoRegister = async (req, res) => {
     res.json({ success: true });
@@ -120,9 +311,10 @@ exports.confirmAccount = async (req, res) => {
         await user.save();
         res.json({ success: true });
     } else {
-        res.status(400).json({
+        res.status(200).json({
             success: false,
             error: 'Wrong confirmation link',
+            translationKey: 'wrong_confirmation_link'
         });
     }
 };
@@ -132,23 +324,31 @@ exports.confirmAccount = async (req, res) => {
 // @access Public
 exports.login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const {
+            body: { username, password },
+        } = req;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({
+            username,
+            isConfirmed: true,
+            OAuthProvider: undefined,
+        });
         if (user === null) {
             // Could not find a user with this username
-            res.status(401).json({
+            res.status(200).json({
                 success: false,
                 error: 'No user found',
+                translationKey: 'no_user_found'
             });
             return;
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Invalid password',
+                translationKey: 'invalid_password'
             });
 
             return;
@@ -158,7 +358,7 @@ exports.login = async (req, res) => {
 
         createCookie(res, cookieToken).json({
             success: true,
-            user: user.toObject(),
+            user: sanitizeUserDocument(user),
             csrfToken,
         });
     } catch (e) {
@@ -171,31 +371,59 @@ exports.login = async (req, res) => {
 // @route GET /api/v1/auth/me
 // @access Private
 exports.getMe = async (req, res) => {
-    const {
-        isConfirmed,
-        password,
-        confirmationLinkUuid,
-        csrfSecret,
-        ...props
-    } = req.user;
+    try {
+        const { user } = req;
 
-    res.json({ success: true, user: props });
+        send(res, 200, {
+            success: true,
+            user: sanitizeUserDocument(user),
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'Could not get you',
+        });
+    }
 };
 
 // @desc Get an user by id
 // @route GET /user/:id
 // @access Private
 exports.getUser = async (req, res) => {
-    const { user } = req;
-    const {
-        isConfirmed,
-        password,
-        confirmationLinkUuid,
-        csrfSecret,
-        ...props
-    } = user._doc;
+    try {
+        const {
+            params: { id },
+        } = req;
+        if (typeof id !== 'string' || id.length !== 24) {
+            send(res, 400, {
+                success: false,
+                error: 'The ID is not correct',
+                translationKey: 'incorrect_id'
+            });
+            return;
+        }
 
-    res.json({ success: true, props });
+        const user = await User.findById(id);
+        if (user === null) {
+            send(res, 404, {
+                success: false,
+                user: 'No user found with this ID',
+                translationKey: 'invalid_user',
+
+            });
+            return;
+        }
+
+        send(res, 200, {
+            success: true,
+            ...sanitizeUserDocument(user),
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured while trying to get the user',
+        });
+    }
 };
 
 // @desc Forgot password
@@ -221,7 +449,7 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Unknown account'] });
+            res.status(200).json({ success: false, error: 'Unknown account', translationKey: 'unknown_account'});
             return;
         }
 
@@ -240,7 +468,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // send a link with the plain guid
-        const link = `${process.env.FRONT_URI}/password-reset?token=${guid}`;
+        const link = `${process.env.FRONT_URI}/password-reset/${guid}`;
 
         email.send({
             to: user.email,
@@ -269,22 +497,24 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success: false, error: 'Invalid password', translationKey: 'invalid_password' });
             return;
         }
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success: false, error: 'Invalid username', translationKey: 'invalid_username' });
             return;
         }
 
         if (!isLinkValid(user, token)) {
-            res.status(400).json({ error: ['Invalid link'] });
+            res.status(200).json({ success: false, error: 'Invalid link', translationKey: 'invalid_link' });
             return;
         }
 
-        user.password = password;
+        user.password = await hashPassword(password);
+        user.isConfirmed = true;
+
         await user.save();
 
         res.json({ success: true });
@@ -317,41 +547,67 @@ function isLinkValid(user, token) {
 // @route PUT /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = async (req, res) => {
-    const {
-        user,
-        body: { email, username, firstName, lastName },
-        file: profilePicture,
-    } = req;
-
-    const availableProperties = [
-        ['email', email],
-        ['username', username],
-        ['firstName', firstName],
-        ['lastName', lastName],
-        [
-            'profilePicture',
-            profilePicture ? profilePicture.path : profilePicture,
-        ],
-    ];
-
-    for (const [key, value] of availableProperties) {
-        console.log(value);
-
-        if (value) {
-            user[key] = value;
-        }
-    }
-
-    // save the modifications
     try {
-        await user.save();
+        const {
+            user,
+            body: { email, username, firstName, lastName },
+            file: profilePicture,
+        } = req;
+
+        const availableProperties = [
+            ['email', email],
+            ['username', username],
+            ['firstName', firstName],
+            ['lastName', lastName],
+            [
+                'profilePicture',
+                profilePicture ? profilePicture.path : profilePicture,
+            ],
+        ];
+
+        for (const [key, value] of availableProperties) {
+            // console.log(value);
+
+            if (value) {
+                user[key] = value;
+            }
+        }
+
+        // save the modifications
+        try {
+            await user.save();
+        } catch (e) {
+            console.error('e in catch', e);
+
+            // There is a duplicate field
+            if (e.code === 11000) {
+                const duplicateField = e.errmsg.includes('username')
+                    ? 'username'
+                    : 'email';
+
+                send(res, 200, {
+                    success: false,
+                    error: `This ${duplicateField} is already used`,
+                    translationKey: 'duplicate_field'
+                });
+                return;
+            }
+            console.log('error ', e.errors);
+            const msg = e.errors;
+            send(res, 500, { success: false, error: msg });
+            return;
+        }
+
+        res.status(200).json({ success: true });
     } catch (e) {
-        const msg = Object.values(e.errors).map(val => val.message);
-        res.status(400).json({ success: false, error: msg });
+        console.error(e);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured',
+        });
         return;
     }
-
-    res.status(200).json({ success: true });
 };
 
 // @desc Update password
@@ -359,14 +615,29 @@ exports.updateDetails = async (req, res) => {
 // @access Private
 exports.updatePassword = async (req, res) => {
     try {
-        const { user } = req;
+        const {
+            user,
+            body: { password },
+        } = req;
+        if (!validPasswordRegex.test(password)) {
+            send(res, 200, {
+                success: false,
+                error:
+                    'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
+                    translationKey: "invalid_password"
+            });
+            return;
+        }
 
-        user.password = req.body.password;
+        user.password = await hashPassword(password);
+
         await user.save();
-        res.json({ success: true });
+
+        send(res, 200, { success: true });
     } catch (e) {
-        const msg = Object.values(e.errors).map(val => val.message);
-        res.status(400).json({ success: false, error: msg });
+        const msg = e.errors.password.message;
+
+        send(res, 200, { success: false, error: msg });
     }
 };
 
@@ -374,6 +645,7 @@ exports.updatePassword = async (req, res) => {
 // @route POST /api/v1/auth/logout
 // @access Private
 exports.logout = async (req, res) => {
+    res.clearCookie('connect.sid');
     res.clearCookie('cookie-id').json({ success: true });
 };
 
@@ -383,3 +655,5 @@ function hashSha512ToHex(text) {
         .update(text)
         .digest('hex');
 }
+
+exports.createUploadPathIfNotExist = createUploadPathIfNotExist;
