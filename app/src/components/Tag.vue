@@ -1,6 +1,11 @@
 <template functional>
   <span
-    class="inline-block rounded-full px-2 py-1 mb-1 mr-1 bg-gray-700 text-gray-200 text-sm font-semibold tag"
+    class="inline-block rounded-full bg-gray-700 text-gray-200 font-semibold tag"
+    :class="[
+      props.big !== undefined
+        ? 'px-3 py-2 mb-2 mr-2 text-base'
+        : 'px-2 py-1 mb-1 mr-1 text-sm'
+    ]"
   >
     <slot />
   </span>
