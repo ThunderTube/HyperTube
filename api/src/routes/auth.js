@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const FileType = require('file-type');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const {
     promises: { writeFile, unlink, mkdir },
 } = require('fs');
