@@ -37,6 +37,18 @@
         {{ genre }}
       </tag>
     </div>
+
+    <list-dropdown label="Cast">
+      <tag v-for="{ name, character } in cast" :key="name" :title="character">
+        {{ name }}
+      </tag>
+    </list-dropdown>
+
+    <list-dropdown label="Crew">
+      <tag v-for="{ name, job } in crew" :key="name" :title="job">
+        {{ name }}
+      </tag>
+    </list-dropdown>
   </div>
 </template>
 
@@ -44,6 +56,7 @@
 import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
 import PlayIcon from './PlayIcon.vue'
+import ListDropdown from './ListDropdown.vue'
 
 export default {
   name: 'MovieViewer',
@@ -51,7 +64,8 @@ export default {
   components: {
     Tag,
     MovieStars,
-    PlayIcon
+    PlayIcon,
+    ListDropdown
   },
   props: {
     title: {
