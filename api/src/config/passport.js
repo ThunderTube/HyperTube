@@ -6,7 +6,7 @@ const stream = require('stream');
 const { promisify } = require('util');
 const fs = require('fs');
 const got = require('got');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 
 const { User } = require('../models/User');
 
