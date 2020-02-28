@@ -50,6 +50,33 @@ export default {
 
       return `${hours.toFixed(0)}h${minutes.toFixed(0)}`
     }
+  },
+  methods: {
+    fetch() {
+      this.loading = true
+      this.initialLoad = false
+
+      axios
+        .get(`/stream/video/${this.id}`)
+        .then(({ data: movie }) => {
+          this.movie = movie
+        })
+        .catch(console.error)
+        .finally(() => {
+          this.loading = false
+        })
+    }
+  },
+  created() {
+    this.fetch()
+  },
+  computed: {
+    formattedRuntime() {
+      const hours = this.runtime / 60
+      const minutes = this.runtime % 60
+
+      return `${hours.toFixed(0)}h${minutes.toFixed(0)}`
+    }
   }
 }
 </script>
