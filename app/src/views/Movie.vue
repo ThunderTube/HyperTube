@@ -1,30 +1,60 @@
 <template>
-  <movie-viewer v-if="movie !== null" v-bind="movie" />
+  <div class="flex justify-center pt-20">
+    <transition name="fade" mode="out-in">
+      <loading-spinner v-if="loading" />
+
+      <movie-viewer v-else-if="movie !== null" v-bind="movie" />
+
+      <movie-viewer-no-data v-else>
+        There is no movie to watch here.
+      </movie-viewer-no-data>
+    </transition>
+  </div>
 </template>
 
 <script>
+import axios from '@/api/axios'
+
 import MovieViewer from '@/components/MovieViewer.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import MovieViewerNoData from '@/components/MovieViewerNoData.vue'
+
+function resolveAfter(ms, value) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(value)
+    }, ms)
+  })
+}
 
 export default {
   components: {
-    MovieViewer
+    MovieViewer,
+    LoadingSpinner,
+    MovieViewerNoData
   },
   data() {
     return {
-      movie: null
+      movie: null,
+      loading: false
     }
   },
   methods: {
     fetch() {
       this.loading = true
-      this.initialLoad = false
 
       axios
         .get(`/stream/video/${this.id}`)
         .then(({ data: movie }) => {
           this.movie = movie
+
+          return resolveAfter(1000)
         })
-        .catch(console.error)
+        .catch((e) => {
+          console.error(e)
+
+          this.movie = null
+        })
         .finally(() => {
           this.loading = false
         })
@@ -50,5 +80,14 @@ export default {
 <style lang="scss" scoped>
 .player {
   height: 500px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
