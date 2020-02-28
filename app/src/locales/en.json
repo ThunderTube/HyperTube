@@ -3,11 +3,18 @@
       "login": "Login",
       "register": "Register",
       "id": "Login",
-      "id_placeholder": "login or email",
+      "id_placeholder": "Username",
       "password": "Password",
       "forgot_password": "Password forgot?",
       "register_input": "Register",
       "register_form_title": "Register form"
+  },
+  
+  "registerscreen": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "id_placeholder": "Username",
+      "password": "Password"
   },
 
   "navbar": {
@@ -23,5 +30,35 @@
   "movie": {
       "play": "Play",
       "watchlist_add": "Add to watchlist"
-  }
+  },
+
+  "profile": {
+      "title": "Profile of ",
+      "username": "Username : ",
+      "firstname": "Firstname : ",
+      "lastname": "Lastname : "
+  },
+
+  "form": {
+    "missing_input": "Check your inputs",
+    "confirm_account": "Confirm your account",
+    "check_mail": "Check your mail",
+    "password_updated": "Password updated",
+    "account_updated": "Account updated"
+  },
+
+      "wrong_file_type": "Wrong file type",
+      "missing_user_inputs": "Missing required inputs",
+      "username_taken": "Username taken",
+      "email_taken": "Username taken",
+      "wrong_confirmation_link": "Wrong confirmation link",
+      "no_user_found": "No user found",
+      "invalid_password": "Invalid password",
+      "incorrect_id": "Incorrect ID",
+      "unknown_account": "Unknown account",
+      "invalid_username": "Invalid username",
+      "invalid_link": "Invalid link",
+      "invalid_user": "Invalid user",
+      "duplicate_key": "Duplicate key"
+
 }

@@ -10,16 +10,27 @@ const userSchema = new Schema({
     username: {
         type: String,
         unique: true,
-        required: [true, 'Please add an username'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add an username'];
+        },
         match: [
-            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3, 20}$/,
+            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3,255}$/,
             'Please add a valid username [at least 2 letters, number and [-] are accepted]',
         ],
     },
     email: {
         type: String,
         unique: true,
-        required: [true, 'Please add an email'],
+        sparse: true,
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add an email'];
+        },
         match: [
             /^[^\W][A-z0-9_]+(\.[a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/,
             'Please add a valid email',
@@ -27,23 +38,38 @@ const userSchema = new Schema({
     },
     lastName: {
         type: String,
-        required: [true, 'Please add a last name'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add a last name [at least 2 letters]'];
+        },
         match: [
-            /^[A-zÀ-ú- ]{2,20}$/,
-            'Please add a valid last name [at least 2 letters]',
+            /^[A-zÀ-ú- ]{1,255}$/,
+            'Please add a valid last name [at least 1 letter]',
         ],
     },
     firstName: {
         type: String,
-        required: [true, 'Please add a first name'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add a first name [at least 1 letters]'];
+        },
         match: [
-            /^[A-zÀ-ú- ]{2,20}$/,
-            'Please add a valid first name [at least 2 letters]',
+            /^[A-zÀ-ú- ]{1,255}$/,
+            'Please add a valid first name [at least 1 letters]',
         ],
     },
     password: {
         type: String,
-        required: [true, 'Please add a password'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add a password'];
+        },
         match: [
             validPasswordRegex,
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
@@ -63,6 +89,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    OAuthProvider: {
+        type: String,
+    },
     passwordResets: {
         type: [{ token: String, expiresAt: Date }],
         default() {
@@ -77,18 +106,15 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
     });
 };
 
-// Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
-    this.password = await hashPassword(this.password);
-    next();
-});
-
 // Verify if username and email is unique
 userSchema.statics.isUnique = async function isUnique({ email, username }) {
-    if ((await this.countDocuments({ email })) !== 0) {
+    if (email !== undefined && (await this.countDocuments({ email })) !== 0) {
         return 'email';
     }
-    if ((await this.countDocuments({ username })) !== 0) {
+    if (
+        username !== undefined &&
+        (await this.countDocuments({ username })) !== 0
+    ) {
         return 'username';
     }
     return true;
@@ -108,12 +134,7 @@ userSchema.statics.verifyJWT = function verifyJWT(rawJwt) {
 };
 
 function hashPassword(password) {
-    return new Promise((resolve, reject) => {
-        bcrypt.hash(password, 10, function(err, hash) {
-            if (err) reject(err);
-            resolve(hash);
-        });
-    });
+    return bcrypt.hash(password, 10);
 }
 
 exports.User = mongoose.model('User', userSchema);

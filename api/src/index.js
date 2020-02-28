@@ -18,7 +18,9 @@ async function app() {
     await connectDB();
 
     const server = express();
-    const assets = sirv(join(__dirname, '../', 'public'));
+    const assets = sirv(join(__dirname, '../', 'public'), {
+        dev: true,
+    });
 
     // Dev logging middleware
     if (process.env.NODE_ENV === 'development') {
@@ -28,28 +30,27 @@ async function app() {
     const email = new Mail();
     const csrf = new Tokens();
 
-    setupPassport();
+    setupPassport(csrf);
 
     server
+        .use(cookieParser(process.env.COOKIE_SECRET))
         .use(express.json())
+        .use(express.urlencoded({ extended: false }))
         .use(assets)
         .use(
             cors({
                 credentials: true,
-                origin: ['http://localhost', 'http://localhost:3000'],
+                origin: ['http://localhost', process.env.FRONT_URI],
             })
         )
-        .use(cookieParser(process.env.COOKIE_SECRET))
         .use(passport.initialize())
         .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
             // This middleware sets the context
-
             res.locals = {
                 email,
                 csrf,
                 isAuthenticated: req.isAuthenticated(),
-                authorizations: User.isConfirmed === true ? ['user'] : [],
                 user: req.user || null,
             };
 

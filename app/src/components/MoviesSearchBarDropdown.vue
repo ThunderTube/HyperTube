@@ -10,9 +10,9 @@
       :name="name"
       class="block appearance-none border bg-gray-800 text-gray-400 rounded px-2 py-2 cursor-pointer w-full transition-colors duration-150 focus:outline-none border-transparent focus:border-gray-200"
     >
-      <option v-for="{ text, value } in options" :key="value" :value="value">{{
-        text
-      }}</option>
+      <option v-for="{ text, value } in options" :key="value" :value="value">
+        {{ text }}
+      </option>
     </select>
   </label>
 </template>
