@@ -77,11 +77,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.player {
-  height: 500px;
-}
-
+<style lang="scss">
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;

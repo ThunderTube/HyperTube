@@ -4,16 +4,30 @@
       {{ title }} ({{ year }})
     </h2>
 
-    <video
-      preload="none"
-      v-bind:poster="image"
-      class="w-full object-cover object-top player"
-    ></video>
+    <div class="player">
+      <video
+        preload="none"
+        v-bind:poster="image"
+        class="w-full h-full object-cover object-top"
+      ></video>
+
+      <transition name="fade" mode="out-in">
+        <button
+          v-if="!launched"
+          class="absolute transition-transform duration-100 transform hover:scale-110 focus:scale-110 focus:outline-none"
+          @click="launched = true"
+        >
+          <play-icon />
+        </button>
+      </transition>
+    </div>
 
     <div class="py-4 text-white">
       <p class="text-xl mb-2" :title="`The movie lasts ${formattedRuntime}`">
         ⏱ {{ formattedRuntime }}
       </p>
+
+      <movie-stars :rating="rating" class="mb-2" />
 
       <blockquote class="text-xl tracking-wide mb-3">
         {{ description }}
@@ -28,12 +42,16 @@
 
 <script>
 import Tag from './Tag.vue'
+import MovieStars from './MovieStars.vue'
+import PlayIcon from './PlayIcon.vue'
 
 export default {
   name: 'MovieViewer',
   inheritAttrs: false,
   components: {
-    Tag
+    Tag,
+    MovieStars,
+    PlayIcon
   },
   props: {
     title: {
@@ -89,6 +107,11 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      launched: false
+    }
+  },
   computed: {
     formattedRuntime() {
       const hours = this.runtime / 60
@@ -102,6 +125,8 @@ export default {
 
 <style lang="scss" scoped>
 .player {
+  @apply relative flex items-center justify-center;
+
   height: 500px;
 }
 </style>
