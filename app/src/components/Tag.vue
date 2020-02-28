@@ -1,5 +1,6 @@
 <template functional>
   <span
+    v-bind="data.attrs"
     class="inline-block rounded-full bg-gray-700 text-gray-200 font-semibold tag"
     :class="[
       props.big !== undefined
