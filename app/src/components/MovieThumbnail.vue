@@ -15,10 +15,14 @@
         @error.native="errorOccuredDuringImageLoading"
       />
 
-      <div class="flex-grow px-6 py-4">
+      <div class="flex-grow px-6 pt-4 pb-2">
         <h2 class="font-bold text-xl mb-2 leading-tight">{{ title }}</h2>
 
-        <p class="text-gray-400 text-base font-semibold">{{ year }}</p>
+        <p class="text-gray-400 text-base font-semibold mb-2">{{ year }}</p>
+
+        <div class="flex flex-wrap items-center py-1">
+          <tag v-for="genre in genres" :key="genre">{{ genre }}</tag>
+        </div>
       </div>
 
       <div class="mb-2 px-6 max-w-full flex justify-center items-center">
@@ -31,6 +35,7 @@
 <script>
 import VLazyImage from 'v-lazy-image'
 
+import Tag from './Tag.vue'
 import MovieThumbnailStars from './MovieThumbnailStars.vue'
 import EmptyImage from '@/assets/img/empty-image.png'
 
@@ -38,6 +43,7 @@ export default {
   name: 'MovieThumbnail',
   inheritAttrs: false,
   components: {
+    Tag,
     VLazyImage,
     MovieThumbnailStars
   },
@@ -60,6 +66,10 @@ export default {
     },
     image: {
       type: String,
+      required: true
+    },
+    genres: {
+      type: Array,
       required: true
     }
   },
