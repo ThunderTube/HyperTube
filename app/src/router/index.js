@@ -16,7 +16,9 @@ export default new Router({
     {
       path: '/:lang',
       component: {
-        render (c) { return c('router-view') }
+        render(c) {
+          return c('router-view')
+        }
       },
       children: [
         {
@@ -25,7 +27,7 @@ export default new Router({
           component: Home
         },
         {
-          path: 'movie',
+          path: 'movie/:id',
           name: 'movie',
           // route level code-splitting
           // this generates a separate chunk (about.[hash].js) for this route
