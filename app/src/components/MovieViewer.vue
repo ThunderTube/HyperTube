@@ -31,6 +31,7 @@ import Tag from './Tag.vue'
 
 export default {
   name: 'MovieViewer',
+  inheritAttrs: false,
   components: {
     Tag
   },
@@ -57,6 +58,34 @@ export default {
     },
     image: {
       type: String,
+      required: true
+    },
+    cast: {
+      type: Array,
+      required: true
+    },
+    crew: {
+      type: Array,
+      required: true
+    },
+    language: {
+      type: String,
+      required: true
+    },
+    torrents: {
+      type: Array,
+      required: true
+    },
+    subtitles: {
+      type: Array,
+      required: true
+    },
+    rating: {
+      type: Number,
+      required: true
+    },
+    comments: {
+      type: Array,
       required: true
     }
   },

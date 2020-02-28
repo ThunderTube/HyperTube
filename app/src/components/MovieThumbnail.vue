@@ -5,14 +5,10 @@
       :title="title"
       class="h-full flex flex-col bg-gray-800 text-gray-200 shadow-xl rounded transition-transform duration-300 transform hover:scale-95"
     >
-      <v-lazy-image
+      <lazy-movie-image
         :src="image"
-        :src-placeholder="
-          require('@/assets/img/mini-default-movie-picture.jpg')
-        "
         :alt="imageAlt"
         class="w-full self-start rounded-t bg-gray-300 object-cover movie-thumbnail__img"
-        @error.native="errorOccuredDuringImageLoading"
       />
 
       <div class="flex-grow px-6 pt-4 pb-2">
@@ -26,26 +22,26 @@
       </div>
 
       <div class="mb-2 px-6 max-w-full flex justify-center items-center">
-        <movie-thumbnail-stars :rating="rating" />
+        <movie-stars :rating="rating" />
       </div>
     </router-link>
   </article>
 </template>
 
 <script>
-import VLazyImage from 'v-lazy-image'
+// import VLazyImage from 'v-lazy-image'
 
 import Tag from './Tag.vue'
-import MovieThumbnailStars from './MovieThumbnailStars.vue'
-import EmptyImage from '@/assets/img/empty-image.png'
+import MovieStars from './MovieStars.vue'
+import LazyMovieImage from './LazyMovieImage'
 
 export default {
   name: 'MovieThumbnail',
   inheritAttrs: false,
   components: {
     Tag,
-    VLazyImage,
-    MovieThumbnailStars
+    LazyMovieImage,
+    MovieStars
   },
   props: {
     imdbId: {
@@ -76,12 +72,6 @@ export default {
   computed: {
     imageAlt() {
       return `${this.title} movie background picture`
-    }
-  },
-  methods: {
-    errorOccuredDuringImageLoading({ target }) {
-      target.classList.add('v-lazy-image-loaded')
-      target.src = EmptyImage
     }
   }
 }
