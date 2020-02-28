@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .page-enter-active,
 .page-leave-active {
   transition: opacity, transform 0.4s ease-in;
