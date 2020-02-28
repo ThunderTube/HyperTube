@@ -1,67 +1,60 @@
 <template>
-  <div class="w-full container pt-20 mx-auto">
-    <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">
-      {{ title }} ({{ year }})
-    </h2>
+  <div class="flex justify-center pt-20">
+    <transition name="fade" mode="out-in">
+      <loading-spinner v-if="loading" />
 
-    <video
-      preload="none"
-      poster="http://image.tmdb.org/t/p/w500/AtsgWhDnHTq68L0lLsUrCnM7TjG.jpg"
-      class="w-full object-cover object-top player"
-    ></video>
+      <movie-viewer v-else-if="movie !== null" v-bind="movie" />
 
-    <div class="py-4 text-white">
-      <p class="text-xl mb-2" :title="`The movie lasts ${formattedRuntime}`">
-        ⏱ {{ formattedRuntime }}
-      </p>
-
-      <blockquote class="text-xl tracking-wide mb-3">
-        {{ description }}
-      </blockquote>
-
-      <tag v-for="genre in genres" :key="genre" big>
-        {{ genre }}
-      </tag>
-    </div>
+      <movie-viewer-no-data v-else>
+        There is no movie to watch here.
+      </movie-viewer-no-data>
+    </transition>
   </div>
 </template>
 
 <script>
-import Tag from '@/components/Tag.vue'
+import axios from '@/api/axios'
+
+import MovieViewer from '@/components/MovieViewer.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import MovieViewerNoData from '@/components/MovieViewerNoData.vue'
+
+function resolveAfter(ms, value) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(value)
+    }, ms)
+  })
+}
 
 export default {
   components: {
-    Tag
+    MovieViewer,
+    LoadingSpinner,
+    MovieViewerNoData
   },
   data() {
     return {
-      title: "Shrek 3 - l'Ogre",
-      year: '2018',
-      runtime: 104,
-      genres: ['action', 'war', 'science-fiction'],
-      description:
-        'Elsa, Anna, Kristoff and Olaf head far into the forest to learn the truth about an ancient mystery of their kingdom.'
-    }
-  },
-  computed: {
-    formattedRuntime() {
-      const hours = this.runtime / 60
-      const minutes = this.runtime % 60
-
-      return `${hours.toFixed(0)}h${minutes.toFixed(0)}`
+      movie: null,
+      loading: false
     }
   },
   methods: {
     fetch() {
       this.loading = true
-      this.initialLoad = false
 
       axios
         .get(`/stream/video/${this.id}`)
         .then(({ data: movie }) => {
           this.movie = movie
+
+          return resolveAfter(1000)
         })
-        .catch(console.error)
+        .catch((e) => {
+          console.error(e)
+
+          this.movie = null
+        })
         .finally(() => {
           this.loading = false
         })
@@ -87,5 +80,14 @@ export default {
 <style lang="scss" scoped>
 .player {
   height: 500px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

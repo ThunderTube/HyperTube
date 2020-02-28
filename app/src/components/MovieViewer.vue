@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full container pt-20 mx-auto">
+  <div class="w-full container mx-auto">
     <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">
       {{ title }} ({{ year }})
     </h2>
@@ -94,7 +94,7 @@ export default {
       const hours = this.runtime / 60
       const minutes = this.runtime % 60
 
-      return `${hours.toFixed(0)}h${minutes.toFixed(0)}`
+      return `${hours.toFixed(0)}h${minutes.toFixed(0).padStart(2, '0')}`
     }
   }
 }
