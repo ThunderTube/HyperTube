@@ -29,7 +29,7 @@
 
       <movie-stars :rating="rating" class="mb-2" />
 
-      <blockquote class="text-xl tracking-wide mb-3">
+      <blockquote class="text-xl tracking-wide mb-4">
         {{ description }}
       </blockquote>
 
