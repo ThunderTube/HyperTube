@@ -6,9 +6,13 @@ const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
 const { extname, join } = require('path');
+const {
+    promises: { mkdir },
+} = require('fs');
 
 const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
+// const { createUploadPathIfNotExist } = require('../routes/auth');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
 
@@ -26,73 +30,6 @@ function createCookie(res, token) {
 
     return res;
 }
-exports.controllerFortyTwo = async (req, res, next) => {
-    try {
-        const { user: passportUser } = req;
-        const { csrf } = res.locals;
-        const isUserUnique = await User.isUnique({
-            email: passportUser.email,
-            username: passportUser.username,
-        });
-        console.log('User unique : ', isUserUnique);
-
-        if (isUserUnique === true) {
-            const {
-                username,
-                email,
-                lastName,
-                firstName,
-                password,
-                profilePicture,
-            } = passportUser;
-
-            const fileExtension = extname(profilePicture).slice(1);
-            const filename = `${uuid()}.${fileExtension}`;
-
-            // We fetch the file and save it locally
-            await pipeline(
-                got.stream(profilePicture),
-                fs.createWriteStream(
-                    join(__dirname, '../../public/uploads', filename)
-                )
-            );
-
-            const csrfSecret = await csrf.secret();
-
-            const user = new User({
-                username,
-                email,
-                lastName,
-                firstName,
-                password,
-                profilePicture: filename,
-                isConfirmed: true,
-                csrfSecret,
-            });
-            await user.save();
-
-            const csrfToken = csrf.create(csrfSecret);
-            const token = user.getSignedJwtToken();
-
-            createCookie(res, token).redirect(
-                `http://localhost:3000/?token=${csrfToken}`
-            );
-        } else if (isUserUnique === 'username') {
-            res.status(400).json({
-                success: false,
-                error: 'Username taken',
-            });
-        } else if (isUserUnique === 'email') {
-            res.status(400).json({
-                success: false,
-                error: 'Email taken',
-            });
-        }
-        next();
-    } catch (e) {
-        console.error(e);
-    }
-};
 
 function trimObject(obj) {
     return Object.entries(obj)
@@ -113,27 +50,28 @@ async function isUserOAuth(property, value) {
     return count > 0;
 }
 
-function trimObject(obj) {
-    return Object.entries(obj)
-        .map(([key, value]) => [key, value.trim()])
-        .reduce((agg, [key, value]) => {
-            agg[key] = value;
+async function createUploadPathIfNotExist() {
+    const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
 
-            return agg;
-        }, {});
+    await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
+
+    return UPLOAD_DIRECTORY_PATH;
 }
 
-/** Verify if username and email are unique.
- *  If it's unique user is save in DB.
- *  Otherwise we verify if user had already an OAuth account.
- *  In this case we logged in the user.
- *  Or we chech what field is duplicate,
- *  and we return to the front the specified error.
- *  */
+/**
+ * Verify if username and email are unique.
+ * If it's unique user is save in DB.
+ * Otherwise we verify if user had already an OAuth account.
+ * In this case we logged in the user.
+ * Or we check what fiseld is duplicate,
+ * and we return to the front the specified error.
+ * */
 
 exports.controllerFortyTwo = async (req, res) => {
     try {
         const { user: passportUser } = req;
+        console.log('passport req.user= ', req.user);
+        // console.log('passport user= ', user);
 
         const { csrf } = res.locals;
         const isUserUnique = await User.isUnique({
@@ -155,6 +93,11 @@ exports.controllerFortyTwo = async (req, res) => {
 
             const fileExtension = extname(profilePicture).slice(1);
             const filename = `${uuid()}.${fileExtension}`;
+            // console.log(
+            //     'createUploadPathIfNotExist: ',
+            //     await createUploadPathIfNotExist()
+            // );
+            await createUploadPathIfNotExist();
 
             // We fetch the file and save it locally
             await pipeline(
@@ -173,7 +116,7 @@ exports.controllerFortyTwo = async (req, res) => {
                 profilePicture: filename,
                 isConfirmed: true,
                 csrfSecret,
-                oAuth: true,
+                registeredUsingOAuth: true,
             });
             await user.save();
 
@@ -577,3 +520,5 @@ function hashSha512ToHex(text) {
         .update(text)
         .digest('hex');
 }
+
+exports.createUploadPathIfNotExist = createUploadPathIfNotExist();
