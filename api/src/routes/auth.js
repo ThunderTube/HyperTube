@@ -40,7 +40,7 @@ router
     .get(
         '/42',
         passport.authenticate('42', {
-            failureRedirect: `${process.env.FRONT_URI}`,
+            failureRedirect: process.env.FRONT_URI,
         }),
         (req, res, next) => {
             console.log('first 42 called');
@@ -52,7 +52,7 @@ router
     .get(
         '/github',
         passport.authenticate('github', {
-            failureRedirect: `${process.env.FRONT_URI}`,
+            failureRedirect: process.env.FRONT_URI,
         }),
         (req, res, next) => {
             console.log('first 42 called');
@@ -65,28 +65,28 @@ router
         passport.authenticate('github'),
         controllerFortyTwo
     )
-    // .get(
-    //     '/facebook',
-    //     passport.authenticate(
-    //         'facebook',
-    //         // {
-    //         //     failureRedirect: `${process.env.FRONT_URI}`,
-    //         // },
-    //         { scope: 'user_friends' }
-    //     ),
-    //     (req, res, next) => {
-    //         console.log('first 42 called');
+    .get(
+        '/facebook',
+        passport.authenticate(
+            'facebook',
+            {
+                failureRedirect: process.env.FRONT_URI,
+            },
+            { scope: 'user_friends' }
+        ),
+        (req, res, next) => {
+            console.log('first 42 called');
 
-    //         next();
-    //     }
-    // )
-    // .get(
-    //     '/facebook/callback',
-    //     passport.authenticate('facebook', {
-    //         failureRedirect: `${process.env.FRONT_URI}`,
-    //     }),
-    //     controllerFortyTwo
-    // )
+            next();
+        }
+    )
+    .get(
+        '/facebook/callback',
+        passport.authenticate('facebook', {
+            failureRedirect: process.env.FRONT_URI,
+        }),
+        controllerFortyTwo
+    )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)

@@ -35,18 +35,30 @@ module.exports = function setupPassport(csrf) {
             }
         )
     );
-    // passport.use(
-    //     new FacebookStrategy(
-    //         {
-    //             clientID: process.env.FACEBOOK_APP_ID,
-    //             clientSecret: process.env.FACEBOOK_APP_SECRET,
-    //             callbackURL: 'http://localhost:3000/v1/auth/facebook/callback',
-    //         },
-    //         (accessToken, refreshToken, profile, cb) => {
-    //             cb(null, profile);
-    //         }
-    //     )
-    // );
+    passport.use(
+        new FacebookStrategy(
+            {
+                clientID: process.env.FACEBOOK_APP_ID,
+                clientSecret: process.env.FACEBOOK_APP_SECRET,
+                callbackURL: 'http://localhost:3000/v1/auth/facebook/callback',
+                profileFields: ['id', 'first_name', 'last_name', 'picture'],
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                // console.log('profile =', profile);
+                const { provider, name, id } = profile;
+                const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
+
+                console.log('profile picture = ', profilePicture);
+
+                cb(null, {
+                    provider,
+                    profilePicture,
+                    firstName: name.givenName,
+                    lastName: name.familyName,
+                });
+            }
+        )
+    );
     passport.use(
         new GithubStrategy(
             {
@@ -55,16 +67,19 @@ module.exports = function setupPassport(csrf) {
                 callbackURL: 'http://localhost:3000/v1/auth/github/callback',
             },
             (accessToken, refreshToken, profile, cb) => {
-                const { login, name, avatar_url } = profile._json;
+                const { username, displayName, photos, provider } = profile;
+
+                // console.log('profile:', profile);
+
                 cb(null, {
-                    username: login,
-                    firstName: name,
-                    profilePicture: avatar_url,
+                    username: username,
+                    firstName: displayName,
+                    profilePicture: photos[0].value,
+                    provider,
                 });
             }
         )
     );
-
     passport.use(
         new JwtStrategy(
             {

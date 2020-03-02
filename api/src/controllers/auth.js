@@ -54,10 +54,10 @@ function sanitizeUserDocument(doc) {
     return props;
 }
 
-async function isUserOAuth(property, value) {
+async function isUserOAuth(provider, property, value) {
     const count = await User.countDocuments({
         [property]: value,
-        registeredUsingOAuth: true,
+        OAuthProvider: provider,
     });
     console.log('count = ', count);
     return count > 0;
@@ -69,6 +69,13 @@ async function createUploadPathIfNotExist() {
     await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
 
     return UPLOAD_DIRECTORY_PATH;
+}
+
+function createUsernameIfNotExist(username, firstName, lastName) {
+    if (username === undefined) {
+        return firstName.concat(lastName);
+    }
+    return username;
 }
 
 /**
@@ -96,20 +103,24 @@ exports.controllerFortyTwo = async (req, res) => {
 
         if (isUserUnique === true) {
             const {
-                username,
+                // username,
                 email,
                 lastName,
                 firstName,
                 password,
                 profilePicture,
+                provider,
             } = passportUser;
+
+            const username = createUsernameIfNotExist(
+                passportUser.username,
+                firstName,
+                lastName
+            );
 
             const fileExtension = extname(profilePicture).slice(1);
             const filename = `${uuid()}.${fileExtension}`;
-            // console.log(
-            //     'createUploadPathIfNotExist: ',
-            //     await createUploadPathIfNotExist()
-            // );
+
             await createUploadPathIfNotExist();
 
             // We fetch the file and save it locally
@@ -129,7 +140,7 @@ exports.controllerFortyTwo = async (req, res) => {
                 profilePicture: filename,
                 isConfirmed: true,
                 csrfSecret,
-                registeredUsingOAuth: true,
+                OAuthProvider: provider,
             });
             await user.save();
 
@@ -141,12 +152,13 @@ exports.controllerFortyTwo = async (req, res) => {
             );
         } else {
             const duplicateField = isUserUnique;
-
+            const provider = req.user.provider;
             const userRegisteredUsingOAuth = await isUserOAuth(
+                provider,
                 duplicateField,
                 passportUser[duplicateField]
             );
-            if (userRegisteredUsingOAuth > 0) {
+            if (userRegisteredUsingOAuth) {
                 const username = req.user.username;
                 const user = await User.findOne({ username });
 
@@ -160,10 +172,10 @@ exports.controllerFortyTwo = async (req, res) => {
                 );
             } else {
                 if (duplicateField === 'username') {
-                    res.status(400).redirect('/?error=username'); // Error for email already taken
+                    res.status(400).redirect('/?error=username'); // Error for username already taken
                 }
                 if (duplicateField === 'email') {
-                    res.status(400).redirect('/?error=email'); // Error for username already taken
+                    res.status(400).redirect('/?error=email'); // Error for email already taken
                 }
             }
         }

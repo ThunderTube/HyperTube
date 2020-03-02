@@ -10,7 +10,12 @@ const userSchema = new Schema({
     username: {
         type: String,
         unique: true,
-        required: [true, 'Please add an username'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add an username'];
+        },
         match: [
             /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3, 20}$/,
             'Please add a valid username [at least 2 letters, number and [-] are accepted]',
@@ -19,8 +24,9 @@ const userSchema = new Schema({
     email: {
         type: String,
         unique: true,
+        sparse: true,
         required() {
-            if (this.registeredUsingOAuth) {
+            if (this.OAuthProvider) {
                 return false;
             }
             return [true, 'Please add an email'];
@@ -33,7 +39,7 @@ const userSchema = new Schema({
     lastName: {
         type: String,
         required() {
-            if (this.registeredUsingOAuth) {
+            if (this.OAuthProvider) {
                 return false;
             }
             return [true, 'Please add a last name [at least 2 letters]'];
@@ -54,7 +60,7 @@ const userSchema = new Schema({
     password: {
         type: String,
         required() {
-            if (this.registeredUsingOAuth) {
+            if (this.OAuthProvider) {
                 return false;
             }
             return [true, 'Please add a password'];
@@ -78,9 +84,8 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    registeredUsingOAuth: {
-        type: Boolean,
-        default: false,
+    OAuthProvider: {
+        type: String,
     },
     passwordResets: {
         type: [{ token: String, expiresAt: Date }],
@@ -107,10 +112,13 @@ userSchema.pre('save', async function(next) {
 
 // Verify if username and email is unique
 userSchema.statics.isUnique = async function isUnique({ email, username }) {
-    if ((await this.countDocuments({ email })) !== 0) {
+    if (email !== undefined && (await this.countDocuments({ email })) !== 0) {
         return 'email';
     }
-    if ((await this.countDocuments({ username })) !== 0) {
+    if (
+        username !== undefined &&
+        (await this.countDocuments({ username })) !== 0
+    ) {
         return 'username';
     }
     return true;
