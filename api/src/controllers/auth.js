@@ -521,4 +521,4 @@ function hashSha512ToHex(text) {
         .digest('hex');
 }
 
-exports.createUploadPathIfNotExist = createUploadPathIfNotExist();
+exports.createUploadPathIfNotExist = createUploadPathIfNotExist;
