@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const FileType = require('file-type');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const {
     promises: { writeFile, unlink, mkdir },
 } = require('fs');
@@ -20,7 +20,9 @@ const {
     updateDetails,
     updatePassword,
     logout,
+    controllerFortyTwo,
     fortyTwoRegister,
+    createUploadPathIfNotExist,
     // fortyTwoCallback,
 } = require('../controllers/auth');
 
@@ -35,12 +37,56 @@ router
         ...uploadAndVerifyFileTypeMiddleware('profilePicture', IMAGE_MIMETYPES),
         register
     )
-    .post(
+    .get(
         '/42',
-        passport.authenticate('42', { failureRedirect: '/login' }),
-        fortyTwoRegister
+        passport.authenticate('42', {
+            failureRedirect: `${process.env.FRONT_URI}`,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
     )
-    // .post('/42/callback', passport.authenticate('42'), fortyTwoCallback)
+    .get('/42/callback', passport.authenticate('42'), controllerFortyTwo)
+    .get(
+        '/github',
+        passport.authenticate('github', {
+            failureRedirect: `${process.env.FRONT_URI}`,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get(
+        '/github/callback',
+        passport.authenticate('github'),
+        controllerFortyTwo
+    )
+    // .get(
+    //     '/facebook',
+    //     passport.authenticate(
+    //         'facebook',
+    //         // {
+    //         //     failureRedirect: `${process.env.FRONT_URI}`,
+    //         // },
+    //         { scope: 'user_friends' }
+    //     ),
+    //     (req, res, next) => {
+    //         console.log('first 42 called');
+
+    //         next();
+    //     }
+    // )
+    // .get(
+    //     '/facebook/callback',
+    //     passport.authenticate('facebook', {
+    //         failureRedirect: `${process.env.FRONT_URI}`,
+    //     }),
+    //     controllerFortyTwo
+    // )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
@@ -70,14 +116,6 @@ function uploadAndVerifyFileTypeMiddleware(
                     next();
                     return;
                 }
-
-                const UPLOAD_DIRECTORY_PATH = join(
-                    __dirname,
-                    '../..',
-                    'public/uploads'
-                );
-
-                await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
                 const {
                     file: { buffer },
                 } = req;
@@ -106,7 +144,10 @@ function uploadAndVerifyFileTypeMiddleware(
 
                 const fileName = `${uuid()}.${ext}`;
 
-                const pathToFile = join(UPLOAD_DIRECTORY_PATH, fileName);
+                const pathToFile = join(
+                    await createUploadPathIfNotExist(),
+                    fileName
+                );
 
                 await writeFile(pathToFile, buffer, null);
 

@@ -53,6 +53,7 @@ export const logoutCurrentUser = async ({ dispatch }) => {
     if (res.data.success) {
       dispatch('clearAuthData')
       dispatch('setAuthIsLoggedIn', false)
+      localStorage.removeItem('csrfToken')
     }
   } catch (error) {
     console.log('logoutCurrentUser ', error.message)

@@ -19,7 +19,12 @@ const userSchema = new Schema({
     email: {
         type: String,
         unique: true,
-        required: [true, 'Please add an email'],
+        required() {
+            if (this.registeredUsingOAuth) {
+                return false;
+            }
+            return [true, 'Please add an email'];
+        },
         match: [
             /^[^\W][A-z0-9_]+(\.[a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/,
             'Please add a valid email',
@@ -27,7 +32,12 @@ const userSchema = new Schema({
     },
     lastName: {
         type: String,
-        required: [true, 'Please add a last name'],
+        required() {
+            if (this.registeredUsingOAuth) {
+                return false;
+            }
+            return [true, 'Please add a last name [at least 2 letters]'];
+        },
         match: [
             /^[A-zÀ-ú- ]{2,20}$/,
             'Please add a valid last name [at least 2 letters]',
@@ -43,7 +53,12 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please add a password'],
+        required() {
+            if (this.registeredUsingOAuth) {
+                return false;
+            }
+            return [true, 'Please add a password'];
+        },
         match: [
             validPasswordRegex,
             'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
@@ -51,8 +66,7 @@ const userSchema = new Schema({
     },
     profilePicture: {
         type: String,
-        required: false
-        //required: [false, 'Please add a profile picture'],
+        required: [true, 'Please add a profile picture'],
     },
     csrfSecret: {
         type: String,
@@ -61,6 +75,10 @@ const userSchema = new Schema({
         type: String,
     },
     isConfirmed: {
+        type: Boolean,
+        default: false,
+    },
+    registeredUsingOAuth: {
         type: Boolean,
         default: false,
     },
@@ -80,7 +98,10 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
-    this.password = await hashPassword(this.password);
+    if (this.password) {
+        this.password = await hashPassword(this.password);
+        next();
+    }
     next();
 });
 

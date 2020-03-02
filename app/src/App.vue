@@ -8,14 +8,14 @@
       />
     </div>
     <div v-else>
-    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="hasCookie || isLoggedIn"/>
-    <div v-show="hasCookie || isLoggedIn">
+    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
+    <div v-if="isLoggedIn">
       <app-menu />
-    <div class="w-full">
-      <transition name="page" mode="out-in">
-        <router-view />
-      </transition>
-    </div>
+      <div class="w-full">
+        <transition name="page" mode="out-in">
+          <router-view />
+        </transition>
+      </div>
     </div>
     </div>
   </div>
@@ -80,5 +80,4 @@ export default {
   opacity: 0;
   transform: scale(1.1);
 }
-
 </style>

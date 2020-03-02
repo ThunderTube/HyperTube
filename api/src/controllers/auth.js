@@ -1,9 +1,18 @@
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const stream = require('stream');
+const fs = require('fs');
 const ms = require('ms');
+const got = require('got');
+const { extname, join } = require('path');
+const {
+    promises: { mkdir },
+} = require('fs');
 
+const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
+// const { createUploadPathIfNotExist } = require('../routes/auth');
 
 const YEAR_IN_MILLISECONDES = 3.154e10;
 
@@ -22,15 +31,143 @@ function createCookie(res, token) {
     return res;
 }
 
+function trimObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => [key, value.trim()])
+        .reduce((agg, [key, value]) => {
+            agg[key] = value;
+
+            return agg;
+        }, {});
+}
+
+async function isUserOAuth(property, value) {
+    const count = await User.countDocuments({
+        [property]: value,
+        registeredUsingOAuth: true,
+    });
+    console.log('count = ', count);
+    return count > 0;
+}
+
+async function createUploadPathIfNotExist() {
+    const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
+
+    await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
+
+    return UPLOAD_DIRECTORY_PATH;
+}
+
+/**
+ * Verify if username and email are unique.
+ * If it's unique user is save in DB.
+ * Otherwise we verify if user had already an OAuth account.
+ * In this case we logged in the user.
+ * Or we check what fiseld is duplicate,
+ * and we return to the front the specified error.
+ * */
+
+exports.controllerFortyTwo = async (req, res) => {
+    try {
+        const { user: passportUser } = req;
+        console.log('passport req.user= ', req.user);
+        // console.log('passport user= ', user);
+
+        const { csrf } = res.locals;
+        const isUserUnique = await User.isUnique({
+            email: passportUser.email,
+            username: passportUser.username,
+        });
+
+        const csrfSecret = await csrf.secret();
+
+        if (isUserUnique === true) {
+            const {
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture,
+            } = passportUser;
+
+            const fileExtension = extname(profilePicture).slice(1);
+            const filename = `${uuid()}.${fileExtension}`;
+            // console.log(
+            //     'createUploadPathIfNotExist: ',
+            //     await createUploadPathIfNotExist()
+            // );
+            await createUploadPathIfNotExist();
+
+            // We fetch the file and save it locally
+            await pipeline(
+                got.stream(profilePicture),
+                fs.createWriteStream(
+                    join(__dirname, '../../public/uploads', filename)
+                )
+            );
+
+            const user = new User({
+                username,
+                email,
+                lastName,
+                firstName,
+                password,
+                profilePicture: filename,
+                isConfirmed: true,
+                csrfSecret,
+                registeredUsingOAuth: true,
+            });
+            await user.save();
+
+            const csrfToken = csrf.create(csrfSecret);
+            const token = user.getSignedJwtToken();
+
+            createCookie(res, token).redirect(
+                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
+            );
+        } else {
+            const duplicateField = isUserUnique;
+
+            const userRegisteredUsingOAuth = await isUserOAuth(
+                duplicateField,
+                passportUser[duplicateField]
+            );
+            if (userRegisteredUsingOAuth > 0) {
+                const username = req.user.username;
+                const user = await User.findOne({ username });
+
+                const token = user.getSignedJwtToken();
+                const csrfToken = csrf.create(csrfSecret);
+
+                createCookie(res, token).redirect(
+                    `http://localhost:3000/?token=${encodeURIComponent(
+                        csrfToken
+                    )}`
+                );
+            } else {
+                if (duplicateField === 'username') {
+                    res.status(400).redirect('/?error=username'); // Error for email already taken
+                }
+                if (duplicateField === 'email') {
+                    res.status(400).redirect('/?error=email'); // Error for username already taken
+                }
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 // @desc Register user
 // @route POST /api/v1/auth/register
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const {
-            body: { username, email, lastName, firstName, password },
-            file,
-        } = req;
+        const { file } = req;
+        const { username, email, lastName, firstName, password } = trimObject(
+            req.body
+        );
         const { csrf } = res.locals;
         if (file === undefined) {
             res.status(200).json({
@@ -101,7 +238,7 @@ exports.register = async (req, res) => {
 };
 
 // @desc Register user with 42 strategy
-// @route POST /api/v1/auth/42
+// @route GET /api/v1/auth/42
 // @access Public
 exports.fortyTwoRegister = async (req, res) => {
     res.json({ success: true });
@@ -187,7 +324,7 @@ exports.getMe = async (req, res) => {
 // @route GET /user/:id
 // @access Private
 exports.getUser = async (req, res) => {
-    const user = req.user;
+    const { user } = req;
     const {
         isConfirmed,
         password,
@@ -347,7 +484,7 @@ exports.updateDetails = async (req, res) => {
     try {
         await user.save();
     } catch (e) {
-        let msg = Object.values(e.errors).map(val => val.message);
+        const msg = Object.values(e.errors).map(val => val.message);
         res.status(400).json({ success: false, error: msg });
         return;
     }
@@ -360,15 +497,14 @@ exports.updateDetails = async (req, res) => {
 // @access Private
 exports.updatePassword = async (req, res) => {
     try {
-        const user = req.user;
+        const { user } = req;
 
         user.password = req.body.password;
         await user.save();
         res.json({ success: true });
     } catch (e) {
-        let msg = Object.values(e.errors).map(val => val.message);
+        const msg = Object.values(e.errors).map(val => val.message);
         res.status(400).json({ success: false, error: msg });
-        return;
     }
 };
 
@@ -385,3 +521,5 @@ function hashSha512ToHex(text) {
         .update(text)
         .digest('hex');
 }
+
+exports.createUploadPathIfNotExist = createUploadPathIfNotExist;
