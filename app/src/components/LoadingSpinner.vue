@@ -1,5 +1,5 @@
 <template functional>
-  <div class="lds-ring">
+  <div class="lds-ring" v-bind="data.attrs" :class="[data.class, data.staticClass]">
     <div></div>
     <div></div>
     <div></div>
@@ -16,7 +16,6 @@ export default {
 <style scoped>
 .lds-ring {
   display: inline-block;
-  position: relative;
   width: 80px;
   height: 80px;
 }
