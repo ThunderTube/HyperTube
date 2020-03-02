@@ -1,7 +1,9 @@
 const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
 const AnonymousStrategy = require('passport-anonymous');
+const JwtStrategy = require('passport-jwt').Strategy;
 const FortyTwoStrategy = require('passport-42').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const GithubStrategy = require('passport-github').Strategy;
 const stream = require('stream');
 const { promisify } = require('util');
 const fs = require('fs');
@@ -30,6 +32,35 @@ module.exports = function setupPassport(csrf) {
             },
             (accessToken, refreshToken, profile, cb) => {
                 cb(null, profile);
+            }
+        )
+    );
+    // passport.use(
+    //     new FacebookStrategy(
+    //         {
+    //             clientID: process.env.FACEBOOK_APP_ID,
+    //             clientSecret: process.env.FACEBOOK_APP_SECRET,
+    //             callbackURL: 'http://localhost:3000/v1/auth/facebook/callback',
+    //         },
+    //         (accessToken, refreshToken, profile, cb) => {
+    //             cb(null, profile);
+    //         }
+    //     )
+    // );
+    passport.use(
+        new GithubStrategy(
+            {
+                clientID: process.env.GITHUB_APP_ID,
+                clientSecret: process.env.GITHUB_APP_SECRET,
+                callbackURL: 'http://localhost:3000/v1/auth/github/callback',
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                const { login, name, avatar_url } = profile._json;
+                cb(null, {
+                    username: login,
+                    firstName: name,
+                    profilePicture: avatar_url,
+                });
             }
         )
     );

@@ -22,6 +22,7 @@ const {
     logout,
     controllerFortyTwo,
     fortyTwoRegister,
+    createUploadPathIfNotExist,
     // fortyTwoCallback,
 } = require('../controllers/auth');
 
@@ -39,7 +40,7 @@ router
     .get(
         '/42',
         passport.authenticate('42', {
-            failureRedirect: `$(proccess.env.FRONT_URI)`,
+            failureRedirect: `${process.env.FRONT_URI}`,
         }),
         (req, res, next) => {
             console.log('first 42 called');
@@ -48,6 +49,44 @@ router
         }
     )
     .get('/42/callback', passport.authenticate('42'), controllerFortyTwo)
+    .get(
+        '/github',
+        passport.authenticate('github', {
+            failureRedirect: `${process.env.FRONT_URI}`,
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get(
+        '/github/callback',
+        passport.authenticate('github'),
+        controllerFortyTwo
+    )
+    // .get(
+    //     '/facebook',
+    //     passport.authenticate(
+    //         'facebook',
+    //         // {
+    //         //     failureRedirect: `${process.env.FRONT_URI}`,
+    //         // },
+    //         { scope: 'user_friends' }
+    //     ),
+    //     (req, res, next) => {
+    //         console.log('first 42 called');
+
+    //         next();
+    //     }
+    // )
+    // .get(
+    //     '/facebook/callback',
+    //     passport.authenticate('facebook', {
+    //         failureRedirect: `${process.env.FRONT_URI}`,
+    //     }),
+    //     controllerFortyTwo
+    // )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
@@ -77,14 +116,6 @@ function uploadAndVerifyFileTypeMiddleware(
                     next();
                     return;
                 }
-
-                const UPLOAD_DIRECTORY_PATH = join(
-                    __dirname,
-                    '../..',
-                    'public/uploads'
-                );
-
-                await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
                 const {
                     file: { buffer },
                 } = req;
@@ -111,7 +142,10 @@ function uploadAndVerifyFileTypeMiddleware(
 
                 const fileName = `${uuid()}.${ext}`;
 
-                const pathToFile = join(UPLOAD_DIRECTORY_PATH, fileName);
+                const pathToFile = join(
+                    await createUploadPathIfNotExist(),
+                    fileName
+                );
 
                 await writeFile(pathToFile, buffer, null);
 
