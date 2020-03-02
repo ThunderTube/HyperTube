@@ -8,7 +8,7 @@
     <video
       crossorigin="use-credentials"
       preload="none"
-      v-bind:poster="image"
+      :poster="poster"
       class="w-full focus:outline-none"
       :class="{ 'h-full object-cover object-top': !hasPlayed }"
       controls
@@ -103,6 +103,9 @@ export default {
     }
   },
   computed: {
+    poster() {
+      return `${process.env.VUE_APP_BASE_URL}/stream/poster/${this.id}`
+    },
     orderedTorrents() {
       const torrents = [...this.torrents].sort(
         ({ seeds: seedsA, peers: peersA }, { seeds: seedsB, peers: peersB }) =>

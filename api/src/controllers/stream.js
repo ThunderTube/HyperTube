@@ -1,4 +1,5 @@
 const send = require('@polka/send-type');
+const got = require('got');
 const srt2vtt = require('srt-to-vtt');
 const { extname } = require('path');
 
@@ -408,6 +409,40 @@ async function getMovieComments(req, res) {
     }
 }
 
+async function streamMoviePosterToClient(req, res) {
+    try {
+        const {
+            params: { id },
+        } = req;
+
+        const movie = await Movie.findOne(
+            {
+                imdbId: id,
+            },
+            {
+                image: 1,
+            }
+        );
+        if (movie === null) {
+            throw new Error('Could not get this movie');
+        }
+        const { image } = movie;
+
+        try {
+            const buffer = await got(image).buffer();
+
+            send(res, 200, buffer);
+        } catch (e) {
+            console.error(e);
+        }
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured during image pipelining',
+        });
+    }
+}
+
 module.exports = {
     getVideos,
     searchVideos,
@@ -418,4 +453,5 @@ module.exports = {
     getSubtitleForVideoAndLangcode,
     commentMovie,
     getMovieComments,
+    streamMoviePosterToClient,
 };
