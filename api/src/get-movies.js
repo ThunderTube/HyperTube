@@ -465,7 +465,7 @@ async function getSubtitles(id) {
     return Object.values(subtitles)
         .filter(({ [OPENSUBTITLES_URL_PROPERTY]: url }) => url !== undefined)
         .map(({ langcode, lang, encoding, score }) => ({
-            url: `/api/v1/stream/subtitles/${id}-${langcode}.vtt`,
+            url: `/stream/subtitles/${id}-${langcode}.vtt`,
             langcode,
             lang,
             encoding,
