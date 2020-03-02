@@ -26,7 +26,7 @@ const userSchema = new Schema({
             return [true, 'Please add an email'];
         },
         match: [
-            /(^[^\W][A-z0-9_]+(\.[a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$)|/,
+            /^[^\W][A-z0-9_]+(\.[a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/,
             'Please add a valid email',
         ],
     },
@@ -36,7 +36,7 @@ const userSchema = new Schema({
             if (this.registeredUsingOAuth) {
                 return false;
             }
-            return [true, 'Please add an email'];
+            return [true, 'Please add a last name [at least 2 letters]'];
         },
         match: [
             /^[A-zÀ-ú- ]{2,20}$/,
@@ -57,7 +57,7 @@ const userSchema = new Schema({
             if (this.registeredUsingOAuth) {
                 return false;
             }
-            return [true, 'Please add an email'];
+            return [true, 'Please add a password'];
         },
         match: [
             validPasswordRegex,
