@@ -1,53 +1,28 @@
 <template>
   <div class="w-full container mx-auto">
-    <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">
-      {{ title }} ({{ year }})
-    </h2>
+    <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">{{ title }} ({{ year }})</h2>
 
-    <div class="player">
-      <video
-        preload="none"
-        v-bind:poster="image"
-        class="w-full h-full object-cover object-top"
-      ></video>
-
-      <transition name="fade" mode="out-in">
-        <button
-          v-if="!launched"
-          class="absolute transition-transform duration-100 transform hover:scale-110 focus:scale-110 focus:outline-none"
-          @click="launched = true"
-        >
-          <play-icon />
-        </button>
-      </transition>
-    </div>
+    <player :id="imdbId" :image="image" :torrents="torrents" :subtitles="subtitles" />
 
     <div class="py-4 text-white">
-      <p class="text-xl mb-2" :title="`The movie lasts ${formattedRuntime}`">
-        ⏱ {{ formattedRuntime }}
-      </p>
+      <p
+        class="text-xl mb-2"
+        :title="`The movie lasts ${formattedRuntime}`"
+      >⏱ {{ formattedRuntime }}</p>
 
       <movie-stars :rating="rating" class="mb-2" />
 
-      <blockquote class="text-xl tracking-wide mb-4">
-        {{ description }}
-      </blockquote>
+      <blockquote class="text-xl tracking-wide mb-4">{{ description }}</blockquote>
 
-      <tag v-for="genre in genres" :key="genre" big>
-        {{ genre }}
-      </tag>
+      <tag v-for="genre in genres" :key="genre" big>{{ genre }}</tag>
     </div>
 
     <list-dropdown label="Cast">
-      <tag v-for="{ name, character } in cast" :key="name" :title="character">
-        {{ name }}
-      </tag>
+      <tag v-for="{ name, character } in cast" :key="name" :title="character">{{ name }}</tag>
     </list-dropdown>
 
     <list-dropdown label="Crew">
-      <tag v-for="{ name, job } in crew" :key="name" :title="job">
-        {{ name }}
-      </tag>
+      <tag v-for="{ name, job } in crew" :key="name" :title="job">{{ name }}</tag>
     </list-dropdown>
   </div>
 </template>
@@ -55,8 +30,8 @@
 <script>
 import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
-import PlayIcon from './PlayIcon.vue'
 import ListDropdown from './ListDropdown.vue'
+import Player from './MoviePlayer.vue'
 
 export default {
   name: 'MovieViewer',
@@ -64,10 +39,14 @@ export default {
   components: {
     Tag,
     MovieStars,
-    PlayIcon,
-    ListDropdown
+    ListDropdown,
+    Player
   },
   props: {
+    imdbId: {
+      type: String,
+      required: true
+    },
     title: {
       type: String,
       required: true
@@ -137,10 +116,3 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.player {
-  @apply relative flex items-center justify-center;
-
-  height: 500px;
-}
-</style>
