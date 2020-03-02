@@ -1,4 +1,4 @@
-import { register, login, forgotPassword, me } from '@/api/auth'
+import { register, login, forgotPassword, me, logout } from '@/api/auth'
 
 export const registerUser = async ({ commit }, data) => {
   try {
@@ -44,6 +44,18 @@ export const getCurrentUser = async ({ dispatch }) => {
     return res
   } catch (error) {
     console.log('getCurrentUser ', error.message)
+  }
+}
+
+export const logoutCurrentUser = async ({ dispatch }) => {
+  try {
+    const res = await logout()
+    if (res.data.success) {
+      dispatch('clearAuthData')
+      dispatch('setAuthIsLoggedIn', false)
+    }
+  } catch (error) {
+    console.log('logoutCurrentUser ', error.message)
   }
 }
 

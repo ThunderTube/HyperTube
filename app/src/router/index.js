@@ -75,8 +75,7 @@ async function requireToken(to, from, next) {
     const guid = to.params.guid
     const token = to.params.token
    console.log(guid)
-   console.log(token)
-   
+    
     // if (!id || !uuid)
     //   next('/')
     // const result = await confirmAccount(uuid, id)

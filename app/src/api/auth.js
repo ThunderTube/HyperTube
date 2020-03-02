@@ -20,7 +20,7 @@ const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, data)
 
 // const updatePassword = (data) => axios.put(`${AUTH}/updatepassword`, { data });
 
-// const logout = (data) => axios.post(`${AUTH}/logout`, { data });
+const logout = () => axios.post(`${AUTH}/logout`);
 
 export {
   register,
@@ -28,9 +28,9 @@ export {
   me,
   confirmAccount,
   // getUser,
-  forgotPassword
+  forgotPassword,
   // resetPassword,
   // updateDetails,
   // updatePassword,
-  // logout
+  logout
 }
