@@ -41,6 +41,18 @@ function trimObject(obj) {
         }, {});
 }
 
+function sanitizeUserDocument(doc) {
+    const {
+        isConfirmed,
+        password,
+        confirmationLinkUuid,
+        csrfSecret,
+        ...props
+    } = doc.toObject();
+
+    return props;
+}
+
 async function isUserOAuth(property, value) {
     const count = await User.countDocuments({
         [property]: value,
@@ -204,10 +216,7 @@ exports.register = async (req, res) => {
         });
 
         if (isUserUnique === true) {
-            const csrfToken = csrf.create(csrfSecret);
-
             await user.save();
-            const token = user.getSignedJwtToken();
 
             res.locals.email.send({
                 to: user.email,
@@ -220,7 +229,7 @@ exports.register = async (req, res) => {
                 ),
             });
 
-            createCookie(res, token).json({ success: true, csrfToken });
+            res.json({ success: true });
         } else if (isUserUnique === 'username') {
             res.status(400).json({
                 success: false,
@@ -272,6 +281,7 @@ exports.login = async (req, res) => {
         const { username, password } = req.body;
         const { csrf } = res.locals;
 
+        console.log('username, password', username, password);
         const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
@@ -295,7 +305,7 @@ exports.login = async (req, res) => {
 
         createCookie(res, cookieToken).json({
             success: true,
-            user: user.toObject(),
+            user: sanitizeUserDocument(user),
             csrfToken,
         });
     } catch (e) {
@@ -308,15 +318,7 @@ exports.login = async (req, res) => {
 // @route GET /api/v1/auth/me
 // @access Private
 exports.getMe = async (req, res) => {
-    const {
-        isConfirmed,
-        password,
-        confirmationLinkUuid,
-        csrfSecret,
-        ...props
-    } = req.user;
-
-    res.json({ success: true, user: props });
+    res.json({ success: true, user: sanitizeUserDocument(req.user) });
 };
 
 // @desc Get an user by id
