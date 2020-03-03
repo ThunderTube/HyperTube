@@ -39,7 +39,7 @@ async function app() {
         .use(
             cors({
                 credentials: true,
-                origin: ['http://localhost', 'http://localhost:3000'],
+                origin: ['http://localhost', process.env.FRONT_URI],
             })
         )
         .use(

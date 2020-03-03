@@ -148,7 +148,9 @@ exports.controllerFortyTwo = async (req, res) => {
             const token = user.getSignedJwtToken();
 
             createCookie(res, token).redirect(
-                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
+                `${process.env.FRONT_URI}/?token=${encodeURIComponent(
+                    csrfToken
+                )}`
             );
         } else {
             const duplicateField = isUserUnique;
@@ -166,7 +168,7 @@ exports.controllerFortyTwo = async (req, res) => {
                 const csrfToken = csrf.create(csrfSecret);
 
                 createCookie(res, token).redirect(
-                    `http://localhost:3000/?token=${encodeURIComponent(
+                    `${process.env.FRONT_URI}/?token=${encodeURIComponent(
                         csrfToken
                     )}`
                 );

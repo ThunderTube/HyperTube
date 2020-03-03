@@ -18,7 +18,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.FORTYTWO_CLIENT_ID,
                 clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-                callbackURL: 'http://localhost:3000/v1/auth/42/callback',
+                callbackURL: `${process.env.FRONT_URI}/v1/auth/42/callback`,
                 profileFields: {
                     id(obj) {
                         return String(obj.id);
@@ -40,7 +40,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.FACEBOOK_APP_ID,
                 clientSecret: process.env.FACEBOOK_APP_SECRET,
-                callbackURL: 'http://localhost:3000/v1/auth/facebook/callback',
+                callbackURL: `${process.env.FRONT_URI}/v1/auth/facebook/callback`,
                 profileFields: ['id', 'first_name', 'last_name', 'picture'],
             },
             (accessToken, refreshToken, profile, cb) => {
@@ -64,7 +64,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.GITHUB_APP_ID,
                 clientSecret: process.env.GITHUB_APP_SECRET,
-                callbackURL: 'http://localhost:3000/v1/auth/github/callback',
+                callbackURL: `${process.env.FRONT_URI}/v1/auth/github/callback`,
             },
             (accessToken, refreshToken, profile, cb) => {
                 const { username, displayName, photos, provider } = profile;
