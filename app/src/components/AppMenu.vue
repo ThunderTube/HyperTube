@@ -3,7 +3,7 @@
     <router-link to="movie" class="flex items-center">
       <div>
         <img
-          :src="`http://localhost:8080/uploads/${getAuthData.profilePicture}`"
+          :src="profilePictureSrc(getAuthData.profilePicture)"
           :alt="getAuthData.username"
           class="rounded-full w-12 h-12"
         />
@@ -109,9 +109,14 @@ export default {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       getAuthData: 'auth/getAuthData'
-    })
+    }),
+
   },
   methods: {
+    profilePictureSrc(image) {
+      const API_ROOT = new URL(process.env.VUE_APP_BASE_URL).origin
+      return `${API_ROOT}/uploads/${image}`
+    },
     ...mapActions({
       logoutCurrentUser: 'auth/logoutCurrentUser'
     }),
