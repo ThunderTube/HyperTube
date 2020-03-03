@@ -1,12 +1,12 @@
 <template>
   <div
     v-if="!isLoggedIn"
-    class="z-50 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
+    class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
   >
-    <div
-      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
-    ></div>
-
+  <div class="z-50">
+    <app-switch-lang />
+  </div>
+    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
     <div
       class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
     >
@@ -121,11 +121,13 @@
 import axios from 'axios'
 import { mapActions } from 'vuex'
 import AppInput from '../components/AppInput'
+import AppSwitchLang from '@/components/AppSwitchLang.vue'
 
 export default {
   name: 'AuthScreen',
   components: {
-    AppInput
+    AppInput,
+    AppSwitchLang
   },
   props: {
     isLoggedIn: {

@@ -3,12 +3,12 @@
     <router-link to="movie" class="flex items-center">
       <div>
         <img
-          src="@/assets/img/avatar.jpg"
-          alt="avatar"
+          :src="`http://localhost:8080/uploads/${getAuthData.profilePicture}`"
+          :alt="getAuthData.username"
           class="rounded-full w-12 h-12"
         />
       </div>
-      <div class="text-gray-500 ml-6 hover:text-gray-300">Brian</div>
+      <div class="text-gray-500 ml-6 hover:text-gray-300">{{ getAuthData.username }}</div>
     </router-link>
 
     <button @click="logoutUser" class="bg-teal-600 hover:bg-teal-700 hover:shadow-lg rounded px-2 py-1 text-white mb-10">
@@ -107,7 +107,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'auth/isLoggedIn'
+      isLoggedIn: 'auth/isLoggedIn',
+      getAuthData: 'auth/getAuthData'
     })
   },
   methods: {

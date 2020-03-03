@@ -14,11 +14,11 @@ const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
 // const { createUploadPathIfNotExist } = require('../routes/auth');
 
-const YEAR_IN_MILLISECONDES = 3.154e10;
+const YEAR_IN_MILLISECONDES = ms('1 year');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${process.env.FRONT_URI}/confirmaccount/${uuid}/${id}`;
+    : ${process.env.FRONT_URI}:3000/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
@@ -39,6 +39,18 @@ function trimObject(obj) {
 
             return agg;
         }, {});
+}
+
+function sanitizeUserDocument(doc) {
+    const {
+        isConfirmed,
+        password,
+        confirmationLinkUuid,
+        csrfSecret,
+        ...props
+    } = doc.toObject();
+
+    return props;
 }
 
 async function isUserOAuth(property, value) {
@@ -206,7 +218,6 @@ exports.register = async (req, res) => {
 
         if (isUserUnique === true) {
             await user.save();
-            const token = user.getSignedJwtToken();
 
             res.locals.email.send({
                 to: user.email,
@@ -218,8 +229,8 @@ exports.register = async (req, res) => {
                     user._id
                 ),
             });
-            // does it log user in ?
-            createCookie(res, token).json({ success: true });
+
+            res.json({ success: true });
         } else if (isUserUnique === 'username') {
             res.status(200).json({
                 success: false,
@@ -273,6 +284,7 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
+        console.log('username, password', username, password);
         const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
@@ -296,7 +308,7 @@ exports.login = async (req, res) => {
 
         createCookie(res, cookieToken).json({
             success: true,
-            user: user.toObject(),
+            user: sanitizeUserDocument(user),
             csrfToken,
         });
     } catch (e) {
@@ -309,15 +321,7 @@ exports.login = async (req, res) => {
 // @route GET /api/v1/auth/me
 // @access Private
 exports.getMe = async (req, res) => {
-    const {
-        isConfirmed,
-        password,
-        confirmationLinkUuid,
-        csrfSecret,
-        ...props
-    } = req.user;
-
-    res.json({ success: true, user: props });
+    res.json({ success: true, user: sanitizeUserDocument(req.user) });
 };
 
 // @desc Get an user by id
@@ -378,7 +382,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // send a link with the plain guid
-        const link = `${process.env.FRONT_URI}/password-reset/${guid}`;
+        const link = `${process.env.FRONT_URI}:3000/password-reset/${guid}`;
 
         email.send({
             to: user.email,
@@ -512,6 +516,7 @@ exports.updatePassword = async (req, res) => {
 // @route POST /api/v1/auth/logout
 // @access Private
 exports.logout = async (req, res) => {
+    res.clearCookie('connect.sid')
     res.clearCookie('cookie-id').json({ success: true });
 };
 

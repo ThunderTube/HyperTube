@@ -1,6 +1,10 @@
 export default {
     csrf: null,
-    data: null,
+    user: null,
     passwordResetToken: null,
-    isLoggedIn: false
+    isLoggedIn: false,
+    resetPassword: {
+      visible: false,
+      guid: null
+    }
   }

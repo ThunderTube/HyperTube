@@ -11,6 +11,7 @@
     <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
     <div v-if="isLoggedIn">
       <app-menu />
+      <app-switch-lang />
       <div class="w-full">
         <transition name="page" mode="out-in">
           <router-view />
@@ -26,17 +27,21 @@ import {AtomSpinner} from 'epic-spinners'
 import { mapGetters, mapActions } from 'vuex'
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
+import AppSwitchLang from '@/components/AppSwitchLang.vue'
 
 export default {
   components: {
     AppMenu,
     AuthScreen,
-    AtomSpinner
+    AtomSpinner,
+    AppSwitchLang
   },
   data() {
     return {
       loading: true,
-      hasCookie: false
+      hasCookie: false,
+      guid: null,
+      resetPassword: false
     }
   },
   async created() {
@@ -48,7 +53,6 @@ export default {
       }
       if (res.data.success)
         this.hasCookie = true
-      console.log(this.hasCookie)
       setTimeout(() => {
         this.loading = false
       }, 500)

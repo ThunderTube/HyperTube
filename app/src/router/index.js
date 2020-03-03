@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
 import { confirmAccount } from '../api/auth'
+import store from '../store'
 
 Vue.use(Router)
 
@@ -62,7 +63,7 @@ async function requireHash(to, from, next) {
       // console.log('confirmation failed')
       return next('/')
     }
-    this.$toast.open({ message: 'Confirmation success', type: 'success'});
+    //this.$toast.open({ message: 'Confirmation success', type: 'success'});
     return next('/')
   } catch (e) {
     console.log('confirmation error catch ', e)
@@ -73,19 +74,16 @@ async function requireHash(to, from, next) {
 async function requireToken(to, from, next) {
   try {
     const guid = to.params.guid
-    const token = to.params.token
-   console.log(guid)
     
-    // if (!id || !uuid)
-    //   next('/')
-    // const result = await confirmAccount(uuid, id)
-    // if (!result.data.success) {
-    //   // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
-    //   // console.log('confirmation failed')
-    //   return next('/')
-    // }
-    this.$toast.open({ message: 'Confirmation success', type: 'success'});
-    return next('/')
+    if (!guid)
+      return next('/')
+    // save guid to state
+    // or try to pass the data with next
+    // set resetPassword to true and set the guid
+    // show the reset password form in the auth screen
+    console.log('ok')
+    // not working ...
+    next({ path: '/', resetPassword: true, guid: guid })
   } catch (e) {
     console.log('confirmation error catch ', e)
     return next('/')

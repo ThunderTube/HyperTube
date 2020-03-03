@@ -1,9 +1,9 @@
 export const CLEAR_AUTH_DATA = (state) => {
-    state.data = null
+    state.user= null
 }
 
 export const SET_AUTH_DATA = (state, data) => {
-    state.data = data
+    state.user = data
 }
 
 export const CLEAR_AUTH_CSRF = (state) => {

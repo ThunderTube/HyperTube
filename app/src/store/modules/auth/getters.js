@@ -1,5 +1,5 @@
 export const getAuthData = (state) => {
-    return state.data
+    return state.user
 }
 
 export const getAuthCSRF = (state) => {

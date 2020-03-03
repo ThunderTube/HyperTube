@@ -36,6 +36,8 @@ export const loginUser = async ({ dispatch }, data) => {
 export const getCurrentUser = async ({ dispatch }) => {
   try {
     const res = await me()
+    if (res.message)
+      return console.log(res.message)
     if (res.data.success) {
       // dispatch('setAuthCSRF', res.data.csrfToken)
       dispatch('setAuthIsLoggedIn', true)

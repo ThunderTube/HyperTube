@@ -14,7 +14,7 @@ const confirmAccount = (uuid, id) => axios.get(`${AUTH}/confirmaccount/${uuid}/$
 
 const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, data)
 
-// const resetPassword = (data) => axios.put(`${AUTH}/resetpassword`, { data });
+const resetPassword = (data) => axios.put(`${AUTH}/resetpassword`, data);
 
 // const updateDetails = (data) => axios.put(`${AUTH}/updatedetails`, { data });
 
@@ -29,7 +29,7 @@ export {
   confirmAccount,
   // getUser,
   forgotPassword,
-  // resetPassword,
+  resetPassword,
   // updateDetails,
   // updatePassword,
   logout
