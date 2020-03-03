@@ -1,7 +1,5 @@
 <template functional>
-  <p class="movies-container__empty-list">
-    There is no movie matching these criteria.
-  </p>
+  <p class="movies-container__empty-list">{{ parent.$t('home.search_nodata') }}</p>
 </template>
 
 <script>
