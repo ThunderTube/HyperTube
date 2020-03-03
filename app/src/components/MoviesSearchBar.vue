@@ -5,16 +5,14 @@
       class="mx-auto flex justify-center items-center py-2 px-3 rounded transition-colors duration-75 bg-transparent hover:bg-gray-700 text-gray-400 tracking-wide focus:outline-none"
       :class="[show ? 'bg-gray-700' : 'bg-gray-800']"
       @click="show = !show"
-    >
-      🔍 {{ this.$t('home.search_button') }}
-    </button>
+    >🔍 {{ $t('home.search_button') }}</button>
 
     <transition mode="out-in" name="search-bar">
       <aside v-if="show" class="flex flex-wrap mt-4">
         <movies-search-bar-input
           :value="searchQuery"
           @input="$emit('update:search-query', $event)"
-          v-bind:placeholder="this.$t('home.search_input')"
+          :placeholder="$t('home.search_input')"
         />
 
         <movies-search-bar-dropdown
@@ -22,7 +20,7 @@
           @input="$emit('update:genre', $event)"
           :items="genres"
           name="genres"
-          v-bind:label="this.$t('home.search_genre_label')"
+          :label="$t('home.search_genre_label')"
           class="sm:pr-1"
         />
         <movies-search-bar-dropdown
@@ -30,7 +28,7 @@
           @input="$emit('update:year', $event)"
           :items="years"
           name="years"
-          v-bind:label="this.$t('home.search_year_label')"
+          :label="$t('home.search_year_label')"
           class="sm:pl-1"
         />
       </aside>
