@@ -37,27 +37,11 @@
       </div>
       <!-- <img src="@/assets/captain_marvel_background.jpg" alt="captain marvel"> -->
     </div>
-    <div
-      class="h-screen bg-red-600 justify-center items-center text-white flex"
-    >
-      <div class="w-1/2 comment-wrapper h-1/2 flex flex-col">
-        <App-New-Comment/>
-        <App-Comment/>
-        <App-Comment/>
-        <App-Comment/>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import AppComment from '@/components/AppComment'
-import AppNewComment from '@/components/AppNewComment'
 export default {
-  components: {
-    AppComment,
-    AppNewComment
-  },
   data() {
     return {
       background: require('@/assets/img/captain_marvel_background.jpg')
