@@ -1,11 +1,12 @@
 <template>
   <div>
-    <button
-      title="Search for movies"
-      class="mx-auto flex justify-center items-center py-2 px-3 rounded transition-colors duration-75 bg-transparent hover:bg-gray-700 text-gray-400 tracking-wide focus:outline-none"
+    <app-button
       :class="[show ? 'bg-gray-700' : 'bg-gray-800']"
+      title="Search for movies"
       @click="show = !show"
-    >🔍 {{ $t('home.search_button') }}</button>
+    >
+      🔍 {{ $t('home.search_button') }}
+    </app-button>
 
     <transition mode="out-in" name="search-bar">
       <aside v-if="show" class="flex flex-wrap mt-4">
@@ -39,12 +40,14 @@
 <script>
 import MoviesSearchBarInput from './MoviesSearchBarInput.vue'
 import MoviesSearchBarDropdown from './MoviesSearchBarDropdown.vue'
+import AppButton from './AppButton.vue'
 
 export default {
   name: 'MoviesSearchBar',
   components: {
     MoviesSearchBarInput,
-    MoviesSearchBarDropdown
+    MoviesSearchBarDropdown,
+    AppButton
   },
   props: {
     searchQuery: {

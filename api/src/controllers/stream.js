@@ -2,8 +2,10 @@ const send = require('@polka/send-type');
 const got = require('got');
 const srt2vtt = require('srt-to-vtt');
 const { extname } = require('path');
+const mongoose = require('mongoose');
 
 const { Movie, TORRENT_STATUSES } = require('../models/Movie');
+const { User } = require('../models/User');
 const {
     getSubtitles,
     streamSubtitleForMovieAndLangcode,
@@ -364,12 +366,21 @@ async function commentMovie(req, res) {
             return;
         }
 
-        movie.comments.push({
-            userId,
-            comment,
-        });
-
-        await movie.save();
+        await Movie.updateOne(
+            {
+                imdbId,
+            },
+            {
+                $push: {
+                    comments: {
+                        _id: mongoose.Types.ObjectId(),
+                        userId,
+                        comment,
+                        createdAt: new Date(),
+                    },
+                },
+            }
+        );
 
         send(res, 200, {
             success: true,
@@ -383,23 +394,78 @@ async function commentMovie(req, res) {
     }
 }
 
+async function getCommentsWritersInformations(writers) {
+    const writersWithInformations = await Promise.all(
+        writers.map(userId => User.findById(userId))
+    );
+
+    return new Map(
+        writersWithInformations.map(writer => [writer._id.toString(), writer])
+    );
+}
+
 async function getMovieComments(req, res) {
     try {
         const {
             params: { id: imdbId },
         } = req;
 
-        const movie = await Movie.findOne({ imdbId }).sort({ createdAt: -1 });
-        if (movie === null) {
+        const commentsDocuments = await Movie.aggregate([
+            {
+                $match: { imdbId },
+            },
+            { $unwind: '$comments' },
+            {
+                $sort: {
+                    'comments.createdAt': -1,
+                },
+            },
+        ]);
+        if (commentsDocuments === null) {
             send(res, 404, {
                 error: 'Could not get comments for this movie',
             });
             return;
         }
 
+        const commentsWithoutWritersInformations = commentsDocuments.map(
+            ({ comments }) => comments
+        );
+
+        const commentsWritersIds = [
+            ...new Set(
+                commentsWithoutWritersInformations.map(({ userId }) =>
+                    userId.toString()
+                )
+            ),
+        ];
+        const commentsWritersInformations = await getCommentsWritersInformations(
+            commentsWritersIds
+        );
+
         send(res, 200, {
             imdbId,
-            comments: movie.toObject().comments,
+            comments: commentsWithoutWritersInformations
+                .map(({ _id, comment, createdAt, userId }) => {
+                    // Add the writer's informations inside its comment.
+                    // If we were with SQL we would not have used such a thing xD.
+
+                    const writerInformations = commentsWritersInformations.get(
+                        userId.toString()
+                    );
+                    if (writerInformations === undefined) return undefined;
+                    const { username, profilePicture } = writerInformations;
+
+                    return {
+                        id: _id,
+                        userId,
+                        comment,
+                        username,
+                        profilePicture,
+                        createdAt,
+                    };
+                })
+                .filter(Boolean),
         });
     } catch (e) {
         console.error(e);
