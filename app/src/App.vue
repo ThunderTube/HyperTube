@@ -48,6 +48,7 @@ export default {
       }
       if (res.data.success)
         this.hasCookie = true
+      console.log(this.hasCookie)
       setTimeout(() => {
         this.loading = false
       }, 500)

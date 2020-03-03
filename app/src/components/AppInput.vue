@@ -52,7 +52,7 @@ export default {
       default: false
     },
     message: {
-      type: String,
+      type: String || Array,
       required: false,
       default: ''
     },

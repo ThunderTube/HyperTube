@@ -218,7 +218,7 @@ exports.register = async (req, res) => {
                     user._id
                 ),
             });
-
+            // does it log user in ?
             createCookie(res, token).json({ success: true });
         } else if (isUserUnique === 'username') {
             res.status(200).json({
