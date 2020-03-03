@@ -6,7 +6,7 @@
       <movie-viewer v-else-if="movie !== null" v-bind="movie" />
 
       <movie-viewer-no-data v-else>
-        There is no movie to watch here.
+        {{ this.$t('movie.error') }}
       </movie-viewer-no-data>
     </transition>
   </div>

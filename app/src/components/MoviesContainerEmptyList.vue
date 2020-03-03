@@ -1,6 +1,6 @@
 <template functional>
   <p class="movies-container__empty-list">
-    There is no movie matching these criteria.
+    {{ this.$t('home.search_nodata') }}
   </p>
 </template>
 

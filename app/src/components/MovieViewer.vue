@@ -1,28 +1,40 @@
 <template>
   <div class="w-full container mx-auto">
-    <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">{{ title }} ({{ year }})</h2>
+    <h2 class="text-white font-semibold text-3xl tracking-wider mb-6">
+      {{ title }} ({{ year }})
+    </h2>
 
-    <player :id="imdbId" :image="image" :torrents="torrents" :subtitles="subtitles" />
+    <player
+      :id="imdbId"
+      :image="image"
+      :torrents="torrents"
+      :subtitles="subtitles"
+    />
 
     <div class="py-4 text-white">
-      <p
-        class="text-xl mb-2"
-        :title="`The movie lasts ${formattedRuntime}`"
-      >⏱ {{ formattedRuntime }}</p>
+      <p class="text-xl mb-2" :title="`The movie lasts ${formattedRuntime}`">
+        ⏱ {{ formattedRuntime }}
+      </p>
 
       <movie-stars :rating="rating" class="mb-2" />
 
-      <blockquote class="text-xl tracking-wide mb-4">{{ description }}</blockquote>
+      <blockquote class="text-xl tracking-wide mb-4">
+        {{ description }}
+      </blockquote>
 
       <tag v-for="genre in genres" :key="genre" big>{{ genre }}</tag>
     </div>
 
-    <list-dropdown label="Cast">
-      <tag v-for="{ name, character } in cast" :key="name" :title="character">{{ name }}</tag>
+    <list-dropdown v-bind:label="this.$t('movie.cast')">
+      <tag v-for="{ name, character } in cast" :key="name" :title="character">{{
+        name
+      }}</tag>
     </list-dropdown>
 
-    <list-dropdown label="Crew">
-      <tag v-for="{ name, job } in crew" :key="name" :title="job">{{ name }}</tag>
+    <list-dropdown v-bind:label="this.$t('movie.crew')">
+      <tag v-for="{ name, job } in crew" :key="name" :title="job">{{
+        name
+      }}</tag>
     </list-dropdown>
   </div>
 </template>
@@ -115,4 +127,3 @@ export default {
   }
 }
 </script>
-
