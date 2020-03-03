@@ -5,7 +5,9 @@
 
       <movie-viewer v-else-if="movie !== null" v-bind="movie" />
 
-      <movie-viewer-no-data v-else>{{ $t('movie.error') }}</movie-viewer-no-data>
+      <movie-viewer-no-data v-else>
+        {{ $t('movie.error') }}
+      </movie-viewer-no-data>
     </transition>
   </div>
 </template>
@@ -16,14 +18,7 @@ import axios from '@/api/axios'
 import MovieViewer from '@/components/MovieViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import MovieViewerNoData from '@/components/MovieViewerNoData.vue'
-
-function resolveAfter(ms, value) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(value)
-    }, ms)
-  })
-}
+import { resolveAfter } from '@/utils.js'
 
 export default {
   components: {

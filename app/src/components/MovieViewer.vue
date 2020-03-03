@@ -24,6 +24,23 @@
     <list-dropdown :label="$t('movie.crew')">
       <tag v-for="{ name, job } in crew" :key="name" :title="job">{{ name }}</tag>
     </list-dropdown>
+
+    <transition name="fade" mode="out-in">
+      <app-button
+        v-if="showLoadCommentsButton"
+        key="button"
+        class="bg-gray-800 mb-6"
+        @click="showComments = true"
+      >See comments</app-button>
+
+      <h3
+        v-else
+        key="text"
+        class="text-white font-semibold text-2xl tracking-wider mb-6 text-center"
+      >Comments ({{ commentsCount }})</h3>
+    </transition>
+
+    <movie-comments-list :id="imdbId" :show="showComments" @loaded="loadedComments" />
   </div>
 </template>
 
@@ -32,6 +49,8 @@ import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
 import ListDropdown from './ListDropdown.vue'
 import Player from './MoviePlayer.vue'
+import AppButton from './AppButton.vue'
+import MovieCommentsList from './MovieCommentsList.vue'
 
 export default {
   name: 'MovieViewer',
@@ -40,7 +59,9 @@ export default {
     Tag,
     MovieStars,
     ListDropdown,
-    Player
+    Player,
+    AppButton,
+    MovieCommentsList
   },
   props: {
     imdbId: {
@@ -102,7 +123,10 @@ export default {
   },
   data() {
     return {
-      launched: false
+      launched: false,
+      showComments: false,
+      showLoadCommentsButton: true,
+      commentsCount: 0
     }
   },
   computed: {
@@ -111,6 +135,12 @@ export default {
       const minutes = this.runtime % 60
 
       return `${hours.toFixed(0)}h${minutes.toFixed(0).padStart(2, '0')}`
+    }
+  },
+  methods: {
+    loadedComments(commentsCount) {
+      this.showLoadCommentsButton = false
+      this.commentsCount = commentsCount
     }
   }
 }

@@ -5,7 +5,9 @@
       'border-gray-200': hasFocus
     }"
   >
-    <span>🔍</span>
+    <span>
+      <slot name="prepend">🔍</slot>
+    </span>
 
     <input
       :value="value"
@@ -15,6 +17,10 @@
       @blur="hasFocus = false"
       class="w-full bg-transparent focus:outline-none ml-3"
     />
+
+    <span v-if="$slots.append" class="ml-3">
+      <slot name="append" />
+    </span>
   </label>
 </template>
 
