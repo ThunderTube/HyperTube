@@ -17,11 +17,11 @@
       <tag v-for="genre in genres" :key="genre" big>{{ genre }}</tag>
     </div>
 
-    <list-dropdown label="Cast">
+    <list-dropdown :label="$t('movie.cast')">
       <tag v-for="{ name, character } in cast" :key="name" :title="character">{{ name }}</tag>
     </list-dropdown>
 
-    <list-dropdown label="Crew">
+    <list-dropdown :label="$t('movie.crew')">
       <tag v-for="{ name, job } in crew" :key="name" :title="job">{{ name }}</tag>
     </list-dropdown>
   </div>
@@ -115,4 +115,3 @@ export default {
   }
 }
 </script>
-
