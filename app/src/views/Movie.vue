@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="min-h-screen bg-cover"
+      class="h-screen bg-cover"
       :style="{ backgroundImage: `url('${background}')` }"
     >
       <div class="pt-32 pl-8 mb-2"></div>
@@ -37,11 +37,6 @@
       </div>
       <!-- <img src="@/assets/captain_marvel_background.jpg" alt="captain marvel"> -->
     </div>
-    <div
-      class="bg-red-600 h-screen flex items-center justify-center uppercase text-white text-5xl"
-    >
-      <h1>Comments</h1>
-    </div>
   </div>
 </template>
 
@@ -54,3 +49,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.comment-wrapper {
+  height: 500px;
+}
+</style>
