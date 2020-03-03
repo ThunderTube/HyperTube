@@ -6,7 +6,7 @@
       :class="[show ? 'bg-gray-700' : 'bg-gray-800']"
       @click="show = !show"
     >
-      🔍 Search a movie
+      🔍 {{ this.$t('home.search_button') }}
     </button>
 
     <transition mode="out-in" name="search-bar">
@@ -14,7 +14,7 @@
         <movies-search-bar-input
           :value="searchQuery"
           @input="$emit('update:search-query', $event)"
-          placeholder="Movie name"
+          v-bind:placeholder="this.$t('home.search_input')"
         />
 
         <movies-search-bar-dropdown
@@ -22,7 +22,7 @@
           @input="$emit('update:genre', $event)"
           :items="genres"
           name="genres"
-          label="Genre"
+          v-bind:label="this.$t('home.search_genre_label')"
           class="sm:pr-1"
         />
         <movies-search-bar-dropdown
@@ -30,7 +30,7 @@
           @input="$emit('update:year', $event)"
           :items="years"
           name="years"
-          label="Release year"
+          v-bind:label="this.$t('home.search_year_label')"
           class="sm:pl-1"
         />
       </aside>
@@ -66,31 +66,31 @@ export default {
     return {
       show: false,
       genres: [
-        { text: 'Action', value: 'action' },
-        { text: 'Adventure', value: 'adventure' },
-        { text: 'Animation', value: 'animation' },
-        { text: 'Sci-Fi', value: 'science-fiction' },
-        { text: 'Comedy', value: 'comedy' },
-        { text: 'Crime', value: 'crime' },
-        { text: 'Drama', value: 'drama' },
-        { text: 'Film-Noir', value: 'film-noir' },
-        { text: 'Romance', value: 'romance' },
-        { text: 'Thriller', value: 'thriller' },
-        { text: 'Horror', value: 'horror' },
-        { text: 'History', value: 'history' },
-        { text: 'Mystery', value: 'mystery' },
-        { text: 'Music', value: 'music' },
-        { text: 'Documentary', value: 'documentary' },
-        { text: 'Sport', value: 'sport' },
-        { text: 'War', value: 'war' },
-        { text: 'Fantasy', value: 'fantasy' },
-        { text: 'Musical', value: 'musical' },
-        { text: 'Family', value: 'family' },
-        { text: 'Biography', value: 'biography' },
-        { text: 'Western', value: 'western' },
-        { text: 'News', value: 'news' },
-        { text: 'Reality-TV', value: 'reality-tv' },
-        { text: 'Talk-Show', value: 'talk-show' }
+        { text: this.$t('genres.action'), value: 'action' },
+        { text: this.$t('genres.adventure'), value: 'adventure' },
+        { text: this.$t('genres.animation'), value: 'animation' },
+        { text: this.$t('genres.sci-fi'), value: 'science-fiction' },
+        { text: this.$t('genres.comedy'), value: 'comedy' },
+        { text: this.$t('genres.crime'), value: 'crime' },
+        { text: this.$t('genres.drama'), value: 'drama' },
+        { text: this.$t('genres.film-noir'), value: 'film-noir' },
+        { text: this.$t('genres.romance'), value: 'romance' },
+        { text: this.$t('genres.thriller'), value: 'thriller' },
+        { text: this.$t('genres.horror'), value: 'horror' },
+        { text: this.$t('genres.history'), value: 'history' },
+        { text: this.$t('genres.mystery'), value: 'mystery' },
+        { text: this.$t('genres.music'), value: 'music' },
+        { text: this.$t('genres.documentary'), value: 'documentary' },
+        { text: this.$t('genres.sport'), value: 'sport' },
+        { text: this.$t('genres.war'), value: 'war' },
+        { text: this.$t('genres.fantasy'), value: 'fantasy' },
+        { text: this.$t('genres.musical'), value: 'musical' },
+        { text: this.$t('genres.family'), value: 'family' },
+        { text: this.$t('genres.biography'), value: 'biography' },
+        { text: this.$t('genres.western'), value: 'western' },
+        { text: this.$t('genres.news'), value: 'news' },
+        { text: this.$t('genres.reality-tv'), value: 'reality-tv' },
+        { text: this.$t('genres.talk-show'), value: 'talk-show' }
       ],
       years: [
         { text: '1950', value: '1950' },
