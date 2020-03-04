@@ -110,7 +110,7 @@ exports.controllerFortyTwo = async (req, res) => {
 
         let username = createUsernameIfNotExist(
             passportUser.username,
-            passportUser.username,
+            passportUser.firstName,
             passportUser.lastName
         );
         console.log('username createUsernameIfNotExist= ', username);
