@@ -411,18 +411,18 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success:false, error: 'Invalid password' });
             return;
         }
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success: false, error: 'Invalid username' });
             return;
         }
 
         if (!isLinkValid(user, token)) {
-            res.status(400).json({ error: ['Invalid link'] });
+            res.status(200).json({ success: false, error: 'Invalid link' });
             return;
         }
 

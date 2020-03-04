@@ -8,7 +8,7 @@
       />
     </div>
     <div v-else>
-    <auth-screen @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn"/>
+    <auth-screen @clear="resetPassword = false" @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn" :reset-password="resetPassword" :guid="guid" />
     <div v-if="isLoggedIn">
       <app-menu />
       <app-switch-lang />
@@ -28,6 +28,7 @@ import { mapGetters, mapActions } from 'vuex'
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
 import AppSwitchLang from '@/components/AppSwitchLang.vue'
+import { getWithExpiry } from './utils/localStorage'
 
 export default {
   components: {
@@ -40,12 +41,17 @@ export default {
     return {
       loading: true,
       hasCookie: false,
-      guid: null,
+      guid: '',
       resetPassword: false
     }
   },
   async created() {
     try {
+      const token = getWithExpiry('resetPasswordToken')
+      if (token) {
+        this.resetPassword = true
+        this.guid = token
+      }
       const res = await this.me()
       if (!res) {
         // this.$toast.open({ message: 'Please login or register an account', type: 'info'})
@@ -53,6 +59,7 @@ export default {
       }
       if (res.data.success)
         this.hasCookie = true
+    
       setTimeout(() => {
         this.loading = false
       }, 500)

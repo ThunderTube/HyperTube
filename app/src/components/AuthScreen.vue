@@ -27,6 +27,9 @@
         </div>
       </div>
       <div class="py-4 text-left px-6">
+        <h3 class="text-black uppercase font-semibold">
+          {{ formType }}
+        </h3>
         <form @submit.prevent="submitForm()">
           <div v-if="login.visible">
             <app-input
@@ -95,12 +98,35 @@
               placeholder="Login"
             />
           </div>
+          <div v-else-if="resetPassword">
+            <app-input
+              v-model="passwordReset.form.username"
+              :name="$t('loginscreen.id')"
+              :placeholder="$t('loginscreen.id_placeholder')"
+              autocomplete="username"
+            />
+            <app-input
+              v-model="passwordReset.form.password"
+              :name="$t('loginscreen.password')"
+              type="password"
+              placeholder="********"
+              autocomplete="password"
+            />
+          </div>
           <div v-show="login.visible">
             <a
               @click.prevent="selectAuthForm('password-forgot')"
               href="#"
               class="text-blue-600"
               >{{ $t('loginscreen.forgot_password') }}</a
+            >
+          </div>
+          <div v-show="resetPassword && login.visible" class="block">
+            <a
+              @click.prevent="selectAuthForm('reset-password')"
+              href="#"
+              class="text-blue-600"
+              >Reset Password</a
             >
           </div>
           <div class="flex justify-end py-2">
@@ -133,6 +159,16 @@ export default {
     isLoggedIn: {
       type: Boolean,
       required: true
+    },
+    resetPassword: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    guid: {
+      type: String,
+      default: '',
+      required: false,
     }
   },
   data() {
@@ -143,6 +179,14 @@ export default {
         form: {
           username: '',
           password: ''
+        }
+      },
+      passwordReset: {
+        visible: false,
+        form: {
+          username: '',
+          password: '',
+          token: ''
         }
       },
       register: {
@@ -171,7 +215,8 @@ export default {
     ...mapActions({
       registerUser: 'auth/registerUser',
       loginUser: 'auth/loginUser',
-      forgotUserPassword: 'auth/forgotUserPassword'
+      forgotUserPassword: 'auth/forgotUserPassword',
+      userPasswordReset: 'auth/passwordReset'
     }),
     selectAuthForm(formType) {
       this.formType = formType
@@ -188,6 +233,10 @@ export default {
           lastName: '',
           firstName: ''
         }
+        this.passwordReset.form = {
+          username: '',
+          password: '',
+        }
         this.passwordForgot.form = {
           username: ''
         }
@@ -199,6 +248,10 @@ export default {
           username: '',
           password: ''
         }
+        this.passwordReset.form = {
+          username: '',
+          password: '',
+        }
         this.passwordForgot.form = {
           username: ''
         }
@@ -206,6 +259,26 @@ export default {
       } else if (this.formType === 'password-forgot') {
         this.login.visible = false
         this.register.visible = false
+        this.login.form = {
+          username: '',
+          password: '',
+        }
+        this.passwordReset.form = {
+          username: '',
+          password: '',
+        }
+        this.register.form = {
+          username: '',
+          password: '',
+          email: '',
+          lastName: '',
+          firstName: ''
+        }
+        this.passwordForgot.visible = true
+      } else if (this.formType === 'reset-password') {
+        this.login.visible = false
+        this.register.visible = false
+        this.passwordForgot.visible = false
         this.login.form = {
           username: '',
           password: ''
@@ -217,7 +290,9 @@ export default {
           lastName: '',
           firstName: ''
         }
-        this.passwordForgot.visible = true
+        this.passwordForgot.form = {
+          username: ''
+        }
       }
     },
     async submitForm() {
@@ -241,13 +316,47 @@ export default {
           this.showAuthForm()
           this.$toast.open({ message: "Please confirm your account", type: 'success'});
         } else if (this.passwordForgot.visible) {
+          console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
             return this.$toast.open({ message: res.data.error, type: 'error'});
           console.log(res)
+          this.formType = 'login'
+          this.showAuthForm()
+          return this.$toast.open({ message: 'Check your mail', type: 'success'});
+        } else if (this.passwordReset) {
+          const res = await this.userPasswordReset(this.passwordReset.form)
+          if (!res.data.success)
+            return this.$toast.open({ message: res.data.error, type: 'error'});
+          localStorage.removeItem('resetPasswordToken')
+          this.formType = 'login'
+          this.showAuthForm()
+          this.$emit('clear')
+          return this.$toast.open({ message: 'Password updated', type: 'success'});
         }
       } catch (error) {
-        //console.log('error in submitForm ', error)
+        console.log('error in submitForm ', error.message)
+      }
+    }
+  },
+  watch: {
+    resetPassword: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        if (newValue) {
+          this.formType = "reset-password"
+          this.showAuthForm()
+        }
+      }
+    },
+    guid: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        if (newValue) {
+          this.passwordReset.form.token = newValue
+        }
       }
     }
   }

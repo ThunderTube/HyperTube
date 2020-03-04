@@ -1,8 +1,17 @@
-import { register, login, forgotPassword, me, logout } from '@/api/auth'
+import { register, login, forgotPassword, me, logout, resetPassword } from '@/api/auth'
 
 export const registerUser = async ({ commit }, data) => {
   try {
     const res = await register(data)
+    return res
+  } catch (error) {
+    console.log('registerUser ', error)
+  }
+}
+
+export const passwordReset = async ({ commit }, data) => {
+  try {
+    const res = await resetPassword(data)
     return res
   } catch (error) {
     console.log('registerUser ', error)

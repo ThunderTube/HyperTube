@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
 import { confirmAccount } from '../api/auth'
-import store from '../store'
+import { setWithExpiry } from '../utils/localStorage'
 
 Vue.use(Router)
 
@@ -77,13 +77,8 @@ async function requireToken(to, from, next) {
     
     if (!guid)
       return next('/')
-    // save guid to state
-    // or try to pass the data with next
-    // set resetPassword to true and set the guid
-    // show the reset password form in the auth screen
-    console.log('ok')
-    // not working ...
-    next({ path: '/', resetPassword: true, guid: guid })
+    setWithExpiry('resetPasswordToken', guid, 600000)
+    next('/')
   } catch (e) {
     console.log('confirmation error catch ', e)
     return next('/')
