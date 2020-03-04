@@ -11,10 +11,9 @@
     <div class="flex flex-col flex-grow items-start">
       <router-link
         :to="`/en/user/${userId}`"
-        class="inline-block text-gray-300 text-semibold mb-2"
-      >
-        {{ username }}
-      </router-link>
+        class="inline-block text-gray-500 text-semibold mb-2"
+        title="See user profile"
+      >{{ username }}</router-link>
 
       <p>{{ comment }}</p>
     </div>

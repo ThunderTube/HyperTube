@@ -37,10 +37,28 @@
         v-else
         key="text"
         class="text-white font-semibold text-2xl tracking-wider mb-6 text-center"
-      >Comments ({{ commentsCount }})</h3>
+      >
+        Comments
+        <transition
+          enter-active-class="transform transition duration-200"
+          leave-active-class="transform transition duration-200"
+          enter-class="opacity-0 -translate-y-4"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-4"
+          mode="out-in"
+        >
+          <span :key="commentsCount" class="inline-block">({{ commentsCount }})</span>
+        </transition>
+      </h3>
     </transition>
 
-    <movie-comments-list :id="imdbId" :show="showComments" @loaded="loadedComments" />
+    <movie-comments-list
+      :id="imdbId"
+      :show="showComments"
+      @loaded="loadedComments"
+      @update:comments-count="commentsCount = $event"
+    />
   </div>
 </template>
 
@@ -138,9 +156,8 @@ export default {
     }
   },
   methods: {
-    loadedComments(commentsCount) {
+    loadedComments() {
       this.showLoadCommentsButton = false
-      this.commentsCount = commentsCount
     }
   }
 }

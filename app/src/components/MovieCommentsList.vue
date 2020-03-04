@@ -4,23 +4,16 @@
 
     <template v-else>
       <div v-if="comments.length > 0" class="grid grid-columns-1 w-full mb-3">
-        <movie-comment
-          v-for="{ id, ...props } in comments"
-          :key="id"
-          v-bind="props"
-        />
+        <movie-comment v-for="{ id, ...props } in comments" :key="id" v-bind="props" />
       </div>
       <no-data v-else>There are no comments for this movie</no-data>
 
       <form @submit.prevent="sendComment" class="w-full">
-        <movies-search-bar-input
-          v-model="newComment"
-          placeholder="Write a comment..."
-        >
-          <template #prepend>🖋</template>
+        <movies-search-bar-input v-model.trim="newComment" placeholder="Write a comment...">
+          <template #prepend>✏️</template>
 
           <template #append>
-            <button type="submit">✅</button>
+            <button type="submit" title="Send me">🍻</button>
           </template>
         </movies-search-bar-input>
       </form>
@@ -79,7 +72,7 @@ export default {
         await resolveAfter(1000)
 
         this.comments = comments
-        this.$emit('loaded', comments.length)
+        this.$emit('loaded')
       } catch (e) {
         console.error(e)
       } finally {
@@ -90,9 +83,16 @@ export default {
       const comment = this.newComment
       this.newComment = ''
 
-      const newCommentItem = {}
+      if (comment.length === 0) return
 
-      this.comments.push({})
+      // TODO: fetch data concerning the user in Vuex Store
+      this.comments.push({
+        userId: '-1',
+        comment,
+        createdAt: new Date().toISOString(),
+        username: 'test',
+        profilePicture: '0a190fc6-a279-49c3-bcef-c230b81a0e36.png'
+      })
 
       axios
         .post(`/stream/video/${this.id}/comment`, {
@@ -106,6 +106,9 @@ export default {
       if (state === true) {
         this.loadComments()
       }
+    },
+    comments(comments) {
+      this.$emit('update:comments-count', comments.length)
     }
   }
 }
