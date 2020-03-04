@@ -18,7 +18,7 @@ const YEAR_IN_MILLISECONDES = ms('1 year');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${process.env.FRONT_URI}:3000/confirmaccount/${uuid}/${id}`;
+    : ${process.env.FRONT_URI}/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
@@ -382,7 +382,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // send a link with the plain guid
-        const link = `${process.env.FRONT_URI}:3000/password-reset/${guid}`;
+        const link = `${process.env.FRONT_URI}/password-reset/${guid}`;
 
         email.send({
             to: user.email,
