@@ -236,6 +236,7 @@ export default {
         this.passwordReset.form = {
           username: '',
           password: '',
+          token: this.passwordReset.form.token
         }
         this.passwordForgot.form = {
           username: ''
@@ -251,6 +252,7 @@ export default {
         this.passwordReset.form = {
           username: '',
           password: '',
+          token: this.passwordReset.form.token
         }
         this.passwordForgot.form = {
           username: ''
@@ -266,6 +268,7 @@ export default {
         this.passwordReset.form = {
           username: '',
           password: '',
+          token: this.passwordReset.form.token
         }
         this.register.form = {
           username: '',
