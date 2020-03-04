@@ -14,7 +14,7 @@
       <div v-if="isLoggedIn">
         <app-menu />
         <app-switch-lang />
-        <div class="w-full">
+        <div class="w-full overflow-hidden">
           <transition name="page" mode="out-in">
             <router-view />
           </transition>
