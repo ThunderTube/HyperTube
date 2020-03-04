@@ -51,7 +51,7 @@ async function app() {
         )
         .use(passport.initialize())
         .use(passport.session())
-        .use(passport.authenticate(['jwt', 'anonymous']))
+        .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
             // This middleware sets the context
             res.locals = {

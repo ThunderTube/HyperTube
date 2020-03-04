@@ -87,6 +87,22 @@ router
         }),
         controllerFortyTwo
     )
+    .get(
+        '/google',
+        passport.authenticate('google', {
+            scope: ['profile', 'email'],
+        }),
+        (req, res, next) => {
+            console.log('first 42 called');
+
+            next();
+        }
+    )
+    .get(
+        '/google/callback',
+        passport.authenticate('google'),
+        controllerFortyTwo
+    )
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)

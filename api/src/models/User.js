@@ -45,16 +45,21 @@ const userSchema = new Schema({
             return [true, 'Please add a last name [at least 2 letters]'];
         },
         match: [
-            /^[A-zÀ-ú- ]{2,20}$/,
-            'Please add a valid last name [at least 2 letters]',
+            /^[A-zÀ-ú- ]{1,20}$/,
+            'Please add a valid last name [at least 1 letter]',
         ],
     },
     firstName: {
         type: String,
-        required: [true, 'Please add a first name'],
+        required() {
+            if (this.OAuthProvider) {
+                return false;
+            }
+            return [true, 'Please add a first name [at least 1 letters]'];
+        },
         match: [
-            /^[A-zÀ-ú- ]{2,20}$/,
-            'Please add a valid first name [at least 2 letters]',
+            /^[A-zÀ-ú- ]{1,20}$/,
+            'Please add a valid first name [at least 1 letters]',
         ],
     },
     password: {

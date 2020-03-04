@@ -5,6 +5,7 @@ const stream = require('stream');
 const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
+const foid = require('foid');
 const { extname, join } = require('path');
 const {
     promises: { mkdir },
@@ -41,7 +42,7 @@ function trimObject(obj) {
             return agg;
         }, {});
 }
-
+1;
 function sanitizeUserDocument(doc) {
     const {
         isConfirmed,
@@ -59,7 +60,7 @@ async function isUserOAuth(provider, property, value) {
         [property]: value,
         OAuthProvider: provider,
     });
-    console.log('count = ', count);
+    // console.log('count = ', count);
     return count > 0;
 }
 
@@ -72,9 +73,21 @@ async function createUploadPathIfNotExist() {
 }
 
 function createUsernameIfNotExist(username, firstName, lastName) {
+    console.log('firstname = ', firstName);
+    console.log('lastname = ', lastName);
+    console.log('username in createUsernameIfNotExist= ', username);
     if (username === undefined) {
+        if (firstName === undefined && lastName === undefined) {
+            return foid(4);
+        }
+
+        if (firstName === undefined || lastName === undefined) {
+            return firstName || lastName;
+        }
+
         return firstName.concat(lastName);
     }
+
     return username;
 }
 
@@ -94,16 +107,23 @@ exports.controllerFortyTwo = async (req, res) => {
         // console.log('passport user= ', user);
 
         const { csrf } = res.locals;
+
+        let username = createUsernameIfNotExist(
+            passportUser.username,
+            passportUser.username,
+            passportUser.lastName
+        );
+        console.log('username createUsernameIfNotExist= ', username);
+
         const isUserUnique = await User.isUnique({
             email: passportUser.email,
-            username: passportUser.username,
+            username,
         });
 
         const csrfSecret = await csrf.secret();
 
         if (isUserUnique === true) {
             const {
-                // username,
                 email,
                 lastName,
                 firstName,
@@ -111,12 +131,6 @@ exports.controllerFortyTwo = async (req, res) => {
                 profilePicture,
                 provider,
             } = passportUser;
-
-            const username = createUsernameIfNotExist(
-                passportUser.username,
-                firstName,
-                lastName
-            );
 
             const fileExtension = extname(profilePicture).slice(1);
             const filename = `${uuid()}.${fileExtension}`;
@@ -148,27 +162,29 @@ exports.controllerFortyTwo = async (req, res) => {
             const token = user.getSignedJwtToken();
 
             createCookie(res, token).redirect(
-                `${process.env.FRONT_URI}/?token=${encodeURIComponent(
-                    csrfToken
-                )}`
+                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
             );
         } else {
             const duplicateField = isUserUnique;
             const provider = req.user.provider;
+
             const userRegisteredUsingOAuth = await isUserOAuth(
                 provider,
                 duplicateField,
-                passportUser[duplicateField]
+                passportUser[duplicateField] || username
             );
+
+            console.log('userRegistered UsingOAuth', userRegisteredUsingOAuth);
+
             if (userRegisteredUsingOAuth) {
-                const username = req.user.username;
+                username = req.user.username || username;
                 const user = await User.findOne({ username });
 
                 const token = user.getSignedJwtToken();
                 const csrfToken = csrf.create(csrfSecret);
 
                 createCookie(res, token).redirect(
-                    `${process.env.FRONT_URI}/?token=${encodeURIComponent(
+                    `http://localhost:3000/?token=${encodeURIComponent(
                         csrfToken
                     )}`
                 );
@@ -471,6 +487,8 @@ exports.resetPassword = async (req, res) => {
         }
 
         user.password = password;
+        user.isConfirmed = true;
+
         await user.save();
 
         res.json({ success: true });

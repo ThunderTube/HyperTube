@@ -4,6 +4,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const FortyTwoStrategy = require('passport-42').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GithubStrategy = require('passport-github').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const stream = require('stream');
 const { promisify } = require('util');
 const fs = require('fs');
@@ -18,7 +19,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.FORTYTWO_CLIENT_ID,
                 clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-                callbackURL: `${process.env.FRONT_URI}/v1/auth/42/callback`,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/42/callback`,
                 profileFields: {
                     id(obj) {
                         return String(obj.id);
@@ -40,7 +41,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.FACEBOOK_APP_ID,
                 clientSecret: process.env.FACEBOOK_APP_SECRET,
-                callbackURL: `${process.env.FRONT_URI}/v1/auth/facebook/callback`,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
                 profileFields: ['id', 'first_name', 'last_name', 'picture'],
             },
             (accessToken, refreshToken, profile, cb) => {
@@ -64,7 +65,7 @@ module.exports = function setupPassport(csrf) {
             {
                 clientID: process.env.GITHUB_APP_ID,
                 clientSecret: process.env.GITHUB_APP_SECRET,
-                callbackURL: `${process.env.FRONT_URI}/v1/auth/github/callback`,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/github/callback`,
             },
             (accessToken, refreshToken, profile, cb) => {
                 const { username, displayName, photos, provider } = profile;
@@ -74,6 +75,26 @@ module.exports = function setupPassport(csrf) {
                 cb(null, {
                     username: username,
                     firstName: displayName,
+                    profilePicture: photos[0].value,
+                    provider,
+                });
+            }
+        )
+    );
+    passport.use(
+        new GoogleStrategy(
+            {
+                clientID: process.env.GOOGLE_APP_ID,
+                clientSecret: process.env.GOOGLE_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/google/callback`,
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                const { name, photos, provider } = profile;
+                console.log('profile:', profile);
+
+                cb(null, {
+                    firstName: name.givenName,
+                    lastName: name.familyName,
                     profilePicture: photos[0].value,
                     provider,
                 });
