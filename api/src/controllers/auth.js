@@ -315,7 +315,7 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username, isConfirmed: true });
         if (user === null) {
             // Could not find a user with this username
             res.status(200).json({
