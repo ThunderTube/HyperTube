@@ -7,7 +7,7 @@ import { setWithExpiry } from '../utils/localStorage'
 
 Vue.use(Router)
 
-const router =  new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
@@ -32,7 +32,9 @@ const router =  new Router({
     {
       path: '/:lang',
       component: {
-        render (c) { return c('router-view') }
+        render(c) {
+          return c('router-view')
+        }
       },
       children: [
         {
@@ -44,7 +46,16 @@ const router =  new Router({
           path: 'movie',
           name: 'movie',
           component: () =>
-            import(/* webpackChunkName: "movie" */ '../views/Movie.vue')
+            import(/* webpackChunkName: "about" */ '../views/Movie.vue')
+        },
+        {
+          path: 'user/:id',
+          name: 'user',
+          // route level code-splitting
+          // this generates a separate chunk (about.[hash].js) for this route
+          // which is lazy-loaded when the route is visited.
+          component: () =>
+            import(/* webpackChunkName: "about" */ '../views/User.vue')
         }
       ]
     }
@@ -55,8 +66,7 @@ async function requireHash(to, from, next) {
   try {
     const uuid = to.params.uuid
     const id = to.params.id
-    if (!id || !uuid)
-      next('/')
+    if (!id || !uuid) next('/')
     const result = await confirmAccount(uuid, id)
     if (!result.data.success) {
       // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
@@ -74,9 +84,8 @@ async function requireHash(to, from, next) {
 async function requireToken(to, from, next) {
   try {
     const guid = to.params.guid
-    
-    if (!guid)
-      return next('/')
+
+    if (!guid) return next('/')
     setWithExpiry('resetPasswordToken', guid, 600000)
     next('/')
   } catch (e) {
