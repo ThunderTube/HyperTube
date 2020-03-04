@@ -126,7 +126,8 @@ function uploadAndVerifyFileTypeMiddleware(
                     console.error(
                         'Could not identify the mimetype of the file'
                     );
-                    res.status(400).json({
+                    res.status(200).json({
+                        success:false,
                         error: 'Could not identify the mimetype of the file',
                     });
                     return;
@@ -134,7 +135,8 @@ function uploadAndVerifyFileTypeMiddleware(
                 const { ext, mime } = metadata;
                 if (!authorizedMimeTypes.includes(mime)) {
                     // Not supported mimetype
-                    res.status(400).json({
+                    res.status(200).json({
+                        success:false,
                         error: 'Mimetype not supported',
                     });
                     return;
@@ -163,7 +165,7 @@ function uploadAndVerifyFileTypeMiddleware(
                 next();
             } catch (e) {
                 console.error(e);
-                res.status(400).json({ error: 'Explosion' });
+                res.status(200).json({ error: 'Explosion' });
             }
         },
     ];

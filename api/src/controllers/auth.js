@@ -18,7 +18,7 @@ const YEAR_IN_MILLISECONDES = ms('1 year');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
-    : ${req.protocol}://${req.hostname}:${process.env.PORT}${req.baseUrl}/confirmaccount/${uuid}/${id}`;
+    : ${process.env.FRONT_URI}/confirmaccount/${uuid}/${id}`;
 }
 
 function createCookie(res, token) {
@@ -182,7 +182,8 @@ exports.register = async (req, res) => {
         );
         const { csrf } = res.locals;
         if (file === undefined) {
-            res.status(400).json({
+            res.status(200).json({
+                success: false,
                 error: 'Invalid file',
             });
             return;
@@ -205,8 +206,8 @@ exports.register = async (req, res) => {
         try {
             await user.validate();
         } catch (e) {
-            const msg = Object.values(e.errors).map(val => val.message);
-            res.status(400).json({ success: false, error: msg });
+            let msg = Object.values(e.errors).map(val => val.message);
+            res.status(200).json({ success: false, error: msg });
             return;
         }
 
@@ -220,7 +221,7 @@ exports.register = async (req, res) => {
 
             res.locals.email.send({
                 to: user.email,
-                subject: 'coucou',
+                subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
                     req,
                     user.username,
@@ -231,12 +232,12 @@ exports.register = async (req, res) => {
 
             res.json({ success: true });
         } else if (isUserUnique === 'username') {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Username taken',
             });
         } else if (isUserUnique === 'email') {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Email taken',
             });
@@ -266,7 +267,7 @@ exports.confirmAccount = async (req, res) => {
         await user.save();
         res.json({ success: true });
     } else {
-        res.status(400).json({
+        res.status(200).json({
             success: false,
             error: 'Wrong confirmation link',
         });
@@ -278,14 +279,16 @@ exports.confirmAccount = async (req, res) => {
 // @access Public
 exports.login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const {
+            body: { username, password },
+        } = req;
         const { csrf } = res.locals;
 
         console.log('username, password', username, password);
         const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
-            res.status(401).json({
+            res.status(200).json({
                 success: false,
                 error: 'No user found',
             });
@@ -293,7 +296,7 @@ exports.login = async (req, res) => {
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 error: 'Invalid password',
             });
@@ -360,7 +363,7 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Unknown account'] });
+            res.status(200).json({ success: false, error: 'Unknown account' });
             return;
         }
 
@@ -379,7 +382,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // send a link with the plain guid
-        const link = `${process.env.FRONT_URI}/password-reset?token=${guid}`;
+        const link = `${process.env.FRONT_URI}/password-reset/${guid}`;
 
         email.send({
             to: user.email,
@@ -408,18 +411,18 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success:false, error: 'Invalid password' });
             return;
         }
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(400).json({ error: ['Invalid password/username'] });
+            res.status(200).json({ success: false, error: 'Invalid username' });
             return;
         }
 
         if (!isLinkValid(user, token)) {
-            res.status(400).json({ error: ['Invalid link'] });
+            res.status(200).json({ success: false, error: 'Invalid link' });
             return;
         }
 
@@ -513,6 +516,7 @@ exports.updatePassword = async (req, res) => {
 // @route POST /api/v1/auth/logout
 // @access Private
 exports.logout = async (req, res) => {
+    res.clearCookie('connect.sid')
     res.clearCookie('cookie-id').json({ success: true });
 };
 

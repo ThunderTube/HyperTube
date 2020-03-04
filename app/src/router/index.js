@@ -2,13 +2,29 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
+import { confirmAccount } from '../api/auth'
+import { setWithExpiry } from '../utils/localStorage'
 
 Vue.use(Router)
 
-export default new Router({
+const router =  new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
+    {
+      path: '/confirmaccount/:uuid/:id',
+      name: 'account_confirmation',
+      beforeEnter: requireHash,
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/UserConfirmation.vue')
+    },
+    {
+      path: '/password-reset/:guid',
+      name: 'password_reset',
+      beforeEnter: requireToken,
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
+    },
     {
       path: '/',
       redirect: `/${i18n.locale}`
@@ -27,13 +43,46 @@ export default new Router({
         {
           path: 'movie',
           name: 'movie',
-          // route level code-splitting
-          // this generates a separate chunk (about.[hash].js) for this route
-          // which is lazy-loaded when the route is visited.
           component: () =>
-            import(/* webpackChunkName: "about" */ '../views/Movie.vue')
+            import(/* webpackChunkName: "movie" */ '../views/Movie.vue')
         }
       ]
     }
   ]
 })
+
+async function requireHash(to, from, next) {
+  try {
+    const uuid = to.params.uuid
+    const id = to.params.id
+    if (!id || !uuid)
+      next('/')
+    const result = await confirmAccount(uuid, id)
+    if (!result.data.success) {
+      // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
+      // console.log('confirmation failed')
+      return next('/')
+    }
+    //this.$toast.open({ message: 'Confirmation success', type: 'success'});
+    return next('/')
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
+async function requireToken(to, from, next) {
+  try {
+    const guid = to.params.guid
+    
+    if (!guid)
+      return next('/')
+    setWithExpiry('resetPasswordToken', guid, 600000)
+    next('/')
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
+export default router

@@ -1,16 +1,20 @@
 <template>
-  <Slide>
-    <router-link to="movie" class="flex items-center mb-10">
+  <Slide disableOutsideClick>
+    <router-link to="movie" class="flex items-center">
       <div>
         <img
-          src="@/assets/img/avatar.jpg"
-          alt="avatar"
+          :src="profilePictureSrc(getAuthData.profilePicture)"
+          :alt="getAuthData.username"
           class="rounded-full w-12 h-12"
         />
       </div>
-      <div class="text-gray-500 ml-6 hover:text-gray-300">Brian</div>
+      <div class="text-gray-500 ml-6 hover:text-gray-300">{{ getAuthData.username }}</div>
     </router-link>
 
+    <button @click="logoutUser" class="bg-teal-600 hover:bg-teal-700 hover:shadow-lg rounded px-2 py-1 text-white mb-10">
+        Logout
+    </button>
+    
     <router-link to="/">
       <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
         <path
@@ -86,7 +90,6 @@
       </svg>
       <span>{{ $t('navbar.settings') }}</span>
     </router-link>
-
     <div class="ml-8">
       <h2 class="text-white font-bold uppercase font-serif text-2xl">
         Hypertube
@@ -97,10 +100,29 @@
 
 <script>
 import { Slide } from 'vue-burger-menu'
-
+import { mapGetters, mapActions } from 'vuex'
 export default {
   components: {
     Slide
+  },
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn',
+      getAuthData: 'auth/getAuthData'
+    }),
+
+  },
+  methods: {
+    profilePictureSrc(image) {
+      const API_ROOT = new URL(process.env.VUE_APP_BASE_URL).origin
+      return `${API_ROOT}/uploads/${image}`
+    },
+    ...mapActions({
+      logoutCurrentUser: 'auth/logoutCurrentUser'
+    }),
+    logoutUser() {
+      this.logoutCurrentUser()
+    }
   }
 }
 </script>

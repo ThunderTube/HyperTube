@@ -7,6 +7,10 @@ import router from './router'
 import store from './store'
 import './assets/styles/app.css'
 import i18n from './i18n'
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/index.css';
+
+Vue.use(VueToast);
 
 Vue.use(VueTailwind)
 
@@ -23,9 +27,12 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+// Turn off all console log message
+// console.log = function(){}
+
 new Vue({
   router,
   store,
   i18n,
-  render: (h) => h(App)
+  render: (h) => h(App),
 }).$mount('#app')
