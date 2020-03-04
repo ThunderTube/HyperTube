@@ -337,7 +337,7 @@ exports.getUser = async (req, res) => {
         ...props
     } = user._doc;
 
-    res.json({ success: true, props });
+    res.json({ success: true, ...props });
 };
 
 // @desc Forgot password

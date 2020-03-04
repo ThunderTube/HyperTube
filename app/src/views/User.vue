@@ -11,9 +11,11 @@
 <script>
 import axios from '@/api/axios'
 import UserProfile from '@/components/UserProfile.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 export default {
   components: {
-    UserProfile
+    UserProfile,
+    LoadingSpinner
   },
   data() {
     return {
@@ -28,7 +30,6 @@ export default {
         .get(`/auth/user/${this.id}`)
         .then(({ data: user }) => {
           this.user = user
-          return resolveAfter(1000)
         })
         .catch((e) => {
           console.error(e)

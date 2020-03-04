@@ -23,5 +23,12 @@
     "movie": {
         "play": "Lecture",
         "watchlist_add": "Add to watchlist"
+    },
+
+    "profile": {
+        "title": "Profile de ",
+        "username": "Pseudonyme : ",
+        "firstname": "Prénom : ",
+        "lastname": "Nom : "
     }
   }
