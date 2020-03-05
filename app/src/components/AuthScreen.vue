@@ -3,31 +3,26 @@
     v-if="!isLoggedIn"
     class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
   >
-  <div class="z-50">
-    <app-switch-lang />
-  </div>
+    <div class="z-50">
+      <app-switch-lang />
+    </div>
     <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
-    <div
-      class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
-    >
-      <div
-        class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800"
-      >
+    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto">
+    <div>
+              <button @click="fortyTwoOauth()">42</button>
+            </div>
+      <div class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800">
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >
-          {{ $t('loginscreen.login') }}
-        </div>
+        >{{ $t('loginscreen.login') }}</div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >
-          {{ $t('loginscreen.register') }}
-        </div>
+        >{{ $t('loginscreen.register') }}</div>
       </div>
       <div class="py-4 text-left px-6">
-        <form @submit.prevent="submitForm()">
+        <form>
           <div v-if="login.visible">
             <app-input
               v-model="login.form.username"
@@ -79,13 +74,7 @@
             />
             <div class="block">
               <!-- <app-input ref="file" name="file" type="file" /> -->
-              <input
-                type="file"
-                id="file"
-                ref="file"
-                accept="image/*"
-                @change="handleFileUpload()"
-              />
+              <input type="file" id="file" ref="file" accept="image/*" @change="handleFileUpload()" />
             </div>
           </div>
           <div v-else-if="passwordForgot.visible">
@@ -115,24 +104,31 @@
               @click.prevent="selectAuthForm('password-forgot')"
               href="#"
               class="text-blue-600"
-              >{{ $t('loginscreen.forgot_password') }}</a
-            >
+            >{{ $t('loginscreen.forgot_password') }}</a>
           </div>
           <div v-show="resetPassword && login.visible" class="block">
             <a
               @click.prevent="selectAuthForm('reset-password')"
               href="#"
               class="text-blue-600"
-              >Reset Password</a
-            >
+            >Reset Password</a>
+          </div>
+          <div class="flex justify-between">
+            <div>
+              <button @click.prevent="fortyTwoOauth()">42</button>
+            </div>
+            <div>
+              <button @click.prevent="googleOauth()">Google</button>
+            </div>
+            <div>
+              <button @click.prevent="githubOauth()">Github</button>
+            </div>
           </div>
           <div class="flex justify-end py-2">
             <button
               @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
-            >
-              Submit
-            </button>
+            >Submit</button>
           </div>
         </form>
       </div>
@@ -165,7 +161,7 @@ export default {
     guid: {
       type: String,
       default: '',
-      required: false,
+      required: false
     }
   },
   data() {
@@ -206,6 +202,29 @@ export default {
     }
   },
   methods: {
+    async fortyTwoOauth() {
+      try {
+        console.log('42')
+      } catch (error) {
+        console.log('e ', error)
+      }
+    },
+    async githubOauth() {
+      try {
+        console.log('github')
+
+      } catch (error) {
+        console.log('e ', error)
+      }
+    },
+    async googleOauth() {
+      try {
+        console.log('google')
+
+      } catch (error) {
+        console.log('e ', error)
+      }
+    },
     handleFileUpload() {
       this.register.form.profilePicture = this.$refs.file.files[0]
     },
@@ -213,7 +232,10 @@ export default {
       registerUser: 'auth/registerUser',
       loginUser: 'auth/loginUser',
       forgotUserPassword: 'auth/forgotUserPassword',
-      userPasswordReset: 'auth/passwordReset'
+      userPasswordReset: 'auth/passwordReset',
+      fortyTwoUser: 'auth/fortyTwoUser',
+      githubUser: 'auth/githubUser',
+      googleUser: 'auth/googleUser'
     }),
     selectAuthForm(formType) {
       this.formType = formType
@@ -260,7 +282,7 @@ export default {
         this.register.visible = false
         this.login.form = {
           username: '',
-          password: '',
+          password: ''
         }
         this.passwordReset.form = {
           username: '',
@@ -300,7 +322,7 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: res.data.error, type: 'error' })
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
@@ -309,30 +331,39 @@ export default {
           })
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: res.data.error, type: 'error' })
           this.formType = 'login'
           this.login.form.username = this.register.form.username
           this.login.form.password = this.register.form.password
           this.showAuthForm()
-          this.$toast.open({ message: "Please confirm your account", type: 'success'});
+          this.$toast.open({
+            message: 'Please confirm your account',
+            type: 'success'
+          })
         } else if (this.passwordForgot.visible) {
           console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: res.data.error, type: 'error' })
           console.log(res)
           this.formType = 'login'
           this.showAuthForm()
-          return this.$toast.open({ message: 'Check your mail', type: 'success'});
+          return this.$toast.open({
+            message: 'Check your mail',
+            type: 'success'
+          })
         } else if (this.passwordReset) {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: res.data.error, type: 'error' })
           localStorage.removeItem('resetPasswordToken')
           this.formType = 'login'
           this.showAuthForm()
           this.$emit('clear')
-          return this.$toast.open({ message: 'Password updated', type: 'success'});
+          return this.$toast.open({
+            message: 'Password updated',
+            type: 'success'
+          })
         }
       } catch (error) {
         console.log('error in submitForm ', error.message)
@@ -345,7 +376,7 @@ export default {
       deep: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          this.formType = "reset-password"
+          this.formType = 'reset-password'
           this.showAuthForm()
         }
       }

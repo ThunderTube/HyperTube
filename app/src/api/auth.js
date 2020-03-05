@@ -22,7 +22,18 @@ const updatePassword = (data) => axios.put(`${AUTH}/updatepassword`, data);
 
 const logout = () => axios.post(`${AUTH}/logout`);
 
+const github = () => axios.get(`${AUTH}/github`);
+
+const google = () => axios.get(`${AUTH}/google`);
+
+const fortyTwo = () => axios.get(`${AUTH}/42`);
+
+const twitter = () => axios.post(`${AUTH}/twitter`);
+
 export {
+  github,
+  google,
+  fortyTwo,
   register,
   login,
   me,
