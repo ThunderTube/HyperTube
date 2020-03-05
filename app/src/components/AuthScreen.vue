@@ -27,9 +27,6 @@
         </div>
       </div>
       <div class="py-4 text-left px-6">
-        <h3 class="text-black uppercase font-semibold">
-          {{ formType }}
-        </h3>
         <form @submit.prevent="submitForm()">
           <div v-if="login.visible">
             <app-input
@@ -134,7 +131,7 @@
               @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
-              {{ formType }}
+              Submit
             </button>
           </div>
         </form>

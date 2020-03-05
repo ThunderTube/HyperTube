@@ -54,6 +54,12 @@ const router = new Router({
           beforeEnter: requireUser,
           component: () =>
             import(/* webpackChunkName: "about" */ '../views/User.vue')
+        },
+        {
+          path: 'me',
+          name: 'me',
+          component: () =>
+            import(/* webpackChunkName: "movie" */ '../views/Me.vue')
         }
       ]
     }
@@ -84,12 +90,9 @@ async function requireUser(to, from, next) {
     const id = to.params.id
     if (!id) next('/')
     const result = await getUser(id)
-    if (!result)
-      next('/')
-    else if (!result.data.success)
-      return next('/')
-    else
-      next()
+    if (!result) next('/')
+    else if (!result.data.success) return next('/')
+    else next()
   } catch (e) {
     console.log('confirmation error catch ', e)
     return next('/')

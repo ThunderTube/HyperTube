@@ -550,8 +550,8 @@ exports.updateDetails = async (req, res) => {
     try {
         await user.save();
     } catch (e) {
-        const msg = Object.values(e.errors).map(val => val.message);
-        res.status(400).json({ success: false, error: msg });
+        const msg = e.errors;
+        res.status(200).json({ success: false, error: msg });
         return;
     }
 
@@ -569,8 +569,8 @@ exports.updatePassword = async (req, res) => {
         await user.save();
         res.json({ success: true });
     } catch (e) {
-        const msg = Object.values(e.errors).map(val => val.message);
-        res.status(400).json({ success: false, error: msg });
+        const msg = e.errors.password.message;
+        res.status(200).json({ success: false, error: msg });
     }
 };
 

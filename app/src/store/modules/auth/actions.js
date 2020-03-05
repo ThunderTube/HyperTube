@@ -1,8 +1,28 @@
-import { register, login, forgotPassword, me, logout, resetPassword } from '@/api/auth'
+import { register, login, forgotPassword, me, logout, resetPassword, updateDetails, updatePassword } from '@/api/auth'
+
+
 
 export const registerUser = async ({ commit }, data) => {
   try {
     const res = await register(data)
+    return res
+  } catch (error) {
+    console.log('registerUser ', error)
+  }
+}
+
+export const updateUserDetails = async ({ commit }, data) => {
+  try {
+    const res = await updateDetails(data)
+    return res
+  } catch (error) {
+    console.log('updateUserDetails ', error)
+  }
+}
+
+export const updateUserPassword = async ({ commit }, data) => {
+  try {
+    const res = await updatePassword(data)
     return res
   } catch (error) {
     console.log('registerUser ', error)

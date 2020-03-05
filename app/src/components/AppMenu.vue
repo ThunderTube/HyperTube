@@ -1,6 +1,6 @@
 <template>
   <Slide disableOutsideClick>
-    <router-link to="movie" class="flex items-center">
+    <router-link :to="{ name: 'me'}" class="flex items-center">
       <div>
         <img
           :src="profilePictureSrc(getAuthData.profilePicture)"
@@ -122,6 +122,7 @@ export default {
     }),
     logoutUser() {
       this.logoutCurrentUser()
+      this.$router.push('/')
     }
   }
 }
