@@ -341,7 +341,23 @@ exports.getUser = async (req, res) => {
         const {
             params: { id },
         } = req;
+        if (typeof id !== 'string' || id.length !== '24') {
+            send(res, 400, {
+                success: false,
+                error: 'The ID is not correct',
+            });
+            return;
+        }
+
         const user = await User.findById(id);
+        if (user === null) {
+            send(res, 404, {
+                success: false,
+                user: 'No user found with this ID',
+            });
+            return;
+        }
+
         send(res, 200, {
             success: true,
             ...sanitizeUserDocument(user),
