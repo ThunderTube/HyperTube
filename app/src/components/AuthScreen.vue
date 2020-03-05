@@ -204,6 +204,8 @@ export default {
   methods: {
     async fortyTwoOauth() {
       try {
+        const res = await this.fortyTwoUser()
+        console.log(res)
         console.log('42')
       } catch (error) {
         console.log('e ', error)
