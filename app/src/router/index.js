@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
-import { confirmAccount } from '../api/auth'
+import { confirmAccount, getUser } from '../api/auth'
 import { setWithExpiry } from '../utils/localStorage'
 
 Vue.use(Router)
@@ -51,9 +51,7 @@ const router = new Router({
         {
           path: 'user/:id',
           name: 'user',
-          // route level code-splitting
-          // this generates a separate chunk (about.[hash].js) for this route
-          // which is lazy-loaded when the route is visited.
+          beforeEnter: requireUser,
           component: () =>
             import(/* webpackChunkName: "about" */ '../views/User.vue')
         }
@@ -75,6 +73,23 @@ async function requireHash(to, from, next) {
     }
     //this.$toast.open({ message: 'Confirmation success', type: 'success'});
     return next('/')
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
+async function requireUser(to, from, next) {
+  try {
+    const id = to.params.id
+    if (!id) next('/')
+    const result = await getUser(id)
+    if (!result)
+      next('/')
+    else if (!result.data.success)
+      return next('/')
+    else
+      next()
   } catch (e) {
     console.log('confirmation error catch ', e)
     return next('/')

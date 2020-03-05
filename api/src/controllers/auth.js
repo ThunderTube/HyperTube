@@ -341,9 +341,7 @@ exports.getUser = async (req, res) => {
         const {
             params: { id },
         } = req;
-
         const user = await User.findById(id);
-
         send(res, 200, {
             success: true,
             ...sanitizeUserDocument(user),
