@@ -2,7 +2,7 @@
     <div class="md:flex items-center bg-white rounded-lg p-6">
      <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" :src="profilePictureSrc">
      <div class="text-center md:text-left">
-       <h2 class="text-lg">{{ fullName }}</h2>
+       <h2 v-if="fullName" class="text-lg">{{ fullName }}</h2>
        <div class="text-purple-500">{{username}}</div>
      </div>
  </div>
@@ -18,11 +18,11 @@ export default {
     },
     firstName: {
       type: String,
-      required: true
+      required: false
     },
     lastName: {
       type: String,
-      required: true
+      required: false
     },
     profilePicture: {
       type: String,
@@ -35,7 +35,14 @@ export default {
       return `${API_ROOT}/uploads/${this.profilePicture}`
     },
     fullName() {
-      return `${this.firstName} ${this.lastName}`
+      if (this.firstName && this.lastName)
+        return `${this.firstName} ${this.lastName}`
+      else if (this.firstName)
+        return `${this.firstName}`
+      else if (this.lastName)
+        return `${this.lastName}`
+      else 
+        return false
     }
   }
 }
