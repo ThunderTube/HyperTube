@@ -1,55 +1,42 @@
 <template>
-<div class="container w-full md:w-1/2 mt-20 box-border grid grid-cols-1 md:grid-cols-2 rounded p-10 bg-gray-800">
-  <div>
-    <div class="mx-auto max-w-xs">
-      <img class="rounded" :src="profilePictureSrc" alt="">
-    </div>
-  </div>
-  <div>
-    <div class="text-white">
-      <h2 class="text-center font-semibold text-3xl tracking-wider mb-6">
-        {{ $t('profile.title') }} {{username}}
-      </h2>
-      <div class="mx-5">
-        <p>{{ $t('profile.username') }}{{username}}</p>
-        <p>{{ $t('profile.firstname') }}{{firstName}}</p>
-        <p>{{ $t('profile.lastname') }}{{lastName}}</p>
-      </div>
-    </div>
-  </div>
-
-</div>
+    <div class="md:flex items-center bg-white rounded-lg p-6">
+     <img class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6" :src="profilePictureSrc">
+     <div class="text-center md:text-left">
+       <h2 class="text-lg">{{ fullName }}</h2>
+       <div class="text-purple-500">{{username}}</div>
+     </div>
+ </div>
 </template>
 
 <script>
 export default {
   name: 'UserProfile',
-  inheritAttrs: false,
-  components: {},
-    props: {
+  props: {
     username: {
       type: String,
       required: true
     },
-      firstName: {
+    firstName: {
       type: String,
-      required: false
+      required: true
     },
-      lastName: {
+    lastName: {
       type: String,
-      required: false
+      required: true
     },
     profilePicture: {
       type: String,
-      required: false
+      required: true
     }
   },
-    computed: {
-
+  computed: {
     profilePictureSrc() {
       const API_ROOT = new URL(process.env.VUE_APP_BASE_URL).origin
       return `${API_ROOT}/uploads/${this.profilePicture}`
     },
+    fullName() {
+      return `${this.firstName} ${this.lastName}`
     }
+  }
 }
 </script>
