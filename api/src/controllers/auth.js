@@ -341,7 +341,7 @@ exports.getUser = async (req, res) => {
         const {
             params: { id },
         } = req;
-        if (typeof id !== 'string' || id.length !== '24') {
+        if (typeof id !== 'string' || id.length !== 24) {
             send(res, 400, {
                 success: false,
                 error: 'The ID is not correct',
