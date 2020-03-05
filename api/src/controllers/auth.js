@@ -9,6 +9,7 @@ const { extname, join } = require('path');
 const {
     promises: { mkdir },
 } = require('fs');
+const send = require('@polka/send-type');
 
 const { pipeline } = require('../utils');
 const { User, validPasswordRegex } = require('../models/User');
@@ -284,7 +285,6 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
-        console.log('username, password', username, password);
         const user = await User.findOne({ username });
         if (user === null) {
             // Could not find a user with this username
@@ -294,7 +294,6 @@ exports.login = async (req, res) => {
             });
             return;
         }
-
         if (!(await bcrypt.compare(password, user.password))) {
             res.status(200).json({
                 success: false,
@@ -321,23 +320,40 @@ exports.login = async (req, res) => {
 // @route GET /api/v1/auth/me
 // @access Private
 exports.getMe = async (req, res) => {
-    res.json({ success: true, user: sanitizeUserDocument(req.user) });
+    try {
+        send(res, 200, {
+            success: true,
+            user: sanitizeUserDocument(req.user),
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'Could not get you',
+        });
+    }
 };
 
 // @desc Get an user by id
 // @route GET /user/:id
 // @access Private
 exports.getUser = async (req, res) => {
-    const { user } = req;
-    const {
-        isConfirmed,
-        password,
-        confirmationLinkUuid,
-        csrfSecret,
-        ...props
-    } = user._doc;
+    try {
+        const {
+            params: { id },
+        } = req;
 
-    res.json({ success: true, ...props });
+        const user = await User.findById(id);
+
+        send(res, 200, {
+            success: true,
+            ...sanitizeUserDocument(user),
+        });
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured while trying to get the user',
+        });
+    }
 };
 
 // @desc Forgot password
@@ -411,7 +427,7 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(200).json({ success:false, error: 'Invalid password' });
+            res.status(200).json({ success: false, error: 'Invalid password' });
             return;
         }
 
@@ -516,7 +532,7 @@ exports.updatePassword = async (req, res) => {
 // @route POST /api/v1/auth/logout
 // @access Private
 exports.logout = async (req, res) => {
-    res.clearCookie('connect.sid')
+    res.clearCookie('connect.sid');
     res.clearCookie('cookie-id').json({ success: true });
 };
 
