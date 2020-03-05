@@ -23,5 +23,12 @@
   "movie": {
       "play": "Play",
       "watchlist_add": "Add to watchlist"
+  },
+
+  "profile": {
+      "title": "Profile of ",
+      "username": "Username : ",
+      "firstname": "Firstname : ",
+      "lastname": "Lastname : "
   }
 }

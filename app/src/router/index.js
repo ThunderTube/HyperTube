@@ -2,12 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import i18n from '../i18n'
-import { confirmAccount } from '../api/auth'
+import { confirmAccount, getUser } from '../api/auth'
 import { setWithExpiry } from '../utils/localStorage'
 
 Vue.use(Router)
 
-const router =  new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
@@ -32,7 +32,9 @@ const router =  new Router({
     {
       path: '/:lang',
       component: {
-        render (c) { return c('router-view') }
+        render(c) {
+          return c('router-view')
+        }
       },
       children: [
         {
@@ -44,7 +46,14 @@ const router =  new Router({
           path: 'movie',
           name: 'movie',
           component: () =>
-            import(/* webpackChunkName: "movie" */ '../views/Movie.vue')
+            import(/* webpackChunkName: "about" */ '../views/Movie.vue')
+        },
+        {
+          path: 'user/:id',
+          name: 'user',
+          beforeEnter: requireUser,
+          component: () =>
+            import(/* webpackChunkName: "about" */ '../views/User.vue')
         }
       ]
     }
@@ -55,8 +64,7 @@ async function requireHash(to, from, next) {
   try {
     const uuid = to.params.uuid
     const id = to.params.id
-    if (!id || !uuid)
-      next('/')
+    if (!id || !uuid) next('/')
     const result = await confirmAccount(uuid, id)
     if (!result.data.success) {
       // this.$toast.open({ message: 'Confirmation failed', type: 'success'});
@@ -71,12 +79,28 @@ async function requireHash(to, from, next) {
   }
 }
 
+async function requireUser(to, from, next) {
+  try {
+    const id = to.params.id
+    if (!id) next('/')
+    const result = await getUser(id)
+    if (!result)
+      next('/')
+    else if (!result.data.success)
+      return next('/')
+    else
+      next()
+  } catch (e) {
+    console.log('confirmation error catch ', e)
+    return next('/')
+  }
+}
+
 async function requireToken(to, from, next) {
   try {
     const guid = to.params.guid
-    
-    if (!guid)
-      return next('/')
+
+    if (!guid) return next('/')
     setWithExpiry('resetPasswordToken', guid, 600000)
     next('/')
   } catch (e) {

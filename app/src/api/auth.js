@@ -10,7 +10,7 @@ const me = () => axios.get(`${AUTH}/me`);
 
 const confirmAccount = (uuid, id) => axios.get(`${AUTH}/confirmaccount/${uuid}/${id}`);
 
-// const getUser = (id, data) => axios.get(`${AUTH}/user/${id}`, { data });
+const getUser = (id) => axios.get(`${AUTH}/user/${id}`);
 
 const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, data)
 
@@ -27,7 +27,7 @@ export {
   login,
   me,
   confirmAccount,
-  // getUser,
+  getUser,
   forgotPassword,
   resetPassword,
   // updateDetails,
