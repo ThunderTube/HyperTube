@@ -6,10 +6,11 @@
     }"
   >
     <video
+      ref="player"
       crossorigin="use-credentials"
-      preload="none"
+      :preload="selectedSource !== undefined ? 'auto' : 'none'"
       :poster="poster"
-      class="w-full focus:outline-none"
+      class="w-full focus:outline-none z-0"
       :class="{ 'h-full object-cover object-top': !hasPlayed }"
       controls
       @playing="hasPlayed = true"
@@ -38,7 +39,7 @@
 
       <ul
         v-else-if="selectedResolution === null"
-        class="absolute inset-0 flex flex-col items-center justify-center"
+        class="absolute inset-0 flex flex-col items-center justify-center z-20"
         style="background-color: rgba(0, 0, 0, 0.4)"
       >
         <div>
@@ -56,7 +57,13 @@
         </div>
       </ul>
 
-      <loading-spinner v-else-if="loading" class="absolute" />
+      <div
+        v-else-if="loading "
+        class="absolute inset-0 flex flex-col items-center justify-center z-20"
+        style="background-color: rgba(0, 0, 0, 0.4)"
+      >
+        <loading-spinner />
+      </div>
     </transition>
   </div>
 </template>
@@ -99,7 +106,10 @@ export default {
       timer: undefined,
       videoMimeType: undefined,
       selectedSource: undefined,
-      hasPlayed: false
+      hasPlayed: false,
+
+      extraLoadingTimer: null,
+      willNeedTranscoding: false
     }
   },
   computed: {
@@ -159,7 +169,20 @@ export default {
 
         if (['FIRST_CHUNKS_LOADED', 'LOADED'].includes(data)) {
           this.selectedSource = `${process.env.VUE_APP_BASE_URL}/stream/video/chunks/${this.id}/${this.selectedResolution}`
-          this.loading = false
+
+          // We need to wait an extra time if the video must be decoded on live
+          if (this.willNeedTranscoding) {
+            const TIME_BEFORE_LAUNCHING = 15e3 // 15 seconds
+
+            clearTimeout(this.extraLoadingTimer)
+            this.extraLoadingTimer = setTimeout(() => {
+              this.loading = false
+              this.launchVideo()
+            }, TIME_BEFORE_LAUNCHING)
+          } else {
+            this.loading = false
+            this.launchVideo()
+          }
 
           clearInterval(this.timer)
         }
@@ -179,9 +202,11 @@ export default {
           throw new Error('An error occured during the downloading of the film')
         }
         console.log('informations =', informations)
-        const { mime } = informations
+        const { mime, willNeedTranscoding } = informations
         this.videoMimeType = mime
+        this.willNeedTranscoding = willNeedTranscoding
 
+        clearInterval(this.timer)
         this.timer = setInterval(() => this.poll(), 2000)
       } catch (e) {
         console.error(e)
@@ -189,10 +214,14 @@ export default {
     },
     formatSubtitleSrc(url) {
       return `${process.env.VUE_APP_BASE_URL}${url}`
+    },
+    launchVideo() {
+      this.$refs.player.play()
     }
   },
   beforeDestroy() {
     clearInterval(this.timer)
+    clearTimeout(this.extraLoadingTimer)
   }
 }
 </script>

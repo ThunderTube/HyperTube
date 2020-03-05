@@ -173,7 +173,9 @@ async function triggerVideoDownloading(req, res) {
         }
     );
     if (!movie) {
-        res.end('Not found');
+        send(res, 404, {
+            error: 'Could not find this movie',
+        });
         return;
     }
 
@@ -185,22 +187,32 @@ async function triggerVideoDownloading(req, res) {
     const mime =
         fsPath &&
         MIME.get(fsPathExtension === 'mp4' ? fsPathExtension : 'webm');
+    const willNeedTranscoding =
+        fsPath && !['mp4', 'webm'].includes(fsPathExtension);
 
     if (fsPath !== undefined && status === TORRENT_STATUSES.LOADED) {
         // Load the movie from the local file system.
         send(res, 200, {
             status: TORRENT_STATUSES.LOADED,
             mime,
+            willNeedTranscoding,
         });
         return;
     }
     if (status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) {
         // Can launch polling.
-        send(res, 200, { status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED, mime });
+        send(res, 200, {
+            status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED,
+            mime,
+            willNeedTranscoding,
+        });
         return;
     }
     if (status === TORRENT_STATUSES.LOADING) {
-        send(res, 200, { status: TORRENT_STATUSES.LOADING });
+        send(res, 200, {
+            status: TORRENT_STATUSES.LOADING,
+            willNeedTranscoding,
+        });
         return;
     }
 
@@ -212,7 +224,11 @@ async function triggerVideoDownloading(req, res) {
     // Lock the torrent.
     // Start downloading the movie.
 
-    const { emitter, file } = await streamTorrent(torrent);
+    const {
+        emitter,
+        file,
+        willNeedTranscoding: streamWillNeedTranscoding,
+    } = await streamTorrent(torrent);
 
     STATE.files.set(toFilesMapKey(id, resolution), file);
 
@@ -244,6 +260,7 @@ async function triggerVideoDownloading(req, res) {
     send(res, 200, {
         status: TORRENT_STATUSES.LOADING,
         mime: MIME.get(file.extension),
+        willNeedTranscoding: streamWillNeedTranscoding,
     });
 }
 
