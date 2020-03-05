@@ -39,7 +39,7 @@ async function app() {
         .use(
             cors({
                 credentials: true,
-                origin: ['http://localhost', 'http://localhost:3000'],
+                origin: ['http://localhost', process.env.FRONT_URI],
             })
         )
         .use(
@@ -51,7 +51,7 @@ async function app() {
         )
         .use(passport.initialize())
         .use(passport.session())
-        .use(passport.authenticate(['jwt', 'anonymous']))
+        .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
             // This middleware sets the context
             res.locals = {

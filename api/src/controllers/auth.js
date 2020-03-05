@@ -5,6 +5,7 @@ const stream = require('stream');
 const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
+const foid = require('foid');
 const { extname, join } = require('path');
 const {
     promises: { mkdir },
@@ -41,7 +42,7 @@ function trimObject(obj) {
             return agg;
         }, {});
 }
-
+1;
 function sanitizeUserDocument(doc) {
     const {
         isConfirmed,
@@ -54,12 +55,12 @@ function sanitizeUserDocument(doc) {
     return props;
 }
 
-async function isUserOAuth(property, value) {
+async function isUserOAuth(provider, property, value) {
     const count = await User.countDocuments({
         [property]: value,
-        registeredUsingOAuth: true,
+        OAuthProvider: provider,
     });
-    console.log('count = ', count);
+    // console.log('count = ', count);
     return count > 0;
 }
 
@@ -69,6 +70,25 @@ async function createUploadPathIfNotExist() {
     await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
 
     return UPLOAD_DIRECTORY_PATH;
+}
+
+function createUsernameIfNotExist(username, firstName, lastName) {
+    console.log('firstname = ', firstName);
+    console.log('lastname = ', lastName);
+    console.log('username in createUsernameIfNotExist= ', username);
+    if (username === undefined) {
+        if (firstName === undefined && lastName === undefined) {
+            return foid(4);
+        }
+
+        if (firstName === undefined || lastName === undefined) {
+            return firstName || lastName;
+        }
+
+        return firstName.concat(lastName);
+    }
+
+    return username;
 }
 
 /**
@@ -87,29 +107,34 @@ exports.controllerFortyTwo = async (req, res) => {
         // console.log('passport user= ', user);
 
         const { csrf } = res.locals;
+
+        let username = createUsernameIfNotExist(
+            passportUser.username,
+            passportUser.firstName,
+            passportUser.lastName
+        );
+        console.log('username createUsernameIfNotExist= ', username);
+
         const isUserUnique = await User.isUnique({
             email: passportUser.email,
-            username: passportUser.username,
+            username,
         });
 
         const csrfSecret = await csrf.secret();
 
         if (isUserUnique === true) {
             const {
-                username,
                 email,
                 lastName,
                 firstName,
                 password,
                 profilePicture,
+                provider,
             } = passportUser;
 
             const fileExtension = extname(profilePicture).slice(1);
             const filename = `${uuid()}.${fileExtension}`;
-            // console.log(
-            //     'createUploadPathIfNotExist: ',
-            //     await createUploadPathIfNotExist()
-            // );
+
             await createUploadPathIfNotExist();
 
             // We fetch the file and save it locally
@@ -129,7 +154,7 @@ exports.controllerFortyTwo = async (req, res) => {
                 profilePicture: filename,
                 isConfirmed: true,
                 csrfSecret,
-                registeredUsingOAuth: true,
+                OAuthProvider: provider,
             });
             await user.save();
 
@@ -141,13 +166,18 @@ exports.controllerFortyTwo = async (req, res) => {
             );
         } else {
             const duplicateField = isUserUnique;
+            const provider = req.user.provider;
 
             const userRegisteredUsingOAuth = await isUserOAuth(
+                provider,
                 duplicateField,
-                passportUser[duplicateField]
+                passportUser[duplicateField] || username
             );
-            if (userRegisteredUsingOAuth > 0) {
-                const username = req.user.username;
+
+            console.log('userRegistered UsingOAuth', userRegisteredUsingOAuth);
+
+            if (userRegisteredUsingOAuth) {
+                username = req.user.username || username;
                 const user = await User.findOne({ username });
 
                 const token = user.getSignedJwtToken();
@@ -160,10 +190,10 @@ exports.controllerFortyTwo = async (req, res) => {
                 );
             } else {
                 if (duplicateField === 'username') {
-                    res.status(400).redirect('/?error=username'); // Error for email already taken
+                    res.status(400).redirect(`${FRONT_URI}/?error=username`); // Error for username already taken
                 }
                 if (duplicateField === 'email') {
-                    res.status(400).redirect('/?error=email'); // Error for username already taken
+                    res.status(400).redirect(`${FRONT_URI}/?error=email`); // Error for email already taken
                 }
             }
         }
@@ -285,7 +315,7 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username, isConfirmed: true });
         if (user === null) {
             // Could not find a user with this username
             res.status(200).json({
@@ -457,6 +487,8 @@ exports.resetPassword = async (req, res) => {
         }
 
         user.password = password;
+        user.isConfirmed = true;
+
         await user.save();
 
         res.json({ success: true });
