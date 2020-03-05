@@ -190,10 +190,10 @@ exports.controllerFortyTwo = async (req, res) => {
                 );
             } else {
                 if (duplicateField === 'username') {
-                    res.status(400).redirect('/?error=username'); // Error for username already taken
+                    res.status(400).redirect(`${FRONT_URI}/?error=username`); // Error for username already taken
                 }
                 if (duplicateField === 'email') {
-                    res.status(400).redirect('/?error=email'); // Error for email already taken
+                    res.status(400).redirect(`${FRONT_URI}/?error=email`); // Error for email already taken
                 }
             }
         }
