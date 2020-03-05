@@ -16,9 +16,9 @@ const forgotPassword = (data) => axios.post(`${AUTH}/forgotpassword`, data)
 
 const resetPassword = (data) => axios.put(`${AUTH}/resetpassword`, data);
 
-// const updateDetails = (data) => axios.put(`${AUTH}/updatedetails`, { data });
+const updateDetails = (data) => axios.put(`${AUTH}/updatedetails`, data);
 
-// const updatePassword = (data) => axios.put(`${AUTH}/updatepassword`, { data });
+const updatePassword = (data) => axios.put(`${AUTH}/updatepassword`, data);
 
 const logout = () => axios.post(`${AUTH}/logout`);
 
@@ -30,7 +30,7 @@ export {
   getUser,
   forgotPassword,
   resetPassword,
-  // updateDetails,
-  // updatePassword,
+  updateDetails,
+  updatePassword,
   logout
 }
