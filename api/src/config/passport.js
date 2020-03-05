@@ -32,7 +32,11 @@ module.exports = function setupPassport(csrf) {
                 },
             },
             (accessToken, refreshToken, profile, cb) => {
-                cb(null, profile);
+                try {
+                    cb(null, profile);
+                } catch (e) {
+                    cb(e, null);
+                }
             }
         )
     );
@@ -45,18 +49,22 @@ module.exports = function setupPassport(csrf) {
                 profileFields: ['id', 'first_name', 'last_name', 'picture'],
             },
             (accessToken, refreshToken, profile, cb) => {
-                // console.log('profile =', profile);
-                const { provider, name, id } = profile;
-                const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
+                try {
+                    // console.log('profile =', profile);
+                    const { provider, name, id } = profile;
+                    const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
 
-                console.log('profile picture = ', profilePicture);
+                    console.log('profile picture = ', profilePicture);
 
-                cb(null, {
-                    provider,
-                    profilePicture,
-                    firstName: name.givenName,
-                    lastName: name.familyName,
-                });
+                    cb(null, {
+                        provider,
+                        profilePicture,
+                        firstName: name.givenName,
+                        lastName: name.familyName,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
             }
         )
     );
@@ -68,16 +76,20 @@ module.exports = function setupPassport(csrf) {
                 callbackURL: `${process.env.BACK_URI}/v1/auth/github/callback`,
             },
             (accessToken, refreshToken, profile, cb) => {
-                const { username, displayName, photos, provider } = profile;
+                try {
+                    const { username, displayName, photos, provider } = profile;
 
-                // console.log('profile:', profile);
+                    // console.log('profile:', profile);
 
-                cb(null, {
-                    username: username,
-                    firstName: displayName,
-                    profilePicture: photos[0].value,
-                    provider,
-                });
+                    cb(null, {
+                        username: username,
+                        firstName: displayName,
+                        profilePicture: photos[0].value,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
             }
         )
     );
@@ -89,15 +101,19 @@ module.exports = function setupPassport(csrf) {
                 callbackURL: `${process.env.BACK_URI}/v1/auth/google/callback`,
             },
             (accessToken, refreshToken, profile, cb) => {
-                const { name, photos, provider } = profile;
-                console.log('profile:', profile);
+                try {
+                    const { name, photos, provider } = profile;
+                    console.log('profile:', profile);
 
-                cb(null, {
-                    firstName: name.givenName,
-                    lastName: name.familyName,
-                    profilePicture: photos[0].value,
-                    provider,
-                });
+                    cb(null, {
+                        firstName: name.givenName,
+                        lastName: name.familyName,
+                        profilePicture: photos[0].value,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
             }
         )
     );
