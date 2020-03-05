@@ -17,7 +17,7 @@ const userSchema = new Schema({
             return [true, 'Please add an username'];
         },
         match: [
-            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3, 20}$/,
+            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3,255}$/,
             'Please add a valid username [at least 2 letters, number and [-] are accepted]',
         ],
     },
@@ -45,7 +45,7 @@ const userSchema = new Schema({
             return [true, 'Please add a last name [at least 2 letters]'];
         },
         match: [
-            /^[A-zÀ-ú- ]{1,20}$/,
+            /^[A-zÀ-ú- ]{1,255}$/,
             'Please add a valid last name [at least 1 letter]',
         ],
     },
@@ -58,7 +58,7 @@ const userSchema = new Schema({
             return [true, 'Please add a first name [at least 1 letters]'];
         },
         match: [
-            /^[A-zÀ-ú- ]{1,20}$/,
+            /^[A-zÀ-ú- ]{1,255}$/,
             'Please add a valid first name [at least 1 letters]',
         ],
     },
