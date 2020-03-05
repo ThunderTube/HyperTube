@@ -29,8 +29,6 @@
 </template>
 
 <script>
-// import VLazyImage from 'v-lazy-image'
-
 import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
 import LazyMovieImage from './LazyMovieImage'
