@@ -71,10 +71,10 @@ const router = new Router({
 async function checkOauthToken(to, from, next) {
   try {
     if (to.query && to.query.token) {
-      localStorage.setItem('csrfToken', to.query.token)
-      axios.defaults.headers.common['X-CSRF-TOKEN'] = to.query.token
+      localStorage.setItem('csrfToken', decodeURIComponent(to.query.token))
+      axios.defaults.headers.common['X-CSRF-TOKEN'] = decodeURIComponent(to.query.token)
     }
-    next()
+    return next()
   } catch (error) {
     console.log('fail in check oauth token')
   }
