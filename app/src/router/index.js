@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import i18n from '../i18n'
 import { confirmAccount, getUser } from '../api/auth'
 import { setWithExpiry } from '../utils/localStorage'
+import axios from 'axios'
 
 Vue.use(Router)
 
@@ -40,7 +41,8 @@ const router = new Router({
         {
           path: '/',
           name: 'home',
-          component: Home
+          component: Home,
+          beforeEnter: checkOauthToken
         },
         {
           path: 'movie',
@@ -65,6 +67,18 @@ const router = new Router({
     }
   ]
 })
+
+async function checkOauthToken(to, from, next) {
+  try {
+    if (to.query && to.query.token) {
+      localStorage.setItem('csrfToken', to.query.token)
+      axios.defaults.headers.common['X-CSRF-TOKEN'] = to.query.token
+    }
+    next()
+  } catch (error) {
+    console.log('fail in check oauth token')
+  }
+}
 
 async function requireHash(to, from, next) {
   try {

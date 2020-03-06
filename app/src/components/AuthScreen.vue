@@ -120,7 +120,6 @@
             <div>
               <a href="http://localhost:8080/v1/auth/github">Github</a>
             </div>
-            
           </div>
           <div class="flex justify-end py-2">
             <button
