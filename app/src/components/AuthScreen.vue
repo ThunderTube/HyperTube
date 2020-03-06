@@ -8,9 +8,6 @@
     </div>
     <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
     <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto">
-    <div>
-              <button @click="fortyTwoOauth()">42</button>
-            </div>
       <div class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800">
         <div
           @click="selectAuthForm('login')"
@@ -115,14 +112,15 @@
           </div>
           <div class="flex justify-between">
             <div>
-              <button @click.prevent="fortyTwoOauth()">42</button>
+              <a href="http://localhost:8080/v1/auth/42">42</a>
             </div>
             <div>
-              <button @click.prevent="googleOauth()">Google</button>
+              <a href="http://localhost:8080/v1/auth/google">Google</a>
             </div>
             <div>
-              <button @click.prevent="githubOauth()">Github</button>
+              <a href="http://localhost:8080/v1/auth/github">Github</a>
             </div>
+            
           </div>
           <div class="flex justify-end py-2">
             <button
