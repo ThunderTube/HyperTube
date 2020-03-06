@@ -65,28 +65,28 @@ router
         passport.authenticate('github'),
         controllerFortyTwo
     )
-    .get(
-        '/facebook',
-        passport.authenticate(
-            'facebook',
-            {
-                failureRedirect: process.env.FRONT_URI,
-            },
-            { scope: 'user_friends' }
-        ),
-        (req, res, next) => {
-            console.log('first 42 called');
+    // .get(
+    //     '/facebook',
+    //     passport.authenticate(
+    //         'facebook',
+    //         {
+    //             failureRedirect: process.env.FRONT_URI,
+    //         },
+    //         { scope: 'user_friends' }
+    //     ),
+    //     (req, res, next) => {
+    //         console.log('first 42 called');
 
-            next();
-        }
-    )
-    .get(
-        '/facebook/callback',
-        passport.authenticate('facebook', {
-            failureRedirect: process.env.FRONT_URI,
-        }),
-        controllerFortyTwo
-    )
+    //         next();
+    //     }
+    // )
+    // .get(
+    //     '/facebook/callback',
+    //     passport.authenticate('facebook', {
+    //         failureRedirect: process.env.FRONT_URI,
+    //     }),
+    //     controllerFortyTwo
+    // )
     .get(
         '/google',
         passport.authenticate('google', {
@@ -143,7 +143,7 @@ function uploadAndVerifyFileTypeMiddleware(
                         'Could not identify the mimetype of the file'
                     );
                     res.status(200).json({
-                        success:false,
+                        success: false,
                         error: 'Could not identify the mimetype of the file',
                     });
                     return;
@@ -152,7 +152,7 @@ function uploadAndVerifyFileTypeMiddleware(
                 if (!authorizedMimeTypes.includes(mime)) {
                     // Not supported mimetype
                     res.status(200).json({
-                        success:false,
+                        success: false,
                         error: 'Mimetype not supported',
                     });
                     return;
