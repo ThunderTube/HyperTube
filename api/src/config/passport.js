@@ -40,34 +40,34 @@ module.exports = function setupPassport(csrf) {
             }
         )
     );
-    passport.use(
-        new FacebookStrategy(
-            {
-                clientID: process.env.FACEBOOK_APP_ID,
-                clientSecret: process.env.FACEBOOK_APP_SECRET,
-                callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
-                profileFields: ['id', 'first_name', 'last_name', 'picture'],
-            },
-            (accessToken, refreshToken, profile, cb) => {
-                try {
-                    // console.log('profile =', profile);
-                    const { provider, name, id } = profile;
-                    const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
+    // passport.use(
+    //     new FacebookStrategy(
+    //         {
+    //             clientID: process.env.FACEBOOK_APP_ID,
+    //             clientSecret: process.env.FACEBOOK_APP_SECRET,
+    //             callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
+    //             profileFields: ['id', 'first_name', 'last_name', 'picture'],
+    //         },
+    //         (accessToken, refreshToken, profile, cb) => {
+    //             try {
+    //                 // console.log('profile =', profile);
+    //                 const { provider, name, id } = profile;
+    //                 const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
 
-                    console.log('profile picture = ', profilePicture);
+    //                 console.log('profile picture = ', profilePicture);
 
-                    cb(null, {
-                        provider,
-                        profilePicture,
-                        firstName: name.givenName,
-                        lastName: name.familyName,
-                    });
-                } catch (e) {
-                    cb(e, null);
-                }
-            }
-        )
-    );
+    //                 cb(null, {
+    //                     provider,
+    //                     profilePicture,
+    //                     firstName: name.givenName,
+    //                     lastName: name.familyName,
+    //                 });
+    //             } catch (e) {
+    //                 cb(e, null);
+    //             }
+    //         }
+    //     )
+    // );
     passport.use(
         new GithubStrategy(
             {
