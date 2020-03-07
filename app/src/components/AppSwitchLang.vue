@@ -2,7 +2,7 @@
   <div>
     <button
       href="#"
-      class="flex top-0 right-0 m-2 p-2 rounded absolute text-white font-bold z-20"
+      class="focus:outline-none flex top-0 right-0 m-2 p-2 rounded absolute text-white font-bold z-20"
       @click="toggleVisibility"
       @keydown.space.exact.prevent="toggleVisibility"
       @keydown.esc.exact="hideDropdown"

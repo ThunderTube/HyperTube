@@ -157,7 +157,7 @@ exports.OAuthcontroller = async (req, res) => {
 
             const csrfToken = csrf.create(csrfSecret);
             const token = user.getSignedJwtToken();
-
+            console.log(csrfToken)
             createCookie(res, token).redirect(
                 `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
             );
@@ -177,7 +177,7 @@ exports.OAuthcontroller = async (req, res) => {
 
                 const token = user.getSignedJwtToken();
                 const csrfToken = csrf.create(csrfSecret);
-
+                console.log(csrfToken)
                 createCookie(res, token).redirect(
                     `http://localhost:3000/?token=${encodeURIComponent(
                         csrfToken
