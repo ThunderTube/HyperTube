@@ -113,8 +113,6 @@ exports.OAuthcontroller = async (req, res) => {
             username,
         });
 
-        
-        const csrfSecret = await csrf.secret();
         if (isUserUnique === true) {
             const {
                 email,
@@ -142,6 +140,9 @@ exports.OAuthcontroller = async (req, res) => {
             } else {
                 filename = 'default-user.jpg';
             }
+
+            const csrfSecret = await csrf.secret();
+
             const user = new User({
                 username,
                 email,
@@ -157,7 +158,7 @@ exports.OAuthcontroller = async (req, res) => {
 
             const csrfToken = csrf.create(csrfSecret);
             const token = user.getSignedJwtToken();
-            console.log(csrfToken)
+            console.log(csrfToken);
             createCookie(res, token).redirect(
                 `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
             );
@@ -176,8 +177,9 @@ exports.OAuthcontroller = async (req, res) => {
                 const user = await User.findOne({ username });
 
                 const token = user.getSignedJwtToken();
-                const csrfToken = csrf.create(csrfSecret);
-                console.log(csrfToken)
+                const csrfToken = csrf.create(user.csrfSecret);
+
+                console.log(csrfToken);
                 createCookie(res, token).redirect(
                     `http://localhost:3000/?token=${encodeURIComponent(
                         csrfToken
