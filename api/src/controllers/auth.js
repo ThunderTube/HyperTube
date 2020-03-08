@@ -113,8 +113,8 @@ exports.OAuthcontroller = async (req, res) => {
             username,
         });
 
+        
         const csrfSecret = await csrf.secret();
-
         if (isUserUnique === true) {
             const {
                 email,
