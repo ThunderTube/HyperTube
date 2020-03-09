@@ -164,7 +164,7 @@ exports.OAuthcontroller = async (req, res) => {
             );
         } else {
             const duplicateField = isUserUnique;
-            const provider = req.user.provider;
+            const {provider} = req.user;
 
             const userRegisteredUsingOAuth = await isUserOAuth(
                 provider,
@@ -238,7 +238,7 @@ exports.register = async (req, res) => {
         try {
             await user.validate();
         } catch (e) {
-            let msg = Object.values(e.errors).map(val => val.message);
+            const msg = Object.values(e.errors).map(val => val.message);
             res.status(200).json({ success: false, error: msg });
             return;
         }

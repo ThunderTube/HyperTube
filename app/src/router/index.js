@@ -72,7 +72,9 @@ async function checkOauthToken(to, from, next) {
   try {
     if (to.query && to.query.token) {
       localStorage.setItem('csrfToken', decodeURIComponent(to.query.token))
-      axios.defaults.headers.common['X-CSRF-TOKEN'] = decodeURIComponent(to.query.token)
+      axios.defaults.headers.common['X-CSRF-TOKEN'] = decodeURIComponent(
+        to.query.token
+      )
     }
     return next()
   } catch (error) {

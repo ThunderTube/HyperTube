@@ -6,17 +6,27 @@
     <div class="z-50">
       <app-switch-lang />
     </div>
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
-    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto">
-      <div class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800">
+    <div
+      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
+    ></div>
+    <div
+      class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
+    >
+      <div
+        class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800"
+      >
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >{{ $t('loginscreen.login') }}</div>
+        >
+          {{ $t('loginscreen.login') }}
+        </div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
-        >{{ $t('loginscreen.register') }}</div>
+        >
+          {{ $t('loginscreen.register') }}
+        </div>
       </div>
       <div class="py-4 text-left px-6">
         <form>
@@ -71,7 +81,13 @@
             />
             <div class="block">
               <!-- <app-input ref="file" name="file" type="file" /> -->
-              <input type="file" id="file" ref="file" accept="image/*" @change="handleFileUpload()" />
+              <input
+                type="file"
+                id="file"
+                ref="file"
+                accept="image/*"
+                @change="handleFileUpload()"
+              />
             </div>
           </div>
           <div v-else-if="passwordForgot.visible">
@@ -101,14 +117,16 @@
               @click.prevent="selectAuthForm('password-forgot')"
               href="#"
               class="text-blue-600"
-            >{{ $t('loginscreen.forgot_password') }}</a>
+              >{{ $t('loginscreen.forgot_password') }}</a
+            >
           </div>
           <div v-show="resetPassword && login.visible" class="block">
             <a
               @click.prevent="selectAuthForm('reset-password')"
               href="#"
               class="text-blue-600"
-            >Reset Password</a>
+              >Reset Password</a
+            >
           </div>
           <div class="flex justify-between">
             <div>
@@ -125,7 +143,9 @@
             <button
               @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
-            >Submit</button>
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>
@@ -211,7 +231,6 @@ export default {
     async githubOauth() {
       try {
         console.log('github')
-
       } catch (error) {
         console.log('e ', error)
       }
@@ -219,7 +238,6 @@ export default {
     async googleOauth() {
       try {
         console.log('google')
-
       } catch (error) {
         console.log('e ', error)
       }
