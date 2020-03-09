@@ -325,7 +325,11 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username, isConfirmed: true });
+        const user = await User.findOne({
+            username,
+            isConfirmed: true,
+            OAuthProvider: undefined,
+        });
         if (user === null) {
             // Could not find a user with this username
             res.status(200).json({
@@ -336,6 +340,8 @@ exports.login = async (req, res) => {
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
+            console.log('COUCOU');
+
             res.status(200).json({
                 success: false,
                 error: 'Invalid password',
