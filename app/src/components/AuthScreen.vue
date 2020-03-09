@@ -49,8 +49,8 @@
             <!-- {{ $t('loginscreen.register_form_title') }} -->
             <app-input
               v-model="register.form.username"
-              name="username"
-              placeholder="username"
+              :name="$t('registerscreen.id_placeholder')"
+              :placeholder="$t('registerscreen.id_placeholder')"
               autocomplete="username"
             />
             <app-input
@@ -62,14 +62,14 @@
             />
             <app-input
               v-model="register.form.firstName"
-              name="firstName"
-              placeholder="first name"
+              :name="$t('registerscreen.firstName')"
+              :placeholder="$t('registerscreen.firstName')"
               autocomplete="given-name"
             />
             <app-input
               v-model="register.form.lastName"
-              name="lastName"
-              placeholder="last name"
+              :name="$t('registerscreen.lastName')"
+              :placeholder="$t('registerscreen.lastName')"
               autocomplete="family-name"
             />
             <app-input
@@ -128,15 +128,18 @@
               >Reset Password</a
             >
           </div>
-          <div class="flex justify-between">
+          <div class="flex justify-between my-8">
             <div>
-              <a href="http://localhost:8080/v1/auth/42">42</a>
+              <a class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/42">42</a>
             </div>
             <div>
-              <a href="http://localhost:8080/v1/auth/google">Google</a>
+              <a class="bg-blue-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/google">Google</a>
             </div>
             <div>
-              <a href="http://localhost:8080/v1/auth/github">Github</a>
+              <a class="bg-green-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/github">Github</a>
+            </div>
+            <div>
+              <a class="bg-orange-600 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/reddit">Reddit</a>
             </div>
           </div>
           <div class="flex justify-end py-2">

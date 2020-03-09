@@ -5,6 +5,7 @@ import i18n from '../i18n'
 import { confirmAccount, getUser } from '../api/auth'
 import { setWithExpiry } from '../utils/localStorage'
 import axios from 'axios'
+import store from '../store/modules/auth'
 
 Vue.use(Router)
 
@@ -47,6 +48,7 @@ const router = new Router({
         {
           path: 'movie',
           name: 'movie',
+          beforeEnter: checkIfLoggedIn,
           component: () =>
             import(/* webpackChunkName: "about" */ '../views/Movie.vue')
         },
@@ -60,6 +62,7 @@ const router = new Router({
         {
           path: 'me',
           name: 'me',
+          beforeEnter: checkIfLoggedIn,
           component: () =>
             import(/* webpackChunkName: "movie" */ '../views/Me.vue')
         }
@@ -67,6 +70,17 @@ const router = new Router({
     }
   ]
 })
+
+
+async function checkIfLoggedIn(to, from, next) {
+  try {
+  if (!store.state.isLoggedIn)
+    return next('/')
+  return next()
+  } catch (error) {
+    console.log('fail in check oauth token')
+  }
+}
 
 async function checkOauthToken(to, from, next) {
   try {
@@ -105,6 +119,7 @@ async function requireUser(to, from, next) {
   try {
     const id = to.params.id
     if (!id) next('/')
+    if (!store.state.isLoggedIn) next('/')
     const result = await getUser(id)
     if (!result) next('/')
     else if (!result.data.success) return next('/')
@@ -118,7 +133,6 @@ async function requireUser(to, from, next) {
 async function requireToken(to, from, next) {
   try {
     const guid = to.params.guid
-
     if (!guid) return next('/')
     setWithExpiry('resetPasswordToken', guid, 600000)
     next('/')

@@ -3,11 +3,18 @@
       "login": "Login",
       "register": "Register",
       "id": "Login",
-      "id_placeholder": "login or email",
+      "id_placeholder": "Username",
       "password": "Password",
       "forgot_password": "Password forgot?",
       "register_input": "Register",
       "register_form_title": "Register form"
+  },
+  
+  "registerscreen": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "id_placeholder": "Username",
+      "password": "Password"
   },
 
   "navbar": {
@@ -31,4 +38,5 @@
       "firstname": "Firstname : ",
       "lastname": "Lastname : "
   }
+  
 }
