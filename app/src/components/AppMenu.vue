@@ -1,6 +1,9 @@
 <template>
   <Slide disableOutsideClick>
-    <router-link :to="{ name: 'me' }" class="flex items-center">
+    <router-link
+      :to="{ name: 'me', lang: $i18n.locale }"
+      class="flex items-center"
+    >
       <div>
         <img
           :src="profilePictureSrc(getAuthData.profilePicture)"
