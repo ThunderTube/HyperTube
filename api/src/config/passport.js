@@ -5,6 +5,7 @@ const FortyTwoStrategy = require('passport-42').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GithubStrategy = require('passport-github').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const RedditStrategy = require('passport-reddit').Strategy;
 const stream = require('stream');
 const { promisify } = require('util');
 const fs = require('fs');
@@ -40,34 +41,33 @@ module.exports = function setupPassport(csrf) {
             }
         )
     );
-    // passport.use(
-    //     new FacebookStrategy(
-    //         {
-    //             clientID: process.env.FACEBOOK_APP_ID,
-    //             clientSecret: process.env.FACEBOOK_APP_SECRET,
-    //             callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
-    //             profileFields: ['id', 'first_name', 'last_name', 'picture'],
-    //         },
-    //         (accessToken, refreshToken, profile, cb) => {
-    //             try {
-    //                 // console.log('profile =', profile);
-    //                 const { provider, name, id } = profile;
-    //                 const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
+    passport.use(
+        new FacebookStrategy(
+            {
+                clientID: process.env.FACEBOOK_APP_ID,
+                clientSecret: process.env.FACEBOOK_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/facebook/callback`,
+                profileFields: ['id', 'first_name', 'last_name', 'picture'],
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { provider, name, id } = profile;
+                    const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
 
-    //                 console.log('profile picture = ', profilePicture);
+                    console.log('profile picture = ', profilePicture);
 
-    //                 cb(null, {
-    //                     provider,
-    //                     profilePicture,
-    //                     firstName: name.givenName,
-    //                     lastName: name.familyName,
-    //                 });
-    //             } catch (e) {
-    //                 cb(e, null);
-    //             }
-    //         }
-    //     )
-    // );
+                    cb(null, {
+                        provider,
+                        profilePicture,
+                        firstName: name.givenName,
+                        lastName: name.familyName,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
     passport.use(
         new GithubStrategy(
             {
@@ -78,8 +78,6 @@ module.exports = function setupPassport(csrf) {
             (accessToken, refreshToken, profile, cb) => {
                 try {
                     const { username, displayName, photos, provider } = profile;
-
-                    // console.log('profile:', profile);
 
                     cb(null, {
                         username: username,
@@ -103,12 +101,31 @@ module.exports = function setupPassport(csrf) {
             (accessToken, refreshToken, profile, cb) => {
                 try {
                     const { name, photos, provider } = profile;
-                    console.log('profile:', profile);
 
                     cb(null, {
                         firstName: name.givenName,
                         lastName: name.familyName,
                         profilePicture: photos[0].value,
+                        provider,
+                    });
+                } catch (e) {
+                    cb(e, null);
+                }
+            }
+        )
+    );
+    passport.use(
+        new RedditStrategy(
+            {
+                clientID: process.env.REDDIT_APP_ID,
+                clientSecret: process.env.REDDIT_APP_SECRET,
+                callbackURL: `${process.env.BACK_URI}/v1/auth/reddit/callback`,
+            },
+            (accessToken, refreshToken, profile, cb) => {
+                try {
+                    const { provider, name } = profile;
+                    cb(null, {
+                        username: name,
                         provider,
                     });
                 } catch (e) {
@@ -145,13 +162,10 @@ module.exports = function setupPassport(csrf) {
     passport.use(new AnonymousStrategy());
 
     passport.serializeUser(function(user, cb) {
-        console.log('serialize');
-
         cb(null, user);
     });
 
     passport.deserializeUser(function(obj, cb) {
-        console.log('deserialize');
         cb(null, obj);
     });
 };

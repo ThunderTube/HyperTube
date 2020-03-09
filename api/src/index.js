@@ -6,7 +6,6 @@ const { join } = require('path');
 const cors = require('cors');
 const passport = require('passport');
 const Tokens = require('csrf');
-const session = require('express-session');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
@@ -42,15 +41,7 @@ async function app() {
                 origin: ['http://localhost', process.env.FRONT_URI],
             })
         )
-        .use(
-            session({
-                secret: 'test',
-                saveUninitialized: false,
-                resave: false,
-            })
-        )
         .use(passport.initialize())
-        .use(passport.session())
         .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
             // This middleware sets the context
@@ -58,7 +49,6 @@ async function app() {
                 email,
                 csrf,
                 isAuthenticated: req.isAuthenticated(),
-                authorizations: User.isConfirmed === true ? ['user'] : [],
                 user: req.user || null,
             };
 
@@ -75,7 +65,5 @@ async function app() {
             );
         });
 }
-
-
 
 app().catch(console.error);

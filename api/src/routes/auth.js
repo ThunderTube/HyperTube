@@ -20,7 +20,7 @@ const {
     updateDetails,
     updatePassword,
     logout,
-    controllerFortyTwo,
+    OAuthcontroller,
     fortyTwoRegister,
     createUploadPathIfNotExist,
     // fortyTwoCallback,
@@ -48,7 +48,7 @@ router
             next();
         }
     )
-    .get('/42/callback', passport.authenticate('42'), controllerFortyTwo)
+    .get('/42/callback', passport.authenticate('42'), OAuthcontroller)
     .get(
         '/github',
         passport.authenticate('github', {
@@ -60,33 +60,29 @@ router
             next();
         }
     )
+    .get('/github/callback', passport.authenticate('github'), OAuthcontroller)
     .get(
-        '/github/callback',
-        passport.authenticate('github'),
-        controllerFortyTwo
-    )
-    // .get(
-    //     '/facebook',
-    //     passport.authenticate(
-    //         'facebook',
-    //         {
-    //             failureRedirect: process.env.FRONT_URI,
-    //         },
-    //         { scope: 'user_friends' }
-    //     ),
-    //     (req, res, next) => {
-    //         console.log('first 42 called');
+        '/facebook',
+        passport.authenticate(
+            'facebook',
+            {
+                failureRedirect: process.env.FRONT_URI,
+            },
+            { scope: 'user_friends' }
+        ),
+        (req, res, next) => {
+            console.log('first 42 called');
 
-    //         next();
-    //     }
-    // )
-    // .get(
-    //     '/facebook/callback',
-    //     passport.authenticate('facebook', {
-    //         failureRedirect: process.env.FRONT_URI,
-    //     }),
-    //     controllerFortyTwo
-    // )
+            next();
+        }
+    )
+    .get(
+        '/facebook/callback',
+        passport.authenticate('facebook', {
+            failureRedirect: process.env.FRONT_URI,
+        }),
+        OAuthcontroller
+    )
     .get(
         '/google',
         passport.authenticate('google', {
@@ -98,11 +94,15 @@ router
             next();
         }
     )
+    .get('/google/callback', passport.authenticate('google'), OAuthcontroller)
     .get(
-        '/google/callback',
-        passport.authenticate('google'),
-        controllerFortyTwo
+        '/reddit',
+        passport.authenticate('reddit', { state: true, duration: 'permanent' }),
+        (req, res, next) => {
+            next();
+        }
     )
+    .get('/reddit/callback', passport.authenticate('reddit'), OAuthcontroller)
     .post('/login', login)
     .get('/me', isLoggedIn, getMe)
     .get('/user/:id', getUser)
