@@ -18,13 +18,13 @@
           @click="selectAuthForm('details')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >
-          My details
+          {{ $t('profile.details') }}
         </div>
         <div
           @click="selectAuthForm('password')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >
-          Password
+          {{ $t('loginscreen.password') }}
         </div>
       </div>
       <div class="py-4 text-left px-6">
@@ -32,9 +32,9 @@
           <div v-if="details.visible">
             <app-input
               v-model="details.form.username"
-              name="username"
-              placeholder="username"
-              autocomplete="username"
+              :name="$t('profile.username')"
+              :placeholder="$t('profile.username')"
+              :autocomplete="$t('profile.username')"
             />
             <app-input
               v-model="details.form.email"
@@ -45,15 +45,15 @@
             />
             <app-input
               v-model="details.form.firstName"
-              name="firstName"
-              placeholder="first name"
-              autocomplete="given-name"
+              :name="$t('profile.firstname')"
+              :placeholder="$t('profile.firstname')"
+              :autocomplete="$t('profile.firstname')"
             />
             <app-input
               v-model="details.form.lastName"
-              name="lastName"
-              placeholder="last name"
-              autocomplete="family-name"
+              :name="$t('profile.lastname')"
+              :placeholder="$t('profile.lastname')"
+              :autocomplete="$t('profile.lastname')"
             />
             <div class="block">
               <input
@@ -79,7 +79,7 @@
               @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
-              Submit
+              {{ $t('profile.confirm') }}
             </button>
           </div>
         </form>
