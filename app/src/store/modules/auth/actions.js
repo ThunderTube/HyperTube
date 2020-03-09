@@ -6,10 +6,7 @@ import {
   logout,
   resetPassword,
   updateDetails,
-  updatePassword,
-  fortyTwo,
-  google,
-  github
+  updatePassword
 } from '@/api/auth'
 
 export const registerUser = async ({ commit }, data) => {
@@ -19,36 +16,6 @@ export const registerUser = async ({ commit }, data) => {
     return res
   } catch (error) {
     console.log('registerUser ', error)
-  }
-}
-
-export const fortyTwoUser = async ({ commit }) => {
-  try {
-    const res = await fortyTwo()
-    console.log(res)
-    return res
-  } catch (error) {
-    console.log('fortyTwoUser ', error)
-  }
-}
-
-export const googleUser = async ({ commit }) => {
-  try {
-    const res = await google()
-    console.log(res)
-    return res
-  } catch (error) {
-    console.log('googleUser ', error)
-  }
-}
-
-export const githubTwoUser = async ({ commit }) => {
-  try {
-    const res = await github()
-    console.log(res)
-    return res
-  } catch (error) {
-    console.log('githubTwoUser ', error)
   }
 }
 
