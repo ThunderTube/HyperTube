@@ -60,7 +60,6 @@ async function isUserOAuth(provider, property, value) {
         [property]: value,
         OAuthProvider: provider,
     });
-    // console.log('count = ', count);
     return count > 0;
 }
 
@@ -73,9 +72,6 @@ async function createUploadPathIfNotExist() {
 }
 
 function createUsernameIfNotExist(username, firstName, lastName) {
-    console.log('firstname = ', firstName);
-    console.log('lastname = ', lastName);
-    console.log('username in createUsernameIfNotExist= ', username);
     if (username === undefined) {
         if (firstName === undefined && lastName === undefined) {
             return foid(4);
@@ -100,11 +96,9 @@ function createUsernameIfNotExist(username, firstName, lastName) {
  * and we return to the front the specified error.
  * */
 
-exports.controllerFortyTwo = async (req, res) => {
+exports.OAuthcontroller = async (req, res) => {
     try {
         const { user: passportUser } = req;
-        console.log('passport req.user= ', req.user);
-        // console.log('passport user= ', user);
 
         const { csrf } = res.locals;
 
@@ -113,7 +107,6 @@ exports.controllerFortyTwo = async (req, res) => {
             passportUser.firstName,
             passportUser.lastName
         );
-        console.log('username createUsernameIfNotExist= ', username);
 
         const isUserUnique = await User.isUnique({
             email: passportUser.email,
@@ -132,19 +125,23 @@ exports.controllerFortyTwo = async (req, res) => {
                 provider,
             } = passportUser;
 
-            const fileExtension = extname(profilePicture).slice(1);
-            const filename = `${uuid()}.${fileExtension}`;
+            let filename;
+            if (profilePicture !== undefined) {
+                const fileExtension = extname(profilePicture).slice(1);
+                filename = `${uuid()}.${fileExtension}`;
 
-            await createUploadPathIfNotExist();
+                await createUploadPathIfNotExist();
 
-            // We fetch the file and save it locally
-            await pipeline(
-                got.stream(profilePicture),
-                fs.createWriteStream(
-                    join(__dirname, '../../public/uploads', filename)
-                )
-            );
-
+                // We fetch the file and save it locally
+                await pipeline(
+                    got.stream(profilePicture),
+                    fs.createWriteStream(
+                        join(__dirname, '../../public/uploads', filename)
+                    )
+                );
+            } else {
+                filename = 'default-user.jpg';
+            }
             const user = new User({
                 username,
                 email,
@@ -173,8 +170,6 @@ exports.controllerFortyTwo = async (req, res) => {
                 duplicateField,
                 passportUser[duplicateField] || username
             );
-
-            console.log('userRegistered UsingOAuth', userRegisteredUsingOAuth);
 
             if (userRegisteredUsingOAuth) {
                 username = req.user.username || username;

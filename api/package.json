@@ -41,6 +41,7 @@
         "passport-google-oauth20": "^2.0.0",
         "passport-jwt": "^4.0.0",
         "passport-local": "^1.0.0",
+        "passport-reddit": "^0.2.4",
         "popcorn-api": "^1.1.1",
         "sirv": "^0.4.2",
         "srt-to-vtt": "^1.1.3",
