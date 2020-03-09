@@ -340,8 +340,6 @@ exports.login = async (req, res) => {
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            console.log('COUCOU');
-
             res.status(200).json({
                 success: false,
                 error: 'Invalid password',
@@ -540,41 +538,66 @@ function isLinkValid(user, token) {
 // @route PUT /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = async (req, res) => {
-    const {
-        user,
-        body: { email, username, firstName, lastName },
-        file: profilePicture,
-    } = req;
-
-    const availableProperties = [
-        ['email', email],
-        ['username', username],
-        ['firstName', firstName],
-        ['lastName', lastName],
-        [
-            'profilePicture',
-            profilePicture ? profilePicture.path : profilePicture,
-        ],
-    ];
-
-    for (const [key, value] of availableProperties) {
-        console.log(value);
-
-        if (value) {
-            user[key] = value;
-        }
-    }
-
-    // save the modifications
     try {
-        await user.save();
+        const {
+            user,
+            body: { email, username, firstName, lastName },
+            file: profilePicture,
+        } = req;
+
+        const availableProperties = [
+            ['email', email],
+            ['username', username],
+            ['firstName', firstName],
+            ['lastName', lastName],
+            [
+                'profilePicture',
+                profilePicture ? profilePicture.path : profilePicture,
+            ],
+        ];
+
+        for (const [key, value] of availableProperties) {
+            // console.log(value);
+
+            if (value) {
+                user[key] = value;
+            }
+        }
+
+        // save the modifications
+        try {
+            await user.save();
+        } catch (e) {
+            console.error('e in catch', e);
+
+            // There is a duplicate field
+            if (e.code === 11000) {
+                const duplicateField = e.errmsg.includes('username')
+                    ? 'username'
+                    : 'email';
+
+                send(res, 200, {
+                    success: false,
+                    error: `This ${duplicateField} is already used`,
+                });
+                return;
+            }
+            console.log('error ', e.errors);
+            const msg = e.errors;
+            send(res, 500, { success: false, error: msg });
+            return;
+        }
+
+        res.status(200).json({ success: true });
     } catch (e) {
-        const msg = e.errors;
-        res.status(200).json({ success: false, error: msg });
+        console.error(e);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured',
+        });
         return;
     }
-
-    res.status(200).json({ success: true });
 };
 
 // @desc Update password
@@ -587,9 +610,10 @@ exports.updatePassword = async (req, res) => {
             body: { password },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            send(res, 500, {
+            send(res, 200, {
                 success: false,
-                error: 'The provided password is not correct',
+                error:
+                    'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
             });
             return;
         }
