@@ -350,9 +350,11 @@ exports.login = async (req, res) => {
 // @access Private
 exports.getMe = async (req, res) => {
     try {
+        const { user } = req;
+
         send(res, 200, {
             success: true,
-            user: sanitizeUserDocument(req.user),
+            user: sanitizeUserDocument(user),
         });
     } catch (e) {
         console.error(e);
