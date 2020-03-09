@@ -1,16 +1,14 @@
+const { createReadStream } = require('fs');
+const { join } = require('path');
+
 const send = require('@polka/send-type');
 const got = require('got');
-const srt2vtt = require('srt-to-vtt');
 const { extname } = require('path');
 const mongoose = require('mongoose');
 
 const { Movie, TORRENT_STATUSES } = require('../models/Movie');
 const { User } = require('../models/User');
-const {
-    getSubtitles,
-    streamSubtitleForMovieAndLangcode,
-    NORMALIZED_GENDERS,
-} = require('../get-movies');
+const { downloadSubtitles, NORMALIZED_GENDERS } = require('../get-movies');
 const { streamTorrent } = require('../stream');
 const { FSFile } = require('../file');
 const { pipeline } = require('../utils');
@@ -144,10 +142,7 @@ async function getVideoInformations(req, res) {
             return;
         }
 
-        send(res, 200, {
-            ...hasWatchedTheMovie(user)(movie),
-            subtitles: await getSubtitles(movie.imdbId),
-        });
+        send(res, 200, hasWatchedTheMovie(user)(movie));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -177,6 +172,24 @@ async function triggerVideoDownloading(req, res) {
             error: 'Could not find this movie',
         });
         return;
+    }
+
+    let subtitles = movie.subtitles;
+    if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
+        // Download subtitles
+
+        console.log('save subtitles');
+
+        subtitles = await downloadSubtitles(id);
+
+        await Movie.updateOne(
+            { imdbId: id },
+            {
+                $push: {
+                    subtitles,
+                },
+            }
+        );
     }
 
     const {
@@ -258,6 +271,7 @@ async function triggerVideoDownloading(req, res) {
     });
 
     send(res, 200, {
+        subtitles,
         status: TORRENT_STATUSES.LOADING,
         mime: MIME.get(file.extension),
         willNeedTranscoding: streamWillNeedTranscoding,
@@ -341,22 +355,32 @@ async function getSubtitleForVideoAndLangcode(req, res) {
     } = req;
 
     try {
-        const srtSubtitleStream = await streamSubtitleForMovieAndLangcode(
-            id,
-            langcode
-        );
-        if (srtSubtitleStream === null) {
-            send(res, 400);
+        const movie = await Movie.findOne({
+            imdbId: id,
+            subtitles: {
+                $elemMatch: {
+                    langcode: langcode,
+                },
+            },
+        });
+        if (movie === null) {
+            send(res, 404);
             return;
         }
 
         res.set('Content-Type', 'text/vtt');
 
-        await pipeline(srtSubtitleStream, srt2vtt(), res);
+        await pipeline(
+            createReadStream(
+                join(__dirname, '../../public', `${id}-${langcode}.vtt`)
+            ),
+            res
+        );
 
         console.log('streamed successfully the subtitle');
     } catch (e) {
         console.error(e);
+
         send(res, 500);
     }
 }
