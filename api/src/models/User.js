@@ -106,15 +106,6 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
     });
 };
 
-// Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
-    if (this.password) {
-        this.password = await hashPassword(this.password);
-        next();
-    }
-    next();
-});
-
 // Verify if username and email is unique
 userSchema.statics.isUnique = async function isUnique({ email, username }) {
     if (email !== undefined && (await this.countDocuments({ email })) !== 0) {
@@ -143,15 +134,7 @@ userSchema.statics.verifyJWT = function verifyJWT(rawJwt) {
 };
 
 function hashPassword(password) {
-    return new Promise((resolve, reject) => {
-        bcrypt.hash(password, 10, function(err, hash) {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(hash);
-        });
-    });
+    return bcrypt.hash(password, 10);
 }
 
 exports.User = mongoose.model('User', userSchema);

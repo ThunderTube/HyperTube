@@ -1,7 +1,6 @@
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const stream = require('stream');
 const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
@@ -13,8 +12,7 @@ const {
 const send = require('@polka/send-type');
 
 const { pipeline } = require('../utils');
-const { User, validPasswordRegex } = require('../models/User');
-// const { createUploadPathIfNotExist } = require('../routes/auth');
+const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = ms('1 year');
 
@@ -164,7 +162,7 @@ exports.OAuthcontroller = async (req, res) => {
             );
         } else {
             const duplicateField = isUserUnique;
-            const {provider} = req.user;
+            const { provider } = req.user;
 
             const userRegisteredUsingOAuth = await isUserOAuth(
                 provider,
@@ -208,13 +206,14 @@ exports.OAuthcontroller = async (req, res) => {
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const { file } = req;
-        const { username, email, lastName, firstName, password } = trimObject(
-            req.body
-        );
-        const { csrf } = res.locals;
+        const {
+            file,
+            body: { password },
+        } = req;
+        const { username, email, lastName, firstName } = trimObject(req.body);
+        const { csrf, email: emailSender } = res.locals;
         if (file === undefined) {
-            res.status(200).json({
+            send(res, 200, {
                 success: false,
                 error: 'Invalid file',
             });
@@ -229,7 +228,7 @@ exports.register = async (req, res) => {
             email,
             lastName,
             firstName,
-            password,
+            password: await hashPassword(password),
             profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
@@ -239,7 +238,7 @@ exports.register = async (req, res) => {
             await user.validate();
         } catch (e) {
             const msg = Object.values(e.errors).map(val => val.message);
-            res.status(200).json({ success: false, error: msg });
+            send(res, 200, { success: false, error: msg });
             return;
         }
 
@@ -251,7 +250,7 @@ exports.register = async (req, res) => {
         if (isUserUnique === true) {
             await user.save();
 
-            res.locals.email.send({
+            emailSender.send({
                 to: user.email,
                 subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
@@ -262,21 +261,31 @@ exports.register = async (req, res) => {
                 ),
             });
 
-            res.json({ success: true });
-        } else if (isUserUnique === 'username') {
-            res.status(200).json({
+            send(res, 200, { success: true });
+            return;
+        }
+
+        if (isUserUnique === 'username') {
+            send(res, 200, {
                 success: false,
                 error: 'Username taken',
             });
-        } else if (isUserUnique === 'email') {
-            res.status(200).json({
+            return;
+        }
+
+        if (isUserUnique === 'email') {
+            send(res, 200, {
                 success: false,
                 error: 'Email taken',
             });
         }
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured during registering',
+        });
     }
 };
 
@@ -325,6 +334,7 @@ exports.login = async (req, res) => {
             });
             return;
         }
+
         if (!(await bcrypt.compare(password, user.password))) {
             res.status(200).json({
                 success: false,
@@ -489,7 +499,7 @@ exports.resetPassword = async (req, res) => {
             return;
         }
 
-        user.password = password;
+        user.password = await hashPassword(password);
         user.isConfirmed = true;
 
         await user.save();
@@ -566,14 +576,27 @@ exports.updateDetails = async (req, res) => {
 // @access Private
 exports.updatePassword = async (req, res) => {
     try {
-        const { user } = req;
+        const {
+            user,
+            body: { password },
+        } = req;
+        if (!validPasswordRegex.test(password)) {
+            send(res, 500, {
+                success: false,
+                error: 'The provided password is not correct',
+            });
+            return;
+        }
 
-        user.password = req.body.password;
+        user.password = await hashPassword(password);
+
         await user.save();
-        res.json({ success: true });
+
+        send(res, 200, { success: true });
     } catch (e) {
         const msg = e.errors.password.message;
-        res.status(200).json({ success: false, error: msg });
+
+        send(res, 200, { success: false, error: msg });
     }
 };
 
