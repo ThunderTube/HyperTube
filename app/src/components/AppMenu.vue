@@ -1,5 +1,21 @@
 <template>
   <Slide disableOutsideClick>
+    <div class="ml-8" style="margin-left: 6px;">
+      <router-link to="/">
+        <h2
+          class="text-white font-bold uppercase font-serif text-2xl"
+          style="margin-top: -30px; margin-left: -4px;"
+        >
+          Thundertube
+        </h2>
+      </router-link>
+    </div>
+    <router-link to="/">
+      <img
+        src="/favicon.ico"
+        style="width: 189px; margin-left: 12px; margin-top: -16px; border-radius: 28px;"
+      />
+    </router-link>
     <router-link
       :to="{ name: 'me', lang: $i18n.locale }"
       class="flex items-center"
@@ -19,37 +35,26 @@
     <button
       @click="logoutUser"
       class="bg-teal-600 hover:bg-teal-700 hover:shadow-lg rounded px-2 py-1 text-white mb-10"
+      style="display: flex; margin: auto; border: 2px solid #319795; color: #319795; background-color: #2d3648;      bottom: 20px;
+    margin-left: 52px;   position: absolute;
+    "
     >
-      Logout
+      <span style="margin-right: 8px;  color: #319795;">Logout</span>
+      <logout-icon class="w-8" />
     </button>
-
-    <router-link to="/">
-      <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
-        <path
-          class="primary"
-          d="M9 22H5a1 1 0 0 1-1-1V11l8-8 8 8v10a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1zm3-9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
-        />
-        <path
-          class="secondary"
-          d="M12.01 4.42l-8.3 8.3a1 1 0 1 1-1.42-1.41l9.02-9.02a1 1 0 0 1 1.41 0l8.99 9.02a1 1 0 0 1-1.42 1.41l-8.28-8.3z"
-        />
-      </svg>
-      <span>{{ $t('navbar.home') }}</span>
-    </router-link>
-    <div class="ml-8">
-      <h2 class="text-white font-bold uppercase font-serif text-2xl">
-        Hypertube
-      </h2>
-    </div>
   </Slide>
 </template>
 
 <script>
 import { Slide } from 'vue-burger-menu'
 import { mapGetters, mapActions } from 'vuex'
+
+import LogoutIcon from './LogoutIcon.vue'
+
 export default {
   components: {
-    Slide
+    Slide,
+    LogoutIcon
   },
   computed: {
     ...mapGetters({
