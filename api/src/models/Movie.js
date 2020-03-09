@@ -113,6 +113,31 @@ const movieSchema = new mongoose.Schema({
             return [];
         },
     },
+    subtitles: {
+        type: [
+            {
+                langcode: {
+                    type: String,
+                    required: true,
+                },
+                lang: {
+                    type: String,
+                    required: true,
+                },
+                encoding: {
+                    type: String,
+                    required: true,
+                },
+                score: {
+                    type: Number,
+                    required: true,
+                },
+            },
+        ],
+        default() {
+            return [];
+        },
+    },
 });
 
 // Create a text index to speed up searchs by `title` field.

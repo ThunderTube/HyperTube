@@ -19,9 +19,9 @@
         <source :src="selectedSource" :type="videoMimeType" />
 
         <track
-          v-for="{url, langcode, lang} in subtitles"
+          v-for="{ url, langcode, lang } in subtitles"
           :key="lang"
-          :src="formatSubtitleSrc(url)"
+          :src="formatSubtitleSrc(langcode)"
           :label="lang"
           :srclang="langcode"
         />
@@ -44,21 +44,28 @@
       >
         <div>
           <li
-            v-for="{resolution, seeds, peers, text, textColor} in orderedTorrents"
+            v-for="{
+              resolution,
+              seeds,
+              peers,
+              text,
+              textColor
+            } in orderedTorrents"
             :key="resolution"
             class="bg-white rounded px-2 py-1 mb-2 cursor-pointer w-full flex items-center justify-between"
             @click="launch(resolution)"
           >
             <span
               class="inline-block bg-gray-500 text-white rounded-full px-2 py-1 align-middle mr-1"
-            >{{resolution}}</span>
-            <span :class="textColor" class="font-medium">{{text}}</span>
+              >{{ resolution }}</span
+            >
+            <span :class="textColor" class="font-medium">{{ text }}</span>
           </li>
         </div>
       </ul>
 
       <div
-        v-else-if="loading "
+        v-else-if="loading"
         class="absolute inset-0 flex flex-col items-center justify-center z-20"
         style="background-color: rgba(0, 0, 0, 0.4)"
       >
@@ -91,10 +98,6 @@ export default {
     torrents: {
       type: Array,
       required: true
-    },
-    subtitles: {
-      type: Array,
-      required: true
     }
   },
   data() {
@@ -107,6 +110,7 @@ export default {
       videoMimeType: undefined,
       selectedSource: undefined,
       hasPlayed: false,
+      subtitles: [],
 
       extraLoadingTimer: null,
       willNeedTranscoding: false
@@ -202,9 +206,10 @@ export default {
           throw new Error('An error occured during the downloading of the film')
         }
         console.log('informations =', informations)
-        const { mime, willNeedTranscoding } = informations
+        const { mime, willNeedTranscoding, subtitles } = informations
         this.videoMimeType = mime
         this.willNeedTranscoding = willNeedTranscoding
+        this.subtitles = subtitles
 
         clearInterval(this.timer)
         this.timer = setInterval(() => this.poll(), 2000)
@@ -212,8 +217,8 @@ export default {
         console.error(e)
       }
     },
-    formatSubtitleSrc(url) {
-      return `${process.env.VUE_APP_BASE_URL}${url}`
+    formatSubtitleSrc(langcode) {
+      return `${process.env.VUE_APP_BASE_URL}/stream/subtitles/${this.id}-${langcode}.vtt`
     },
     launchVideo() {
       this.$refs.player.play()
