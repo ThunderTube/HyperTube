@@ -92,20 +92,22 @@
     "submit": "Submit"
   },
 
-  "wrong_file_type": "Wrong file type",
-  "missing_user_inputs": "Missing required inputs",
-  "username_taken": "Username taken",
-  "email_taken": "Username taken",
-  "wrong_confirmation_link": "Wrong confirmation link",
-  "no_user_found": "No user found",
-  "invalid_password": "Invalid password",
-  "incorrect_id": "Incorrect ID",
-  "unknown_account": "Unknown account",
-  "invalid_username": "Invalid username",
-  "invalid_link": "Invalid link",
-  "invalid_user": "Invalid user",
-  "duplicate_key": "Duplicate key",
-  "email_unexistant": "Wrong email format",
+  "server": {
+    "wrong_file_type": "Wrong file type",
+    "missing_user_inputs": "Missing required inputs",
+    "username_taken": "Username taken",
+    "email_taken": "Username taken",
+    "wrong_confirmation_link": "Wrong confirmation link",
+    "no_user_found": "No user found",
+    "invalid_password": "Invalid password",
+    "incorrect_id": "Incorrect ID",
+    "unknown_account": "Unknown account",
+    "invalid_username": "Invalid username",
+    "invalid_link": "Invalid link",
+    "invalid_user": "Invalid user",
+    "duplicate_key": "Duplicate key",
+    "wrong_email_format": "Wrong email format"
+  },
 
   "comments": {
     "see": "See comments",

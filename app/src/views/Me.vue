@@ -156,7 +156,7 @@ export default {
           const res = await this.updateUserDetails(formData)
           if (res.data.error || !res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           this.formType = 'details'
@@ -169,7 +169,7 @@ export default {
           const res = await this.updateUserPassword(this.password.form)
           if (!res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           this.formType = 'details'
