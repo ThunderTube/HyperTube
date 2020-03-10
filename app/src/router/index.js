@@ -32,7 +32,7 @@ const router = new Router({
       redirect: `/${i18n.locale}`
     },
     {
-      path: '/:lang',
+      path: '/:lang(fr|en)',
       component: {
         render(c) {
           return c('router-view')
@@ -67,6 +67,12 @@ const router = new Router({
             import(/* webpackChunkName: "movie" */ '../views/Me.vue')
         }
       ]
+    },
+    {
+      path: '*',
+      name: '404',
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/404.vue')
     }
   ]
 })

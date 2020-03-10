@@ -10,14 +10,15 @@
     "register_form_title": "Formulaire d'inscription"
   },
 
+  "registerscreen": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "id_placeholder": "Pseudonyme",
+    "password": "Mot de passe"
+  },
+
   "navbar": {
-    "search": "Rechercher",
-    "home": "Accueil",
-    "watchlist": "Liste de visionnage",
-    "movies": "Films",
-    "series": "Series",
-    "originals": "Exclusivitées",
-    "settings": "Paramètres"
+    "logout": "Se déconnecter"
   },
 
   "movie": {
@@ -64,13 +65,19 @@
     "news": "Informations",
     "reality-tv": "TV Réalité",
     "talk-show": "Talk-Show"
+<<<<<<< HEAD
   }, 
+=======
+  },
+>>>>>>> 3408ed4d2d22255785654388e9654b6b98a3a00e
 
   "profile": {
     "title": "Profile de ",
     "username": "Pseudonyme : ",
     "firstname": "Prénom : ",
-    "lastname": "Nom : "
+    "lastname": "Nom : ",
+    "details": "Mes informations",
+    "confirm": "Confirmer"
   },
   
   "form": {
@@ -94,6 +101,13 @@
   "invalid_username": "Nom d'utilisateur invalide",
   "invalid_link": "Lien invalide",
   "invalid_user": "Utilisateur invalide",
-  "duplicate_key": "Champs dupliquer"
+  "duplicate_key": "Champs dupliquer",
 
+  "comments":{
+    "see": "Voir les commentaires",
+    "title": "Commentaires",
+    "error": "Il n'y a pas de commentaires ici.",
+    "write": "Écrire un commentaire...",
+    "send": "Envoyer"
+  }
 }

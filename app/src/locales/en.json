@@ -18,13 +18,7 @@
   },
 
   "navbar": {
-    "search": "Search",
-    "home": "Home",
-    "watchlist": "Watchlist",
-    "movies": "Movies",
-    "series": "Series",
-    "originals": "Originals",
-    "settings": "Settings"
+    "logout": "Logout"
   },
 
   "movie": {
@@ -77,7 +71,9 @@
     "title": "Profile of ",
     "username": "Username : ",
     "firstname": "Firstname : ",
-    "lastname": "Lastname : "
+    "lastname": "Lastname : ",
+    "details": "My Details",
+    "confirm": "Submit"
 },
   
   "form": {
@@ -101,6 +97,13 @@
   "invalid_username": "Invalid username",
   "invalid_link": "Invalid link",
   "invalid_user": "Invalid user",
-  "duplicate_key": "Duplicate key"
+  "duplicate_key": "Duplicate key",
 
+  "comments":{
+    "see": "See comments",
+    "title": "Comments",
+    "error": "There is no comments here",
+    "write": "Write a comment...",
+    "send": "Send"
+  }
 }
