@@ -13,16 +13,14 @@
     <infinite-scroll
       v-if="hasMore || loading"
       scroll-container="scroll-container"
-      :loading="loading"
+      :should-handle="!loading"
       :handler="fetchMore"
-      style="grid-column: 1/-1"
+      style="grid-column: 1 / -1"
       class="py-5"
     >
-      <slot name="loader">
-        <div class="h-full w-full flex justify-center items-center">
-          <loading-spinner />
-        </div>
-      </slot>
+      <div class="h-full w-full flex justify-center items-center">
+        <loading-spinner class="absolute" />
+      </div>
     </infinite-scroll>
   </section>
 </template>

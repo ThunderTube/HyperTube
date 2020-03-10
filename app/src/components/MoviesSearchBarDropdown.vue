@@ -51,7 +51,7 @@ export default {
     options() {
       return [
         {
-          text: 'None',
+          text: this.$t('home.search_none'),
           value: null
         },
         ...this.items

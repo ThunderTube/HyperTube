@@ -37,6 +37,12 @@ class Torrent {
         this.file = null;
     }
 
+    get willNeedTranscoding() {
+        const ext = extname(this.file.path).slice(1);
+
+        return !['webm', 'mp4'].includes(ext);
+    }
+
     get extension() {
         if (this.file === null) return null;
 
@@ -51,11 +57,15 @@ class Torrent {
         let piecesCount = 0;
         let permittedDownloading = false;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             this.engine.on('ready', () => {
                 const file = this.engine.files.find(({ name }) =>
                     this.AUTHORIZED_EXTENSIONS.some(ext => name.endsWith(ext))
                 );
+                if (file === undefined) {
+                    reject(new Error('Could not get a film for this torrent'));
+                    return;
+                }
 
                 // Select the file in order to request its downloading
                 file.select();
@@ -65,6 +75,7 @@ class Torrent {
                 resolve({
                     emitter,
                     file: this.file,
+                    willNeedTranscoding: this.willNeedTranscoding,
                 });
             });
 

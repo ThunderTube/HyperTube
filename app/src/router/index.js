@@ -46,7 +46,7 @@ const router = new Router({
           beforeEnter: checkOauthToken
         },
         {
-          path: 'movie',
+          path: 'movie/:id',
           name: 'movie',
           beforeEnter: checkIfLoggedIn,
           component: () =>
@@ -71,12 +71,10 @@ const router = new Router({
   ]
 })
 
-
 async function checkIfLoggedIn(to, from, next) {
   try {
-  if (!store.state.isLoggedIn)
-    return next('/')
-  return next()
+    if (!store.state.isLoggedIn) return next('/')
+    return next()
   } catch (error) {
     console.log('fail in check oauth token')
   }

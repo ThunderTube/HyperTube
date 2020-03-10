@@ -1,64 +1,75 @@
 {
   "loginscreen": {
-      "login": "Login",
-      "register": "Register",
-      "id": "Login",
-      "id_placeholder": "Username",
-      "password": "Password",
-      "forgot_password": "Password forgot?",
-      "register_input": "Register",
-      "register_form_title": "Register form"
+    "login": "Login",
+    "register": "Register",
+    "id": "Login",
+    "id_placeholder": "login or email",
+    "password": "Password",
+    "forgot_password": "Password forgot?",
+    "register_input": "Register",
+    "register_form_title": "Register form"
   },
-  
+
   "registerscreen": {
-      "firstName": "First name",
-      "lastName": "Last name",
-      "id_placeholder": "Username",
-      "password": "Password"
+    "firstName": "First name",
+    "lastName": "Last name",
+    "id_placeholder": "Username",
+    "password": "Password"
   },
 
   "navbar": {
-      "search": "Search",
-      "home": "Home",
-      "watchlist": "Watchlist",
-      "movies": "Movies",
-      "series": "Series",
-      "originals": "Originals",
-      "settings": "Settings"
+    "search": "Search",
+    "home": "Home",
+    "watchlist": "Watchlist",
+    "movies": "Movies",
+    "series": "Series",
+    "originals": "Originals",
+    "settings": "Settings"
   },
 
   "movie": {
-      "play": "Play",
-      "watchlist_add": "Add to watchlist"
+    "play": "Play",
+    "watchlist_add": "Add to watchlist",
+    "error": "There is no movie to watch here.",
+    "cast": "Cast",
+    "crew": "Crew"
   },
 
-  "profile": {
-      "title": "Profile of ",
-      "username": "Username : ",
-      "firstname": "Firstname : ",
-      "lastname": "Lastname : "
+  "home": {
+    "title": "Movies",
+    "search_button": "Search a movie",
+    "search_input": "Movie name",
+    "search_genre_label": "Genre",
+    "search_year_label": "Release Year",
+    "search_none": "None",
+    "search_nodata": "There is no movie matching these criteria."
   },
 
-  "form": {
-    "missing_input": "Check your inputs",
-    "confirm_account": "Confirm your account",
-    "check_mail": "Check your mail",
-    "password_updated": "Password updated",
-    "account_updated": "Account updated"
-  },
-
-      "wrong_file_type": "Wrong file type",
-      "missing_user_inputs": "Missing required inputs",
-      "username_taken": "Username taken",
-      "email_taken": "Username taken",
-      "wrong_confirmation_link": "Wrong confirmation link",
-      "no_user_found": "No user found",
-      "invalid_password": "Invalid password",
-      "incorrect_id": "Incorrect ID",
-      "unknown_account": "Unknown account",
-      "invalid_username": "Invalid username",
-      "invalid_link": "Invalid link",
-      "invalid_user": "Invalid user",
-      "duplicate_key": "Duplicate key"
-
+  "genres": {
+    "action": "Action",
+    "adventure": "Adventure",
+    "animation": "Animation",
+    "sci-fi": "Sci-Fi",
+    "comedy": "Comedy",
+    "crime": "Crime",
+    "drama": "Drama",
+    "film-noir": "Film-Noir",
+    "romance": "Romance",
+    "thriller": "Thriller",
+    "horror": "Horror",
+    "history": "History",
+    "mystery": "Mystery",
+    "music": "Music",
+    "documentary": "Documentary",
+    "sport": "Sport",
+    "war": "War",
+    "fantasy": "Fantasy",
+    "musical": "Musical",
+    "family": "Family",
+    "biography": "Biography",
+    "western": "Western",
+    "news": "News",
+    "reality-tv": "Reality-TV",
+    "talk-show": "Talk-Show"
+  }
 }

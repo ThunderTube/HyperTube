@@ -1,8 +1,13 @@
+const { createWriteStream } = require('fs');
+const { join } = require('path');
+
 const got = require('got');
+const srt2vtt = require('srt-to-vtt');
 const popcorn = require('popcorn-api');
 const Joi = require('@hapi/joi');
 const OS = require('opensubtitles-api');
-const languages = require('@cospired/i18n-iso-languages');
+
+const { pipeline } = require('./utils');
 
 const MOVIES_ORIGINS = {
     POPCORN_TIME: 'POPCORN_TIME',
@@ -453,6 +458,8 @@ async function getMovies() {
 }
 
 async function getSubtitles(id) {
+    const INTERESTING_LANGS = ['en', 'fr'];
+
     const OpenSubtitles = new OS({
         useragent: 'TemporaryUserAgent',
         ssl: true,
@@ -462,39 +469,49 @@ async function getSubtitles(id) {
         imdbid: id,
     });
 
+    console.log('virgin subtitles =', subtitles);
+
     return Object.values(subtitles)
         .filter(({ [OPENSUBTITLES_URL_PROPERTY]: url }) => url !== undefined)
-        .map(({ langcode, lang, encoding, score }) => ({
-            url: `/api/v1/stream/subtitles/${id}-${langcode}.vtt`,
-            langcode,
-            lang,
-            encoding,
-            score,
-        }));
+        .filter(({ langcode }) => INTERESTING_LANGS.includes(langcode))
+        .map(
+            ({
+                [OPENSUBTITLES_URL_PROPERTY]: url,
+                langcode,
+                lang,
+                encoding,
+                score,
+            }) => ({
+                url,
+                langcode,
+                lang,
+                encoding,
+                score,
+            })
+        );
 }
 
-async function streamSubtitleForMovieAndLangcode(id, langcode) {
-    const OpenSubtitles = new OS({
-        useragent: 'TemporaryUserAgent',
-        ssl: true,
-    });
+function fetchConvertAndSaveSubtitle(imdbId) {
+    return ({ url, langcode }) => {
+        return pipeline(
+            got.stream(url),
+            srt2vtt(),
+            createWriteStream(
+                join(__dirname, '../public', `${imdbId}-${langcode}.vtt`)
+            )
+        );
+    };
+}
 
-    const { [langcode]: subtitle } = await OpenSubtitles.search({
-        imdbid: id,
-        sublanguageid: languages.alpha2ToAlpha3B(langcode),
-    });
-    if (subtitle === undefined) {
-        return null;
-    }
+async function downloadSubtitles(id) {
+    const subtitles = await getSubtitles(id);
 
-    console.log('subtitle', subtitle);
+    console.log('download', subtitles);
 
-    const { [OPENSUBTITLES_URL_PROPERTY]: url } = subtitle;
-    if (url === undefined) {
-        return null;
-    }
+    await Promise.all(subtitles.map(fetchConvertAndSaveSubtitle(id)));
 
-    return got.stream(url);
+    // Remove `url` from all subtitles entries
+    return subtitles.map(({ url, ...props }) => props);
 }
 
 exports.MOVIES_ORIGINS = MOVIES_ORIGINS;
@@ -502,4 +519,4 @@ exports.NORMALIZED_GENDERS = NORMALIZED_GENDERS;
 exports.POSSIBLE_GENRES = POSSIBLE_GENRES;
 exports.getMovies = getMovies;
 exports.getSubtitles = getSubtitles;
-exports.streamSubtitleForMovieAndLangcode = streamSubtitleForMovieAndLangcode;
+exports.downloadSubtitles = downloadSubtitles;
