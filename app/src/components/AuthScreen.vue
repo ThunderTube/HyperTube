@@ -74,7 +74,7 @@
             />
             <app-input
               v-model="register.form.password"
-              name="password"
+              :name="$t('registerscreen.password')"
               type="password"
               placeholder="********"
               autocomplete="new-password"
@@ -93,8 +93,8 @@
           <div v-else-if="passwordForgot.visible">
             <app-input
               v-model="passwordForgot.form.username"
-              name="password-forgot"
-              placeholder="Login"
+              :name="$t('loginscreen.forgot_password')"
+              :placeholder="$t('loginscreen.id')"
             />
           </div>
           <div v-else-if="resetPassword">

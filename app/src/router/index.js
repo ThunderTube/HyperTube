@@ -28,6 +28,12 @@ const router = new Router({
         import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
     },
     {
+      path: '404',
+      name: '404',
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/404.vue')
+    },
+    {
       path: '/',
       redirect: `/${i18n.locale}`
     },
@@ -65,6 +71,12 @@ const router = new Router({
           beforeEnter: checkIfLoggedIn,
           component: () =>
             import(/* webpackChunkName: "movie" */ '../views/Me.vue')
+        },
+        {
+          path: '404',
+          name: '404',
+          component: () =>
+            import(/* webpackChunkName: "movie" */ '../views/404.vue')
         }
       ]
     }

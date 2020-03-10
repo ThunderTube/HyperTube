@@ -1,7 +1,7 @@
 <template>
   <Slide disableOutsideClick>
     <div class="ml-8" style="margin-left: 6px;">
-      <router-link to="/">
+      <router-link :to="`/${$i18n.locale}/`">
         <h2
           class="text-white font-bold uppercase font-serif text-2xl"
           style="margin-top: -30px; margin-left: -4px;"
@@ -10,7 +10,7 @@
         </h2>
       </router-link>
     </div>
-    <router-link to="/">
+    <router-link :to="`/${$i18n.locale}/`">
       <img
         src="/favicon.ico"
         style="width: 189px; margin-left: 12px; margin-top: -16px; border-radius: 28px;"
@@ -39,7 +39,7 @@
     margin-left: 52px;   position: absolute;
     "
     >
-      <span style="margin-right: 8px;  color: #319795;">Logout</span>
+      <span style="margin-right: 8px;  color: #319795;">{{ $t('navbar.logout') }}</span>
       <logout-icon class="w-8" />
     </button>
   </Slide>

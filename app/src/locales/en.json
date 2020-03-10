@@ -18,13 +18,7 @@
   },
 
   "navbar": {
-    "search": "Search",
-    "home": "Home",
-    "watchlist": "Watchlist",
-    "movies": "Movies",
-    "series": "Series",
-    "originals": "Originals",
-    "settings": "Settings"
+    "logout": "Logout"
   },
 
   "movie": {
@@ -71,5 +65,22 @@
     "news": "News",
     "reality-tv": "Reality-TV",
     "talk-show": "Talk-Show"
+  },
+
+  "profile": {
+    "title": "Profile of ",
+    "username": "Username : ",
+    "firstname": "Firstname : ",
+    "lastname": "Lastname : ",
+    "details": "My Details",
+    "confirm": "Submit"
+  },
+
+  "comments":{
+    "see": "See comments",
+    "title": "Comments",
+    "error": "There is no comments here",
+    "write": "Write a comment...",
+    "send": "Send"
   }
 }

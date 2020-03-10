@@ -39,7 +39,7 @@
         class="bg-gray-800 mb-6"
         @click="showComments = true"
       >
-        See comments
+        {{ $t('comments.see') }}
       </app-button>
 
       <h3
@@ -47,7 +47,7 @@
         key="text"
         class="text-white font-semibold text-2xl tracking-wider mb-6 text-center"
       >
-        Comments
+        {{ $t('comments.title') }}
         <transition
           enter-active-class="transform transition duration-200"
           leave-active-class="transform transition duration-200"

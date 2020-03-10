@@ -24,7 +24,7 @@
         <p class="text-gray-400 text-base font-semibold mb-2">{{ year }}</p>
 
         <div class="flex flex-wrap items-center py-1">
-          <tag v-for="genre in genres" :key="genre">{{ genre }}</tag>
+          <tag v-for="genre in genres" :key="genre">{{$t('genres.' + genre.toLowerCase())}}</tag>
         </div>
       </div>
 

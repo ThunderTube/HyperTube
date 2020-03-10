@@ -10,17 +10,17 @@
           v-bind="props"
         />
       </div>
-      <no-data v-else>There are no comments for this movie</no-data>
+      <no-data v-else>{{ $t('comments.error') }}</no-data>
 
       <form @submit.prevent="sendComment" class="w-full">
         <movies-search-bar-input
           v-model.trim="newComment"
-          placeholder="Write a comment..."
+          :placeholder="$t('comments.write')"
         >
           <template #prepend>✏️</template>
 
           <template #append>
-            <button type="submit" title="Send me">🍻</button>
+            <button type="submit" :title="t('comments.send')">🍻</button>
           </template>
         </movies-search-bar-input>
       </form>
