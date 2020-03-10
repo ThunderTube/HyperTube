@@ -144,7 +144,7 @@
           </div>
           <div class="flex justify-end py-2">
             <button
-              @click.prevent="submitForm"
+              @click.prevent="processFormInput"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
               Submit
@@ -222,28 +222,29 @@ export default {
     }
   },
   methods: {
-    async fortyTwoOauth() {
-      try {
-        const res = await this.fortyTwoUser()
-        console.log(res)
-        console.log('42')
-      } catch (error) {
-        console.log('e ', error)
-      }
-    },
-    async githubOauth() {
-      try {
-        console.log('github')
-      } catch (error) {
-        console.log('e ', error)
-      }
-    },
-    async googleOauth() {
-      try {
-        console.log('google')
-      } catch (error) {
-        console.log('e ', error)
-      }
+    processFormInput() {
+      let o
+      if (this.formType === 'login')
+        o = this.login.form
+      if (this.formType === 'register')
+        o = this.register.form
+      if (this.formType === 'password-forgot')
+        o = this.passwordReset.form
+      if (this.formType === 'password-reset')
+        o = this.passwordForgot.form
+      let empty = false;
+      Object.keys(o).forEach((key, index) => {
+        if (o[key] === "" || o[key] === null || o[key] === undefined) {
+          // error[key] = true;
+          empty = true;
+        }
+      });
+      if (empty)
+        this.$toast.open({
+            message: 'Please check all your inputs',
+            type: 'error'
+          })
+      if (!empty) this.submitForm();
     },
     handleFileUpload() {
       this.register.form.profilePicture = this.$refs.file.files[0]
