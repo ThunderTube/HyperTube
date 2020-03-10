@@ -27,6 +27,7 @@
         </transition>
       </div>
     </template>
+    <app-footer />
   </div>
 </template>
 
@@ -37,13 +38,15 @@ import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
 import AppSwitchLang from '@/components/AppSwitchLang.vue'
 import { getWithExpiry } from './utils/localStorage'
+import AppFooter from '@/components/AppFooter'
 
 export default {
   components: {
     AppMenu,
     AuthScreen,
     AtomSpinner,
-    AppSwitchLang
+    AppSwitchLang,
+    AppFooter
   },
   data() {
     return {
