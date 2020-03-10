@@ -63,7 +63,7 @@ export default {
 
       setTimeout(() => {
         this.loading = false
-      }, 500)
+      }, 1000)
     } catch (error) {
       console.log('app created ', error.message)
     }

@@ -8,6 +8,7 @@ import {
   updateDetails,
   updatePassword
 } from '@/api/auth'
+import router from '../../../router'
 
 export const registerUser = async ({ commit }, data) => {
   try {
@@ -92,7 +93,7 @@ export const logoutCurrentUser = async ({ dispatch }) => {
       dispatch('clearAuthData')
       dispatch('setAuthIsLoggedIn', false)
       localStorage.removeItem('csrfToken')
-      this.$router.push('/')
+      router.push('/')
     }
   } catch (error) {
     console.log('logoutCurrentUser ', error.message)

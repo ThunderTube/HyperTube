@@ -362,11 +362,9 @@ export default {
             type: 'success'
           })
         } else if (this.passwordForgot.visible) {
-          console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
             return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
-          console.log(res)
           this.formType = 'login'
           this.showAuthForm()
           return this.$toast.open({
