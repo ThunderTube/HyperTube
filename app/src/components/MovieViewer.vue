@@ -17,7 +17,9 @@
         {{ description }}
       </blockquote>
 
-      <tag v-for="genre in genres" :key="genre" big>{{ genre }}</tag>
+      <tag v-for="genre in genres" :key="genre" big>{{
+        $t('genres.' + genre.toLowerCase())
+      }}</tag>
     </div>
 
     <list-dropdown :label="$t('movie.cast')">
