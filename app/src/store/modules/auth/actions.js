@@ -92,6 +92,7 @@ export const logoutCurrentUser = async ({ dispatch }) => {
       dispatch('clearAuthData')
       dispatch('setAuthIsLoggedIn', false)
       localStorage.removeItem('csrfToken')
+      this.$router.push('/')
     }
   } catch (error) {
     console.log('logoutCurrentUser ', error.message)

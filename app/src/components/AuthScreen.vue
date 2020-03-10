@@ -229,9 +229,9 @@ export default {
       if (this.formType === 'register')
         o = this.register.form
       if (this.formType === 'password-forgot')
-        o = this.passwordReset.form
-      if (this.formType === 'password-reset')
         o = this.passwordForgot.form
+      if (this.formType === 'password-reset')
+        o = this.passwordReset.form
       let empty = false;
       Object.keys(o).forEach((key, index) => {
         if (o[key] === "" || o[key] === null || o[key] === undefined) {
