@@ -128,7 +128,10 @@
               >Reset Password</a
             >
           </div>
-          <div class="flex justify-between my-8">
+          <div
+            v-if="login.visible || register.visible"
+            class="flex justify-between my-8"
+          >
             <div>
               <a
                 class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg"
@@ -380,7 +383,6 @@ export default {
             type: 'success'
           })
         } else if (this.passwordForgot.visible) {
-          console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
             return this.$toast.open({
