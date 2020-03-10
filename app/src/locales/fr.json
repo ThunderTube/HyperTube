@@ -65,11 +65,7 @@
     "news": "Informations",
     "reality-tv": "TV Réalité",
     "talk-show": "Talk-Show"
-<<<<<<< HEAD
-  }, 
-=======
   },
->>>>>>> 3408ed4d2d22255785654388e9654b6b98a3a00e
 
   "profile": {
     "title": "Profile de ",
@@ -79,7 +75,7 @@
     "details": "Mes informations",
     "confirm": "Confirmer"
   },
-  
+
   "form": {
     "missing_input": "Completer le formulaire",
     "confirm_account": "Confirmer votre compte",
@@ -88,7 +84,7 @@
     "account_updated": "Information mis a jour",
     "submit": "Envoyer"
   },
- 
+
   "wrong_file_type": "Mauvais type de fichier",
   "missing_user_inputs": "Il manque des champs obligatoires",
   "username_taken": "Le nom d'utilisateur est pris",
@@ -103,7 +99,7 @@
   "invalid_user": "Utilisateur invalide",
   "duplicate_key": "Champs dupliquer",
 
-  "comments":{
+  "comments": {
     "see": "Voir les commentaires",
     "title": "Commentaires",
     "error": "Il n'y a pas de commentaires ici.",
