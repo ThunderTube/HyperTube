@@ -64,7 +64,14 @@
     "western": "Western",
     "news": "News",
     "reality-tv": "Reality-TV",
-    "talk-show": "Talk-Show"
+    "talk-show": "Talk-Show",
+    "science-fiction": "Sci-Fi",
+    "superhero": "Superhero",
+    "anime": "Anime",
+    "holiday": "Holiday",
+    "short": "Short",
+    "suspense": "Suspense",
+    "tv-movie": "Tv-movie"
   },
 
   "profile": {
@@ -74,8 +81,8 @@
     "lastname": "Lastname : ",
     "details": "My Details",
     "confirm": "Submit"
-},
-  
+  },
+
   "form": {
     "missing_input": "Check your inputs",
     "confirm_account": "Confirm your account",
@@ -84,7 +91,7 @@
     "account_updated": "Account updated",
     "submit": "Submit"
   },
-  
+
   "wrong_file_type": "Wrong file type",
   "missing_user_inputs": "Missing required inputs",
   "username_taken": "Username taken",
@@ -100,7 +107,7 @@
   "duplicate_key": "Duplicate key",
   "email_unexistant": "Wrong email format",
 
-  "comments":{
+  "comments": {
     "see": "See comments",
     "title": "Comments",
     "error": "There is no comments here",

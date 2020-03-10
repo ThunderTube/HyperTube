@@ -64,7 +64,14 @@
     "western": "Western",
     "news": "Informations",
     "reality-tv": "TV Réalité",
-    "talk-show": "Talk-Show"
+    "talk-show": "Talk-Show",
+    "science-fiction": "Science-Fiction",
+    "superhero": "SuperHero",
+    "anime": "Anime",
+    "holiday": "Fêtes",
+    "short": "Court Metrage",
+    "suspense": "Suspense",
+    "tv-movie": "Film TV"
   },
 
   "profile": {
