@@ -108,7 +108,7 @@ export default {
 
       this.$router
         .replace({
-          path: this.$route.path,
+          name: this.$route.name || '404',
           params: { lang: locale }
         })
         .catch(() => {})

@@ -74,12 +74,17 @@ export const loginUser = async ({ dispatch }, data) => {
 export const getCurrentUser = async ({ dispatch }) => {
   try {
     const res = await me()
-    if (res.message) return console.log(res.message)
+
+    if (res.message) {
+      return console.log(res.message)
+    }
+
     if (res.data.success) {
       // dispatch('setAuthCSRF', res.data.csrfToken)
       dispatch('setAuthIsLoggedIn', true)
       dispatch('setAuthData', res.data.user)
     }
+
     return res
   } catch (error) {
     console.log('getCurrentUser ', error.message)
@@ -92,8 +97,8 @@ export const logoutCurrentUser = async ({ dispatch }) => {
     if (res.data.success) {
       dispatch('clearAuthData')
       dispatch('setAuthIsLoggedIn', false)
+
       localStorage.removeItem('csrfToken')
-      router.push('/')
     }
   } catch (error) {
     console.log('logoutCurrentUser ', error.message)

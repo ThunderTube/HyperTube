@@ -39,7 +39,9 @@
     margin-left: 52px;   position: absolute;
     "
     >
-      <span style="margin-right: 8px;  color: #319795;">{{ $t('navbar.logout') }}</span>
+      <span style="margin-right: 8px;  color: #319795;">
+        {{ $t('navbar.logout') }}
+      </span>
       <logout-icon class="w-8" />
     </button>
   </Slide>
@@ -70,9 +72,14 @@ export default {
     ...mapActions({
       logoutCurrentUser: 'auth/logoutCurrentUser'
     }),
-    logoutUser() {
-      this.logoutCurrentUser()
-      this.$router.push('/')
+    async logoutUser() {
+      const { locale } = this.$i18n
+
+      await this.logoutCurrentUser()
+
+      this.$router
+        .replace({ name: 'auth', params: { lang: locale } })
+        .catch(() => {})
     }
   }
 }
