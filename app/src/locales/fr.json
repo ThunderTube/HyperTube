@@ -98,6 +98,7 @@
   "invalid_link": "Lien invalide",
   "invalid_user": "Utilisateur invalide",
   "duplicate_key": "Champs dupliquer",
+  "email_unexistant": "Mauvais format d'email",
 
   "comments": {
     "see": "Voir les commentaires",
