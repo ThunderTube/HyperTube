@@ -8,7 +8,8 @@ import { auth } from './modules'
 const store = () => {
   return new Vuex.Store({
     modules: {
-      auth    }
+      auth
+    }
   })
 }
 

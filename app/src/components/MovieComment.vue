@@ -13,7 +13,8 @@
         :to="`/en/user/${userId}`"
         class="inline-block text-gray-500 text-semibold mb-2"
         title="See user profile"
-      >{{ username }}</router-link>
+        >{{ username }}</router-link
+      >
 
       <p>{{ comment }}</p>
     </div>
