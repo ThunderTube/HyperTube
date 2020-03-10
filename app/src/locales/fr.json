@@ -37,6 +37,14 @@
         "username": "Pseudonyme : ",
         "firstname": "Prénom : ",
         "lastname": "Nom : "
-    }
+    },
+
+    "form": {
+        "missing_input": "Completer le formulaire",
+        "confirm_account": "Confirmer votre compte",
+        "check_mail": "Verifier vos email",
+        "password_updated": "Mot de passe mis a jour",
+        "account_updated": "Information mis a jour"
+      }
     
   }

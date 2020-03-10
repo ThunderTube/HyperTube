@@ -37,6 +37,14 @@
       "username": "Username : ",
       "firstname": "Firstname : ",
       "lastname": "Lastname : "
+  },
+
+  "form": {
+    "missing_input": "Check your inputs",
+    "confirm_account": "Confirm your account",
+    "check_mail": "Check your mail",
+    "password_updated": "Password updated",
+    "account_updated": "Account updated"
   }
   
 }

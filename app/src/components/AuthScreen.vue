@@ -241,7 +241,7 @@ export default {
       });
       if (empty)
         this.$toast.open({
-            message: 'Please check all your inputs',
+            message: this.$t('form.missing_input'),
             type: 'error'
           })
       if (!empty) this.submitForm();
@@ -358,7 +358,7 @@ export default {
           this.login.form.password = this.register.form.password
           this.showAuthForm()
           this.$toast.open({
-            message: 'Please confirm your account',
+            message: this.$t('form.confirm_account'),
             type: 'success'
           })
         } else if (this.passwordForgot.visible) {
@@ -370,7 +370,7 @@ export default {
           this.formType = 'login'
           this.showAuthForm()
           return this.$toast.open({
-            message: 'Check your mail',
+            message: this.$t('form.check_mail'),
             type: 'success'
           })
         } else if (this.passwordReset) {
@@ -382,7 +382,7 @@ export default {
           this.showAuthForm()
           this.$emit('clear')
           return this.$toast.open({
-            message: 'Password updated',
+            message: this.$t('form.password_updated'),
             type: 'success'
           })
         }

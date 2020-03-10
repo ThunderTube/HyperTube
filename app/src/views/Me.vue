@@ -157,7 +157,7 @@ export default {
           if (res.data.error || !res.data.success)
             return this.$toast.open({ message: res.data.error, type: 'error' })
           this.formType = 'details'
-          this.$toast.open({ message: 'Account updated', type: 'success' })
+          this.$toast.open({ message: this.$t('form.account_updated'), type: 'success' })
           await this.me()
         } else if (this.password.visible) {
           const res = await this.updateUserPassword(this.password.form)
@@ -167,7 +167,7 @@ export default {
           this.showAuthForm()
           await this.me()
           return this.$toast.open({
-            message: 'Password updated',
+            message: this.$t('form.password_updated'),
             type: 'success'
           })
         }
