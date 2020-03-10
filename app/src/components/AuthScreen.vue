@@ -163,7 +163,7 @@
               @click.prevent="processFormInput"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
-              Submit
+              {{ $t('profile.confirm') }}
             </button>
           </div>
         </form>
