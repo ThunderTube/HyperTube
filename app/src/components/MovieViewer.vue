@@ -4,11 +4,7 @@
       {{ title }} ({{ year }})
     </h2>
 
-    <player
-      :id="imdbId"
-      :image="image"
-      :torrents="torrents"
-    />
+    <player :id="imdbId" :image="image" :torrents="torrents" />
 
     <div class="py-4 text-white">
       <p class="text-xl mb-2" :title="`The movie lasts ${formattedRuntime}`">

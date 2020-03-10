@@ -155,14 +155,23 @@ export default {
           })
           const res = await this.updateUserDetails(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
           this.formType = 'details'
-          this.$toast.open({ message: this.$t('form.account_updated'), type: 'success' })
+          this.$toast.open({
+            message: this.$t('form.account_updated'),
+            type: 'success'
+          })
           await this.me()
         } else if (this.password.visible) {
           const res = await this.updateUserPassword(this.password.form)
           if (!res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
           this.formType = 'details'
           this.showAuthForm()
           await this.me()

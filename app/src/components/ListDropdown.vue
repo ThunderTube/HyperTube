@@ -7,7 +7,8 @@
       <span
         class="inline-block transform origin-center transition-transform duration-300 mr-2"
         :class="{ '-rotate-90': !show }"
-      >🔽️</span>
+        >🔽️</span
+      >
       {{ label }}
     </button>
 

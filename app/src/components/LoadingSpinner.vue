@@ -1,5 +1,9 @@
 <template functional>
-  <div class="lds-ring" v-bind="data.attrs" :class="[data.class, data.staticClass]">
+  <div
+    class="lds-ring"
+    v-bind="data.attrs"
+    :class="[data.class, data.staticClass]"
+  >
     <div></div>
     <div></div>
     <div></div>

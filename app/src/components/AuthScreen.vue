@@ -130,16 +130,32 @@
           </div>
           <div class="flex justify-between my-8">
             <div>
-              <a class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/42">42</a>
+              <a
+                class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                href="http://localhost:8080/v1/auth/42"
+                >42</a
+              >
             </div>
             <div>
-              <a class="bg-blue-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/google">Google</a>
+              <a
+                class="bg-blue-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                href="http://localhost:8080/v1/auth/google"
+                >Google</a
+              >
             </div>
             <div>
-              <a class="bg-green-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/github">Github</a>
+              <a
+                class="bg-green-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                href="http://localhost:8080/v1/auth/github"
+                >Github</a
+              >
             </div>
             <div>
-              <a class="bg-orange-600 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/reddit">Reddit</a>
+              <a
+                class="bg-orange-600 text-white px-4 py-2 rounded  hover:shadow-lg"
+                href="http://localhost:8080/v1/auth/reddit"
+                >Reddit</a
+              >
             </div>
           </div>
           <div class="flex justify-end py-2">
@@ -224,27 +240,23 @@ export default {
   methods: {
     processFormInput() {
       let o
-      if (this.formType === 'login')
-        o = this.login.form
-      if (this.formType === 'register')
-        o = this.register.form
-      if (this.formType === 'password-forgot')
-        o = this.passwordReset.form
-      if (this.formType === 'password-reset')
-        o = this.passwordForgot.form
-      let empty = false;
+      if (this.formType === 'login') o = this.login.form
+      if (this.formType === 'register') o = this.register.form
+      if (this.formType === 'password-forgot') o = this.passwordReset.form
+      if (this.formType === 'password-reset') o = this.passwordForgot.form
+      let empty = false
       Object.keys(o).forEach((key, index) => {
-        if (o[key] === "" || o[key] === null || o[key] === undefined) {
+        if (o[key] === '' || o[key] === null || o[key] === undefined) {
           // error[key] = true;
-          empty = true;
+          empty = true
         }
-      });
+      })
       if (empty)
         this.$toast.open({
-            message: this.$t('form.missing_input'),
-            type: 'error'
-          })
-      if (!empty) this.submitForm();
+          message: this.$t('form.missing_input'),
+          type: 'error'
+        })
+      if (!empty) this.submitForm()
     },
     handleFileUpload() {
       this.register.form.profilePicture = this.$refs.file.files[0]
@@ -343,7 +355,10 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
@@ -352,7 +367,10 @@ export default {
           })
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
           this.formType = 'login'
           this.login.form.username = this.register.form.username
           this.login.form.password = this.register.form.password
@@ -365,7 +383,10 @@ export default {
           console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
           console.log(res)
           this.formType = 'login'
           this.showAuthForm()
@@ -376,7 +397,10 @@ export default {
         } else if (this.passwordReset) {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
-            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
+            return this.$toast.open({
+              message: this.$t(res.data.translationKey),
+              type: 'error'
+            })
           localStorage.removeItem('resetPasswordToken')
           this.formType = 'login'
           this.showAuthForm()

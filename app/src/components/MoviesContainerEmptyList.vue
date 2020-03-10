@@ -1,5 +1,7 @@
 <template functional>
-  <p class="movies-container__empty-list">{{ parent.$t('home.search_nodata') }}</p>
+  <p class="movies-container__empty-list">
+    {{ parent.$t('home.search_nodata') }}
+  </p>
 </template>
 
 <script>
