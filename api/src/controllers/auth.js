@@ -613,7 +613,7 @@ exports.updateDetails = async (req, res) => {
             }
             console.log('error ', e.errors);
             const msg = e.errors;
-            send(res, 500, { success: false, error: msg });
+            send(res, 200, { success: false, error: msg, translationKey: 'wrong_email_format' });
             return;
         }
 

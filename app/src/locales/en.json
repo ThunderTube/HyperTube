@@ -98,6 +98,7 @@
   "invalid_link": "Invalid link",
   "invalid_user": "Invalid user",
   "duplicate_key": "Duplicate key",
+  "email_unexistant": "Wrong email format",
 
   "comments":{
     "see": "See comments",
