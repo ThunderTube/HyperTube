@@ -100,6 +100,7 @@ const movieSchema = new mongoose.Schema({
                 comment: {
                     type: String,
                     required: true,
+                    max: 255,
                 },
                 createdAt: {
                     type: Date,
