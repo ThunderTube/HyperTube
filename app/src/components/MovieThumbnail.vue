@@ -3,13 +3,20 @@
     <router-link
       :to="`/${$i18n.locale}/movie/${imdbId}`"
       :title="title"
-      class="h-full flex flex-col bg-gray-800 text-gray-200 shadow-xl rounded transition-transform duration-300 transform hover:scale-95"
+      class="h-full flex flex-col bg-gray-800 text-gray-200 shadow-xl rounded transition-transform duration-300 transform hover:scale-95 relative"
     >
       <lazy-movie-image
         :src="image"
         :alt="imageAlt"
         class="w-full self-start rounded-t bg-gray-300 object-cover movie-thumbnail__img"
       />
+
+      <div
+        v-if="watched"
+        class="absolute top-0 left-0 flex items-center justify-center m-2 p-1 rounded-full bg-gray-700"
+      >
+        <eye-icon class="text-white w-5 h-5" />
+      </div>
 
       <div class="flex-grow px-6 pt-4 pb-2">
         <h2 class="font-bold text-xl mb-2 leading-tight">{{ title }}</h2>
@@ -32,6 +39,7 @@
 import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
 import LazyMovieImage from './LazyMovieImage'
+import EyeIcon from './EyeIcon.vue'
 
 export default {
   name: 'MovieThumbnail',
@@ -39,7 +47,8 @@ export default {
   components: {
     Tag,
     LazyMovieImage,
-    MovieStars
+    MovieStars,
+    EyeIcon
   },
   props: {
     imdbId: {
@@ -65,6 +74,10 @@ export default {
     genres: {
       type: Array,
       required: true
+    },
+    watched: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
