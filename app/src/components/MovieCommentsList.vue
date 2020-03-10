@@ -4,12 +4,19 @@
 
     <template v-else>
       <div v-if="comments.length > 0" class="grid grid-columns-1 w-full mb-3">
-        <movie-comment v-for="{ id, ...props } in comments" :key="id" v-bind="props" />
+        <movie-comment
+          v-for="{ id, ...props } in comments"
+          :key="id"
+          v-bind="props"
+        />
       </div>
       <no-data v-else>There are no comments for this movie</no-data>
 
       <form @submit.prevent="sendComment" class="w-full">
-        <movies-search-bar-input v-model.trim="newComment" placeholder="Write a comment...">
+        <movies-search-bar-input
+          v-model.trim="newComment"
+          placeholder="Write a comment..."
+        >
           <template #prepend>✏️</template>
 
           <template #append>
@@ -85,13 +92,19 @@ export default {
 
       if (comment.length === 0) return
 
+      const {
+        _id: userId,
+        profilePicture,
+        username
+      } = this.$store.state.auth.user
+
       // TODO: fetch data concerning the user in Vuex Store
       this.comments.push({
-        userId: '-1',
+        userId,
         comment,
-        createdAt: new Date().toISOString(),
-        username: 'test',
-        profilePicture: '0a190fc6-a279-49c3-bcef-c230b81a0e36.png'
+        username,
+        profilePicture,
+        createdAt: new Date().toISOString()
       })
 
       axios

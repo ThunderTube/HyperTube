@@ -174,7 +174,7 @@ async function triggerVideoDownloading(req, res) {
         return;
     }
 
-    let subtitles = movie.subtitles;
+    let {subtitles} = movie;
     if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
         // Download subtitles
 
@@ -359,7 +359,7 @@ async function getSubtitleForVideoAndLangcode(req, res) {
             imdbId: id,
             subtitles: {
                 $elemMatch: {
-                    langcode: langcode,
+                    langcode,
                 },
             },
         });
@@ -441,7 +441,9 @@ async function getCommentsWritersInformations(writers) {
     );
 
     return new Map(
-        writersWithInformations.map(writer => [writer._id.toString(), writer])
+        writersWithInformations
+            .filter(Boolean)
+            .map(writer => [writer._id.toString(), writer])
     );
 }
 
@@ -458,7 +460,7 @@ async function getMovieComments(req, res) {
             { $unwind: '$comments' },
             {
                 $sort: {
-                    'comments.createdAt': -1,
+                    'comments.createdAt': 1,
                 },
             },
         ]);
