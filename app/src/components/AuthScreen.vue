@@ -128,7 +128,7 @@
               >Reset Password</a
             >
           </div>
-          <div class="flex justify-between my-8">
+          <div v-if="login.visible || register.visible" class="flex justify-between my-8">
             <div>
               <a class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/42">42</a>
             </div>
