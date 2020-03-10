@@ -145,6 +145,7 @@ function uploadAndVerifyFileTypeMiddleware(
                     res.status(200).json({
                         success: false,
                         error: 'Could not identify the mimetype of the file',
+                        translationKey: 'wrong_file_type'
                     });
                     return;
                 }
@@ -154,6 +155,7 @@ function uploadAndVerifyFileTypeMiddleware(
                     res.status(200).json({
                         success: false,
                         error: 'Mimetype not supported',
+                        translationKey: 'wrong_file_type'
                     });
                     return;
                 }

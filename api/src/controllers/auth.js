@@ -1,7 +1,6 @@
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const stream = require('stream');
 const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
@@ -13,8 +12,7 @@ const {
 const send = require('@polka/send-type');
 
 const { pipeline } = require('../utils');
-const { User, validPasswordRegex } = require('../models/User');
-// const { createUploadPathIfNotExist } = require('../routes/auth');
+const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = ms('1 year');
 
@@ -113,8 +111,6 @@ exports.OAuthcontroller = async (req, res) => {
             username,
         });
 
-        const csrfSecret = await csrf.secret();
-
         if (isUserUnique === true) {
             const {
                 email,
@@ -142,6 +138,9 @@ exports.OAuthcontroller = async (req, res) => {
             } else {
                 filename = 'default-user.jpg';
             }
+
+            const csrfSecret = await csrf.secret();
+
             const user = new User({
                 username,
                 email,
@@ -157,13 +156,13 @@ exports.OAuthcontroller = async (req, res) => {
 
             const csrfToken = csrf.create(csrfSecret);
             const token = user.getSignedJwtToken();
-
+            console.log(csrfToken);
             createCookie(res, token).redirect(
                 `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
             );
         } else {
             const duplicateField = isUserUnique;
-            const provider = req.user.provider;
+            const { provider } = req.user;
 
             const userRegisteredUsingOAuth = await isUserOAuth(
                 provider,
@@ -176,8 +175,9 @@ exports.OAuthcontroller = async (req, res) => {
                 const user = await User.findOne({ username });
 
                 const token = user.getSignedJwtToken();
-                const csrfToken = csrf.create(csrfSecret);
+                const csrfToken = csrf.create(user.csrfSecret);
 
+                console.log(csrfToken);
                 createCookie(res, token).redirect(
                     `http://localhost:3000/?token=${encodeURIComponent(
                         csrfToken
@@ -206,15 +206,17 @@ exports.OAuthcontroller = async (req, res) => {
 // @access Public
 exports.register = async (req, res) => {
     try {
-        const { file } = req;
-        const { username, email, lastName, firstName, password } = trimObject(
-            req.body
-        );
-        const { csrf } = res.locals;
+        const {
+            file,
+            body: { password },
+        } = req;
+        const { username, email, lastName, firstName } = trimObject(req.body);
+        const { csrf, email: emailSender } = res.locals;
         if (file === undefined) {
-            res.status(200).json({
+            send(res, 200, {
                 success: false,
                 error: 'Invalid file',
+                translationKey: 'wrong_file_type'
             });
             return;
         }
@@ -227,7 +229,7 @@ exports.register = async (req, res) => {
             email,
             lastName,
             firstName,
-            password,
+            password: await hashPassword(password),
             profilePicture: file.path,
             confirmationLinkUuid,
             csrfSecret,
@@ -236,8 +238,8 @@ exports.register = async (req, res) => {
         try {
             await user.validate();
         } catch (e) {
-            let msg = Object.values(e.errors).map(val => val.message);
-            res.status(200).json({ success: false, error: msg });
+            const msg = Object.values(e.errors).map(val => val.message);
+            send(res, 200, { success: false, error: msg, translationKey: 'missing_user_inputs' });
             return;
         }
 
@@ -249,7 +251,7 @@ exports.register = async (req, res) => {
         if (isUserUnique === true) {
             await user.save();
 
-            res.locals.email.send({
+            emailSender.send({
                 to: user.email,
                 subject: 'Welcome to ThunderTube',
                 text: createRegisterMail(
@@ -260,21 +262,33 @@ exports.register = async (req, res) => {
                 ),
             });
 
-            res.json({ success: true });
-        } else if (isUserUnique === 'username') {
-            res.status(200).json({
+            send(res, 200, { success: true });
+            return;
+        }
+
+        if (isUserUnique === 'username') {
+            send(res, 200, {
                 success: false,
                 error: 'Username taken',
+                translationKey: 'username_taken'
             });
-        } else if (isUserUnique === 'email') {
-            res.status(200).json({
+            return;
+        }
+
+        if (isUserUnique === 'email') {
+            send(res, 200, {
                 success: false,
                 error: 'Email taken',
+                translationKey: 'email_taken'
             });
         }
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured during registering',
+        });
     }
 };
 
@@ -300,6 +314,7 @@ exports.confirmAccount = async (req, res) => {
         res.status(200).json({
             success: false,
             error: 'Wrong confirmation link',
+            translationKey: 'wrong_confirmation_link'
         });
     }
 };
@@ -314,19 +329,26 @@ exports.login = async (req, res) => {
         } = req;
         const { csrf } = res.locals;
 
-        const user = await User.findOne({ username, isConfirmed: true });
+        const user = await User.findOne({
+            username,
+            isConfirmed: true,
+            OAuthProvider: undefined,
+        });
         if (user === null) {
             // Could not find a user with this username
             res.status(200).json({
                 success: false,
                 error: 'No user found',
+                translationKey: 'no_user_found'
             });
             return;
         }
+
         if (!(await bcrypt.compare(password, user.password))) {
             res.status(200).json({
                 success: false,
                 error: 'Invalid password',
+                translationKey: 'invalid_password'
             });
 
             return;
@@ -376,6 +398,7 @@ exports.getUser = async (req, res) => {
             send(res, 400, {
                 success: false,
                 error: 'The ID is not correct',
+                translationKey: 'incorrect_id'
             });
             return;
         }
@@ -385,6 +408,8 @@ exports.getUser = async (req, res) => {
             send(res, 404, {
                 success: false,
                 user: 'No user found with this ID',
+                translationKey: 'invalid_user',
+
             });
             return;
         }
@@ -424,7 +449,7 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(200).json({ success: false, error: 'Unknown account' });
+            res.status(200).json({ success: false, error: 'Unknown account', translationKey: 'unknown_account'});
             return;
         }
 
@@ -472,22 +497,22 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(200).json({ success: false, error: 'Invalid password' });
+            res.status(200).json({ success: false, error: 'Invalid password', translationKey: 'invalid_password' });
             return;
         }
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(200).json({ success: false, error: 'Invalid username' });
+            res.status(200).json({ success: false, error: 'Invalid username', translationKey: 'invalid_username' });
             return;
         }
 
         if (!isLinkValid(user, token)) {
-            res.status(200).json({ success: false, error: 'Invalid link' });
+            res.status(200).json({ success: false, error: 'Invalid link', translationKey: 'invalid_link' });
             return;
         }
 
-        user.password = password;
+        user.password = await hashPassword(password);
         user.isConfirmed = true;
 
         await user.save();
@@ -522,41 +547,67 @@ function isLinkValid(user, token) {
 // @route PUT /api/v1/auth/updatedetails
 // @access Private
 exports.updateDetails = async (req, res) => {
-    const {
-        user,
-        body: { email, username, firstName, lastName },
-        file: profilePicture,
-    } = req;
-
-    const availableProperties = [
-        ['email', email],
-        ['username', username],
-        ['firstName', firstName],
-        ['lastName', lastName],
-        [
-            'profilePicture',
-            profilePicture ? profilePicture.path : profilePicture,
-        ],
-    ];
-
-    for (const [key, value] of availableProperties) {
-        console.log(value);
-
-        if (value) {
-            user[key] = value;
-        }
-    }
-
-    // save the modifications
     try {
-        await user.save();
+        const {
+            user,
+            body: { email, username, firstName, lastName },
+            file: profilePicture,
+        } = req;
+
+        const availableProperties = [
+            ['email', email],
+            ['username', username],
+            ['firstName', firstName],
+            ['lastName', lastName],
+            [
+                'profilePicture',
+                profilePicture ? profilePicture.path : profilePicture,
+            ],
+        ];
+
+        for (const [key, value] of availableProperties) {
+            // console.log(value);
+
+            if (value) {
+                user[key] = value;
+            }
+        }
+
+        // save the modifications
+        try {
+            await user.save();
+        } catch (e) {
+            console.error('e in catch', e);
+
+            // There is a duplicate field
+            if (e.code === 11000) {
+                const duplicateField = e.errmsg.includes('username')
+                    ? 'username'
+                    : 'email';
+
+                send(res, 200, {
+                    success: false,
+                    error: `This ${duplicateField} is already used`,
+                    translationKey: 'duplicate_field'
+                });
+                return;
+            }
+            console.log('error ', e.errors);
+            const msg = e.errors;
+            send(res, 500, { success: false, error: msg });
+            return;
+        }
+
+        res.status(200).json({ success: true });
     } catch (e) {
-        const msg = e.errors;
-        res.status(200).json({ success: false, error: msg });
+        console.error(e);
+
+        send(res, 500, {
+            success: false,
+            error: 'An error occured',
+        });
         return;
     }
-
-    res.status(200).json({ success: true });
 };
 
 // @desc Update password
@@ -564,14 +615,29 @@ exports.updateDetails = async (req, res) => {
 // @access Private
 exports.updatePassword = async (req, res) => {
     try {
-        const { user } = req;
+        const {
+            user,
+            body: { password },
+        } = req;
+        if (!validPasswordRegex.test(password)) {
+            send(res, 200, {
+                success: false,
+                error:
+                    'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
+                    translationKey: "invalid_password"
+            });
+            return;
+        }
 
-        user.password = req.body.password;
+        user.password = await hashPassword(password);
+
         await user.save();
-        res.json({ success: true });
+
+        send(res, 200, { success: true });
     } catch (e) {
         const msg = e.errors.password.message;
-        res.status(200).json({ success: false, error: msg });
+
+        send(res, 200, { success: false, error: msg });
     }
 };
 

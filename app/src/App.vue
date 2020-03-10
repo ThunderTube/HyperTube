@@ -1,29 +1,31 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
-      <atom-spinner
-        :animation-duration="500"
-        :size="120"
-        :color="'#ffffff'"
-      />
+      <atom-spinner :animation-duration="500" :size="120" :color="'#ffffff'" />
     </div>
     <div v-else>
-    <auth-screen @clear="resetPassword = false" @auth:login="isLoggedIn = true" :is-logged-in="isLoggedIn" :reset-password="resetPassword" :guid="guid" />
-    <div v-if="isLoggedIn">
-      <app-menu />
-      <app-switch-lang />
-      <div class="w-full">
-        <transition name="page" mode="out-in">
-          <router-view />
-        </transition>
+      <auth-screen
+        @clear="resetPassword = false"
+        @auth:login="isLoggedIn = true"
+        :is-logged-in="isLoggedIn"
+        :reset-password="resetPassword"
+        :guid="guid"
+      />
+      <div v-if="isLoggedIn">
+        <app-menu />
+        <app-switch-lang />
+        <div class="w-full">
+          <transition name="page" mode="out-in">
+            <router-view />
+          </transition>
+        </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
 
 <script>
-import {AtomSpinner} from 'epic-spinners'
+import { AtomSpinner } from 'epic-spinners'
 import { mapGetters, mapActions } from 'vuex'
 import AppMenu from '@/components/AppMenu'
 import AuthScreen from '@/components/AuthScreen'
@@ -55,14 +57,13 @@ export default {
       const res = await this.me()
       if (!res) {
         // this.$toast.open({ message: 'Please login or register an account', type: 'info'})
-        return this.loading = false
+        return (this.loading = false)
       }
-      if (res.data.success)
-        this.hasCookie = true
-    
+      if (res.data.success) this.hasCookie = true
+
       setTimeout(() => {
         this.loading = false
-      }, 500)
+      }, 1000)
     } catch (error) {
       console.log('app created ', error.message)
     }

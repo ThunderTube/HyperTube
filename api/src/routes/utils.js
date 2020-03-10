@@ -13,7 +13,10 @@ function validCSRF(req, res, next) {
         headers: { 'x-csrf-token': csrfToken },
         user: { csrfSecret },
     } = req;
-
+    console.log('utils.js');
+    console.log(csrfToken);
+    console.log(csrfSecret);
+    console.log(!csrf.verify(csrfSecret, csrfToken));
     if (typeof csrfToken !== 'string' || !csrf.verify(csrfSecret, csrfToken)) {
         res.status(403).json({ error: 'Invalid CSRF token' });
         return;

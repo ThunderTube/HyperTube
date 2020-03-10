@@ -3,10 +3,12 @@
     v-if="!isLoggedIn"
     class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
   >
-  <div class="z-50">
-    <app-switch-lang />
-  </div>
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
+    <div class="z-50">
+      <app-switch-lang />
+    </div>
+    <div
+      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
+    ></div>
     <div
       class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
     >
@@ -27,7 +29,7 @@
         </div>
       </div>
       <div class="py-4 text-left px-6">
-        <form @submit.prevent="submitForm()">
+        <form>
           <div v-if="login.visible">
             <app-input
               v-model="login.form.username"
@@ -47,8 +49,8 @@
             <!-- {{ $t('loginscreen.register_form_title') }} -->
             <app-input
               v-model="register.form.username"
-              name="username"
-              placeholder="username"
+              :name="$t('registerscreen.id_placeholder')"
+              :placeholder="$t('registerscreen.id_placeholder')"
               autocomplete="username"
             />
             <app-input
@@ -60,14 +62,14 @@
             />
             <app-input
               v-model="register.form.firstName"
-              name="firstName"
-              placeholder="first name"
+              :name="$t('registerscreen.firstName')"
+              :placeholder="$t('registerscreen.firstName')"
               autocomplete="given-name"
             />
             <app-input
               v-model="register.form.lastName"
-              name="lastName"
-              placeholder="last name"
+              :name="$t('registerscreen.lastName')"
+              :placeholder="$t('registerscreen.lastName')"
               autocomplete="family-name"
             />
             <app-input
@@ -126,9 +128,23 @@
               >Reset Password</a
             >
           </div>
+          <div v-if="login.visible || register.visible" class="flex justify-between my-8">
+            <div>
+              <a class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/42">42</a>
+            </div>
+            <div>
+              <a class="bg-blue-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/google">Google</a>
+            </div>
+            <div>
+              <a class="bg-green-900 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/github">Github</a>
+            </div>
+            <div>
+              <a class="bg-orange-600 text-white px-4 py-2 rounded  hover:shadow-lg" href="http://localhost:8080/v1/auth/reddit">Reddit</a>
+            </div>
+          </div>
           <div class="flex justify-end py-2">
             <button
-              @click.prevent="submitForm"
+              @click.prevent="processFormInput"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
               Submit
@@ -165,7 +181,7 @@ export default {
     guid: {
       type: String,
       default: '',
-      required: false,
+      required: false
     }
   },
   data() {
@@ -206,6 +222,30 @@ export default {
     }
   },
   methods: {
+    processFormInput() {
+      let o
+      if (this.formType === 'login')
+        o = this.login.form
+      if (this.formType === 'register')
+        o = this.register.form
+      if (this.formType === 'password-forgot')
+        o = this.passwordForgot.form
+      if (this.formType === 'password-reset')
+        o = this.passwordReset.form
+      let empty = false;
+      Object.keys(o).forEach((key, index) => {
+        if (o[key] === "" || o[key] === null || o[key] === undefined) {
+          // error[key] = true;
+          empty = true;
+        }
+      });
+      if (empty)
+        this.$toast.open({
+            message: this.$t('form.missing_input'),
+            type: 'error'
+          })
+      if (!empty) this.submitForm();
+    },
     handleFileUpload() {
       this.register.form.profilePicture = this.$refs.file.files[0]
     },
@@ -213,7 +253,10 @@ export default {
       registerUser: 'auth/registerUser',
       loginUser: 'auth/loginUser',
       forgotUserPassword: 'auth/forgotUserPassword',
-      userPasswordReset: 'auth/passwordReset'
+      userPasswordReset: 'auth/passwordReset',
+      fortyTwoUser: 'auth/fortyTwoUser',
+      githubUser: 'auth/githubUser',
+      googleUser: 'auth/googleUser'
     }),
     selectAuthForm(formType) {
       this.formType = formType
@@ -260,7 +303,7 @@ export default {
         this.register.visible = false
         this.login.form = {
           username: '',
-          password: '',
+          password: ''
         }
         this.passwordReset.form = {
           username: '',
@@ -300,7 +343,7 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
@@ -309,30 +352,37 @@ export default {
           })
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           this.formType = 'login'
           this.login.form.username = this.register.form.username
           this.login.form.password = this.register.form.password
           this.showAuthForm()
-          this.$toast.open({ message: "Please confirm your account", type: 'success'});
+          this.$toast.open({
+            message: this.$t('form.confirm_account'),
+            type: 'success'
+          })
         } else if (this.passwordForgot.visible) {
-          console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
-          console.log(res)
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           this.formType = 'login'
           this.showAuthForm()
-          return this.$toast.open({ message: 'Check your mail', type: 'success'});
+          return this.$toast.open({
+            message: this.$t('form.check_mail'),
+            type: 'success'
+          })
         } else if (this.passwordReset) {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           localStorage.removeItem('resetPasswordToken')
           this.formType = 'login'
           this.showAuthForm()
           this.$emit('clear')
-          return this.$toast.open({ message: 'Password updated', type: 'success'});
+          return this.$toast.open({
+            message: this.$t('form.password_updated'),
+            type: 'success'
+          })
         }
       } catch (error) {
         console.log('error in submitForm ', error.message)
@@ -345,7 +395,7 @@ export default {
       deep: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          this.formType = "reset-password"
+          this.formType = 'reset-password'
           this.showAuthForm()
         }
       }

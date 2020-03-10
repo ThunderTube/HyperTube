@@ -1,10 +1,19 @@
-import { register, login, forgotPassword, me, logout, resetPassword, updateDetails, updatePassword } from '@/api/auth'
-
-
+import {
+  register,
+  login,
+  forgotPassword,
+  me,
+  logout,
+  resetPassword,
+  updateDetails,
+  updatePassword
+} from '@/api/auth'
+import router from '../../../router'
 
 export const registerUser = async ({ commit }, data) => {
   try {
     const res = await register(data)
+
     return res
   } catch (error) {
     console.log('registerUser ', error)
@@ -54,7 +63,7 @@ export const loginUser = async ({ dispatch }, data) => {
       // dispatch('setAuthCSRF', res.data.csrfToken)
       // dispatch('setAuthIsLoggedIn', true)
       // dispatch('setAuthData', res.data.user)
-        dispatch('getCurrentUser')
+      dispatch('getCurrentUser')
     }
     return res
   } catch (error) {
@@ -65,8 +74,7 @@ export const loginUser = async ({ dispatch }, data) => {
 export const getCurrentUser = async ({ dispatch }) => {
   try {
     const res = await me()
-    if (res.message)
-      return console.log(res.message)
+    if (res.message) return console.log(res.message)
     if (res.data.success) {
       // dispatch('setAuthCSRF', res.data.csrfToken)
       dispatch('setAuthIsLoggedIn', true)
@@ -85,6 +93,7 @@ export const logoutCurrentUser = async ({ dispatch }) => {
       dispatch('clearAuthData')
       dispatch('setAuthIsLoggedIn', false)
       localStorage.removeItem('csrfToken')
+      router.push('/')
     }
   } catch (error) {
     console.log('logoutCurrentUser ', error.message)
