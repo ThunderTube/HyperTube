@@ -343,7 +343,7 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error' })
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
@@ -352,7 +352,7 @@ export default {
           })
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error' })
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           this.formType = 'login'
           this.login.form.username = this.register.form.username
           this.login.form.password = this.register.form.password
@@ -365,7 +365,7 @@ export default {
           console.log('ok')
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error' })
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           console.log(res)
           this.formType = 'login'
           this.showAuthForm()
@@ -376,7 +376,7 @@ export default {
         } else if (this.passwordReset) {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error' })
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           localStorage.removeItem('resetPasswordToken')
           this.formType = 'login'
           this.showAuthForm()

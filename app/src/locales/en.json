@@ -45,6 +45,20 @@
     "check_mail": "Check your mail",
     "password_updated": "Password updated",
     "account_updated": "Account updated"
-  }
-  
+  },
+
+      "wrong_file_type": "Wrong file type",
+      "missing_user_inputs": "Missing required inputs",
+      "username_taken": "Username taken",
+      "email_taken": "Username taken",
+      "wrong_confirmation_link": "Wrong confirmation link",
+      "no_user_found": "No user found",
+      "invalid_password": "Invalid password",
+      "incorrect_id": "Incorrect ID",
+      "unknown_account": "Unknown account",
+      "invalid_username": "Invalid username",
+      "invalid_link": "Invalid link",
+      "invalid_user": "Invalid user",
+      "duplicate_key": "Duplicate key"
+
 }

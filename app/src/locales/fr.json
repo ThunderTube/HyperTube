@@ -45,6 +45,24 @@
         "check_mail": "Verifier vos email",
         "password_updated": "Mot de passe mis a jour",
         "account_updated": "Information mis a jour"
-      }
+      },
+
+
+    "wrong_file_type": "Mauvais type de fichier",
+    "missing_user_inputs": "Il manque des champs obligatoires",
+    "username_taken": "Le nom d'utilisateur est pris",
+    "email_taken": "Email est pris",
+    "wrong_confirmation_link": "Mauvais lien de confirmation",
+    "no_user_found": "Aucun utilisateur",
+    "invalid_password": "Mot de passe incorrecte",
+    "incorrect_id": "Identifiant incorrecte",
+    "unknown_account": "Compte inconnu",
+    "invalid_username": "Nom d'utilisateur invalide",
+    "invalid_link": "Lien invalide",
+    "invalid_user": "Utilisateur invalide",
+    "duplicate_key": "Champs dupliquer"
+
+
+
     
   }
