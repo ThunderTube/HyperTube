@@ -1,26 +1,32 @@
 <template>
   <div id="app" class="bg-gray-900 min-h-screen">
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
-      <atom-spinner :animation-duration="500" :size="120" :color="'#ffffff'" />
+      <atom-spinner :animation-duration="500" :size="120" color="#ffffff" />
     </div>
-    <div v-else>
+
+    <template v-else>
       <auth-screen
         @clear="resetPassword = false"
         @auth:login="isLoggedIn = true"
-        :is-logged-in="isLoggedIn"
+        :is-logged-in="isLoggedIn || $route.name === '404'"
         :reset-password="resetPassword"
         :guid="guid"
       />
-      <div v-if="isLoggedIn">
+      <template v-if="isLoggedIn">
         <app-menu />
-        <app-switch-lang />
-        <div class="w-full overflow-hidden">
-          <transition name="page" mode="out-in">
-            <router-view />
-          </transition>
-        </div>
+      </template>
+
+      <app-switch-lang />
+
+      <div
+        v-if="isLoggedIn || (!isLoggedIn && $route.name === '404')"
+        class="w-full overflow-hidden"
+      >
+        <transition name="page" mode="out-in">
+          <router-view />
+        </transition>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 

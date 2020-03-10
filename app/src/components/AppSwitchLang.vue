@@ -108,7 +108,7 @@ export default {
 
       this.$router
         .replace({
-          name: this.$route.name,
+          path: this.$route.path,
           params: { lang: locale }
         })
         .catch(() => {})

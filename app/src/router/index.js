@@ -28,17 +28,11 @@ const router = new Router({
         import(/* webpackChunkName: "movie" */ '../views/PasswordReset.vue')
     },
     {
-      path: '404',
-      name: '404',
-      component: () =>
-        import(/* webpackChunkName: "movie" */ '../views/404.vue')
-    },
-    {
       path: '/',
       redirect: `/${i18n.locale}`
     },
     {
-      path: '/:lang',
+      path: '/:lang(fr|en)',
       component: {
         render(c) {
           return c('router-view')
@@ -71,14 +65,14 @@ const router = new Router({
           beforeEnter: checkIfLoggedIn,
           component: () =>
             import(/* webpackChunkName: "movie" */ '../views/Me.vue')
-        },
-        {
-          path: '404',
-          name: '404',
-          component: () =>
-            import(/* webpackChunkName: "movie" */ '../views/404.vue')
         }
       ]
+    },
+    {
+      path: '*',
+      name: '404',
+      component: () =>
+        import(/* webpackChunkName: "movie" */ '../views/404.vue')
     }
   ]
 })
