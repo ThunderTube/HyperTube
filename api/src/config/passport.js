@@ -80,7 +80,7 @@ module.exports = function setupPassport(csrf) {
                     const { username, displayName, photos, provider } = profile;
 
                     cb(null, {
-                        username: username,
+                        username,
                         firstName: displayName,
                         profilePicture: photos[0].value,
                         provider,

@@ -1,11 +1,13 @@
 <template>
-      <div
+  <div
     class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
   >
-  <div class="z-50">
-    <app-switch-lang />
-  </div>
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"></div>
+    <div class="z-50">
+      <app-switch-lang />
+    </div>
+    <div
+      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
+    ></div>
     <div
       class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
     >
@@ -13,13 +15,13 @@
         class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800"
       >
         <div
-        @click="selectAuthForm('details')"
+          @click="selectAuthForm('details')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >
           My details
         </div>
         <div
-        @click="selectAuthForm('password')"
+          @click="selectAuthForm('password')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
         >
           Password
@@ -27,7 +29,6 @@
       </div>
       <div class="py-4 text-left px-6">
         <form>
-       
           <div v-if="details.visible">
             <app-input
               v-model="details.form.username"
@@ -64,7 +65,7 @@
               />
             </div>
           </div>
-             <div v-else-if="password.visible">
+          <div v-else-if="password.visible">
             <app-input
               v-model="password.form.password"
               :name="$t('loginscreen.password')"
@@ -75,7 +76,7 @@
           </div>
           <div class="flex justify-end py-2">
             <button
-             @click.prevent="submitForm"
+              @click.prevent="submitForm"
               class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
             >
               Submit
@@ -97,7 +98,7 @@ export default {
     AppInput,
     AppSwitchLang
   },
-    data() {
+  data() {
     return {
       formType: 'details',
       details: {
@@ -121,20 +122,19 @@ export default {
   },
   methods: {
     ...mapActions({
-        updateUserDetails: 'auth/updateUserDetails',
-        updateUserPassword: 'auth/updateUserPassword',
-        me: 'auth/getCurrentUser'
-
+      updateUserDetails: 'auth/updateUserDetails',
+      updateUserPassword: 'auth/updateUserPassword',
+      me: 'auth/getCurrentUser'
     }),
     selectAuthForm(formType) {
       this.formType = formType
       this.showAuthForm()
     },
-     handleFileUpload() {
+    handleFileUpload() {
       this.details.form.profilePicture = this.$refs.file.files[0]
     },
     showAuthForm() {
-    if (this.formType === 'details') {
+      if (this.formType === 'details') {
         this.password.visible = false
         this.password.form = {
           password: ''
@@ -155,18 +155,21 @@ export default {
           })
           const res = await this.updateUserDetails(formData)
           if (res.data.error || !res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           this.formType = 'details'
-          this.$toast.open({ message: "Account updated", type: 'success'});
-            await this.me()
+          this.$toast.open({ message: this.$t('form.account_updated'), type: 'success' })
+          await this.me()
         } else if (this.password.visible) {
           const res = await this.updateUserPassword(this.password.form)
           if (!res.data.success)
-            return this.$toast.open({ message: res.data.error, type: 'error'});
+            return this.$toast.open({ message: this.$t(res.data.translationKey), type: 'error' })
           this.formType = 'details'
           this.showAuthForm()
           await this.me()
-          return this.$toast.open({ message: 'Password updated', type: 'success'});
+          return this.$toast.open({
+            message: this.$t('form.password_updated'),
+            type: 'success'
+          })
         }
       } catch (error) {
         console.log('error in submitForm ', error.message)
@@ -174,15 +177,15 @@ export default {
     }
   },
   computed: {
-      ...mapGetters({
-          getAuthData: 'auth/getAuthData'
-      })
+    ...mapGetters({
+      getAuthData: 'auth/getAuthData'
+    })
   },
   created() {
-      this.details.form.email = this.getAuthData.email
-      this.details.form.username = this.getAuthData.username
-      this.details.form.firstName = this.getAuthData.firstName
-      this.details.form.lastName = this.getAuthData.lastName
+    this.details.form.email = this.getAuthData.email
+    this.details.form.username = this.getAuthData.username
+    this.details.form.firstName = this.getAuthData.firstName
+    this.details.form.lastName = this.getAuthData.lastName
   }
 }
 </script>

@@ -18,7 +18,9 @@ async function app() {
     await connectDB();
 
     const server = express();
-    const assets = sirv(join(__dirname, '../', 'public'));
+    const assets = sirv(join(__dirname, '../', 'public'), {
+        dev: true,
+    });
 
     // Dev logging middleware
     if (process.env.NODE_ENV === 'development') {

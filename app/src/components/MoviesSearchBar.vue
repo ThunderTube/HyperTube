@@ -5,7 +5,9 @@
       class="mx-auto flex justify-center items-center py-2 px-3 rounded transition-colors duration-75 bg-transparent hover:bg-gray-700 text-gray-400 tracking-wide focus:outline-none"
       :class="[show ? 'bg-gray-700' : 'bg-gray-800']"
       @click="show = !show"
-    >🔍 Search a movie</button>
+    >
+      🔍 Search a movie
+    </button>
 
     <transition mode="out-in" name="search-bar">
       <aside v-if="show" class="flex flex-wrap mt-4">
