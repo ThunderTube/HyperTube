@@ -9,8 +9,10 @@ const TORRENT_STATUSES = {
     NONE: 'NONE',
 };
 
+// console.log('last, first', mongoose.Types.ObjectId, mongoose.ObjectId);
+
 const movieSchema = new mongoose.Schema({
-    _id: mongoose.ObjectId,
+    _id: mongoose.Types.ObjectId,
     imdbId: {
         type: String,
         index: true,
@@ -104,6 +106,31 @@ const movieSchema = new mongoose.Schema({
                     default() {
                         return new Date();
                     },
+                },
+            },
+        ],
+        default() {
+            return [];
+        },
+    },
+    subtitles: {
+        type: [
+            {
+                langcode: {
+                    type: String,
+                    required: true,
+                },
+                lang: {
+                    type: String,
+                    required: true,
+                },
+                encoding: {
+                    type: String,
+                    required: true,
+                },
+                score: {
+                    type: Number,
+                    required: true,
                 },
             },
         ],

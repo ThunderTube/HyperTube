@@ -10,6 +10,7 @@ const {
     getSubtitleForVideoAndLangcode,
     commentMovie,
     getMovieComments,
+    streamMoviePosterToClient,
 } = require('../controllers/stream');
 const { POSSIBLE_GENRES } = require('../get-movies');
 
@@ -25,6 +26,7 @@ router
     .get('/video/download/:id/:resolution', triggerVideoDownloading)
     .get('/video/status/:id/:resolution', getDownloadingStatus)
     .get('/video/chunks/:id/:resolution', getVideoStream)
-    .get('/subtitles/:id-:langcode.vtt', getSubtitleForVideoAndLangcode);
+    .get('/subtitles/:id-:langcode.vtt', getSubtitleForVideoAndLangcode)
+    .get('/poster/:id', streamMoviePosterToClient);
 
 module.exports = router;

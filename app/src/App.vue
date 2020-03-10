@@ -14,7 +14,7 @@
       <div v-if="isLoggedIn">
         <app-menu />
         <app-switch-lang />
-        <div class="w-full">
+        <div class="w-full overflow-hidden">
           <transition name="page" mode="out-in">
             <router-view />
           </transition>
@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .page-enter-active,
 .page-leave-active {
   transition: opacity, transform 0.4s ease-in;

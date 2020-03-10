@@ -1,13 +1,14 @@
+const { createReadStream } = require('fs');
+const { join } = require('path');
+
 const send = require('@polka/send-type');
-const srt2vtt = require('srt-to-vtt');
+const got = require('got');
 const { extname } = require('path');
+const mongoose = require('mongoose');
 
 const { Movie, TORRENT_STATUSES } = require('../models/Movie');
-const {
-    getSubtitles,
-    streamSubtitleForMovieAndLangcode,
-    NORMALIZED_GENDERS,
-} = require('../get-movies');
+const { User } = require('../models/User');
+const { downloadSubtitles, NORMALIZED_GENDERS } = require('../get-movies');
 const { streamTorrent } = require('../stream');
 const { FSFile } = require('../file');
 const { pipeline } = require('../utils');
@@ -141,10 +142,7 @@ async function getVideoInformations(req, res) {
             return;
         }
 
-        send(res, 200, {
-            ...hasWatchedTheMovie(user)(movie),
-            subtitles: await getSubtitles(movie.imdbId),
-        });
+        send(res, 200, hasWatchedTheMovie(user)(movie));
     } catch (e) {
         console.error(e);
         send(res, 500);
@@ -170,8 +168,28 @@ async function triggerVideoDownloading(req, res) {
         }
     );
     if (!movie) {
-        res.end('Not found');
+        send(res, 404, {
+            error: 'Could not find this movie',
+        });
         return;
+    }
+
+    let {subtitles} = movie;
+    if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
+        // Download subtitles
+
+        console.log('save subtitles');
+
+        subtitles = await downloadSubtitles(id);
+
+        await Movie.updateOne(
+            { imdbId: id },
+            {
+                $push: {
+                    subtitles,
+                },
+            }
+        );
     }
 
     const {
@@ -182,22 +200,32 @@ async function triggerVideoDownloading(req, res) {
     const mime =
         fsPath &&
         MIME.get(fsPathExtension === 'mp4' ? fsPathExtension : 'webm');
+    const willNeedTranscoding =
+        fsPath && !['mp4', 'webm'].includes(fsPathExtension);
 
     if (fsPath !== undefined && status === TORRENT_STATUSES.LOADED) {
         // Load the movie from the local file system.
         send(res, 200, {
             status: TORRENT_STATUSES.LOADED,
             mime,
+            willNeedTranscoding,
         });
         return;
     }
     if (status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) {
         // Can launch polling.
-        send(res, 200, { status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED, mime });
+        send(res, 200, {
+            status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED,
+            mime,
+            willNeedTranscoding,
+        });
         return;
     }
     if (status === TORRENT_STATUSES.LOADING) {
-        send(res, 200, { status: TORRENT_STATUSES.LOADING });
+        send(res, 200, {
+            status: TORRENT_STATUSES.LOADING,
+            willNeedTranscoding,
+        });
         return;
     }
 
@@ -209,7 +237,11 @@ async function triggerVideoDownloading(req, res) {
     // Lock the torrent.
     // Start downloading the movie.
 
-    const { emitter, file } = await streamTorrent(torrent);
+    const {
+        emitter,
+        file,
+        willNeedTranscoding: streamWillNeedTranscoding,
+    } = await streamTorrent(torrent);
 
     STATE.files.set(toFilesMapKey(id, resolution), file);
 
@@ -239,8 +271,10 @@ async function triggerVideoDownloading(req, res) {
     });
 
     send(res, 200, {
+        subtitles,
         status: TORRENT_STATUSES.LOADING,
         mime: MIME.get(file.extension),
+        willNeedTranscoding: streamWillNeedTranscoding,
     });
 }
 
@@ -321,22 +355,32 @@ async function getSubtitleForVideoAndLangcode(req, res) {
     } = req;
 
     try {
-        const srtSubtitleStream = await streamSubtitleForMovieAndLangcode(
-            id,
-            langcode
-        );
-        if (srtSubtitleStream === null) {
-            send(res, 400);
+        const movie = await Movie.findOne({
+            imdbId: id,
+            subtitles: {
+                $elemMatch: {
+                    langcode,
+                },
+            },
+        });
+        if (movie === null) {
+            send(res, 404);
             return;
         }
 
         res.set('Content-Type', 'text/vtt');
 
-        await pipeline(srtSubtitleStream, srt2vtt(), res);
+        await pipeline(
+            createReadStream(
+                join(__dirname, '../../public', `${id}-${langcode}.vtt`)
+            ),
+            res
+        );
 
         console.log('streamed successfully the subtitle');
     } catch (e) {
         console.error(e);
+
         send(res, 500);
     }
 }
@@ -363,12 +407,21 @@ async function commentMovie(req, res) {
             return;
         }
 
-        movie.comments.push({
-            userId,
-            comment,
-        });
-
-        await movie.save();
+        await Movie.updateOne(
+            {
+                imdbId,
+            },
+            {
+                $push: {
+                    comments: {
+                        _id: mongoose.Types.ObjectId(),
+                        userId,
+                        comment,
+                        createdAt: new Date(),
+                    },
+                },
+            }
+        );
 
         send(res, 200, {
             success: true,
@@ -382,28 +435,119 @@ async function commentMovie(req, res) {
     }
 }
 
+async function getCommentsWritersInformations(writers) {
+    const writersWithInformations = await Promise.all(
+        writers.map(userId => User.findById(userId))
+    );
+
+    return new Map(
+        writersWithInformations
+            .filter(Boolean)
+            .map(writer => [writer._id.toString(), writer])
+    );
+}
+
 async function getMovieComments(req, res) {
     try {
         const {
             params: { id: imdbId },
         } = req;
 
-        const movie = await Movie.findOne({ imdbId }).sort({ createdAt: -1 });
-        if (movie === null) {
+        const commentsDocuments = await Movie.aggregate([
+            {
+                $match: { imdbId },
+            },
+            { $unwind: '$comments' },
+            {
+                $sort: {
+                    'comments.createdAt': 1,
+                },
+            },
+        ]);
+        if (commentsDocuments === null) {
             send(res, 404, {
                 error: 'Could not get comments for this movie',
             });
             return;
         }
 
+        const commentsWithoutWritersInformations = commentsDocuments.map(
+            ({ comments }) => comments
+        );
+
+        const commentsWritersIds = [
+            ...new Set(
+                commentsWithoutWritersInformations.map(({ userId }) =>
+                    userId.toString()
+                )
+            ),
+        ];
+        const commentsWritersInformations = await getCommentsWritersInformations(
+            commentsWritersIds
+        );
+
         send(res, 200, {
             imdbId,
-            comments: movie.toObject().comments,
+            comments: commentsWithoutWritersInformations
+                .map(({ _id, comment, createdAt, userId }) => {
+                    // Add the writer's informations inside its comment.
+                    // If we were with SQL we would not have used such a thing xD.
+
+                    const writerInformations = commentsWritersInformations.get(
+                        userId.toString()
+                    );
+                    if (writerInformations === undefined) return undefined;
+                    const { username, profilePicture } = writerInformations;
+
+                    return {
+                        id: _id,
+                        userId,
+                        comment,
+                        username,
+                        profilePicture,
+                        createdAt,
+                    };
+                })
+                .filter(Boolean),
         });
     } catch (e) {
         console.error(e);
         send(res, 500, {
             error: 'An error occured during comments getting',
+        });
+    }
+}
+
+async function streamMoviePosterToClient(req, res) {
+    try {
+        const {
+            params: { id },
+        } = req;
+
+        const movie = await Movie.findOne(
+            {
+                imdbId: id,
+            },
+            {
+                image: 1,
+            }
+        );
+        if (movie === null) {
+            throw new Error('Could not get this movie');
+        }
+        const { image } = movie;
+
+        try {
+            const buffer = await got(image).buffer();
+
+            send(res, 200, buffer);
+        } catch (e) {
+            console.error(e);
+        }
+    } catch (e) {
+        console.error(e);
+        send(res, 500, {
+            error: 'An error occured during image pipelining',
         });
     }
 }
@@ -418,4 +562,5 @@ module.exports = {
     getSubtitleForVideoAndLangcode,
     commentMovie,
     getMovieComments,
+    streamMoviePosterToClient,
 };

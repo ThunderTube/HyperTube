@@ -216,7 +216,7 @@ exports.register = async (req, res) => {
             send(res, 200, {
                 success: false,
                 error: 'Invalid file',
-                translationKey: 'wrong_file_type'
+                translationKey: 'wrong_file_type',
             });
             return;
         }
@@ -239,7 +239,11 @@ exports.register = async (req, res) => {
             await user.validate();
         } catch (e) {
             const msg = Object.values(e.errors).map(val => val.message);
-            send(res, 200, { success: false, error: msg, translationKey: 'missing_user_inputs' });
+            send(res, 200, {
+                success: false,
+                error: msg,
+                translationKey: 'missing_user_inputs',
+            });
             return;
         }
 
@@ -270,7 +274,7 @@ exports.register = async (req, res) => {
             send(res, 200, {
                 success: false,
                 error: 'Username taken',
-                translationKey: 'username_taken'
+                translationKey: 'username_taken',
             });
             return;
         }
@@ -279,7 +283,7 @@ exports.register = async (req, res) => {
             send(res, 200, {
                 success: false,
                 error: 'Email taken',
-                translationKey: 'email_taken'
+                translationKey: 'email_taken',
             });
         }
     } catch (e) {
@@ -314,7 +318,7 @@ exports.confirmAccount = async (req, res) => {
         res.status(200).json({
             success: false,
             error: 'Wrong confirmation link',
-            translationKey: 'wrong_confirmation_link'
+            translationKey: 'wrong_confirmation_link',
         });
     }
 };
@@ -339,7 +343,7 @@ exports.login = async (req, res) => {
             res.status(200).json({
                 success: false,
                 error: 'No user found',
-                translationKey: 'no_user_found'
+                translationKey: 'no_user_found',
             });
             return;
         }
@@ -348,7 +352,7 @@ exports.login = async (req, res) => {
             res.status(200).json({
                 success: false,
                 error: 'Invalid password',
-                translationKey: 'invalid_password'
+                translationKey: 'invalid_password',
             });
 
             return;
@@ -398,7 +402,7 @@ exports.getUser = async (req, res) => {
             send(res, 400, {
                 success: false,
                 error: 'The ID is not correct',
-                translationKey: 'incorrect_id'
+                translationKey: 'incorrect_id',
             });
             return;
         }
@@ -409,7 +413,6 @@ exports.getUser = async (req, res) => {
                 success: false,
                 user: 'No user found with this ID',
                 translationKey: 'invalid_user',
-
             });
             return;
         }
@@ -449,7 +452,11 @@ exports.forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(200).json({ success: false, error: 'Unknown account', translationKey: 'unknown_account'});
+            res.status(200).json({
+                success: false,
+                error: 'Unknown account',
+                translationKey: 'unknown_account',
+            });
             return;
         }
 
@@ -497,18 +504,30 @@ exports.resetPassword = async (req, res) => {
             body: { username, password, token },
         } = req;
         if (!validPasswordRegex.test(password)) {
-            res.status(200).json({ success: false, error: 'Invalid password', translationKey: 'invalid_password' });
+            res.status(200).json({
+                success: false,
+                error: 'Invalid password',
+                translationKey: 'invalid_password',
+            });
             return;
         }
 
         const user = await User.findOne({ username });
         if (user === null) {
-            res.status(200).json({ success: false, error: 'Invalid username', translationKey: 'invalid_username' });
+            res.status(200).json({
+                success: false,
+                error: 'Invalid username',
+                translationKey: 'invalid_username',
+            });
             return;
         }
 
         if (!isLinkValid(user, token)) {
-            res.status(200).json({ success: false, error: 'Invalid link', translationKey: 'invalid_link' });
+            res.status(200).json({
+                success: false,
+                error: 'Invalid link',
+                translationKey: 'invalid_link',
+            });
             return;
         }
 
@@ -588,7 +607,7 @@ exports.updateDetails = async (req, res) => {
                 send(res, 200, {
                     success: false,
                     error: `This ${duplicateField} is already used`,
-                    translationKey: 'duplicate_field'
+                    translationKey: 'duplicate_field',
                 });
                 return;
             }
@@ -606,7 +625,7 @@ exports.updateDetails = async (req, res) => {
             success: false,
             error: 'An error occured',
         });
-        return;
+        
     }
 };
 
@@ -624,7 +643,7 @@ exports.updatePassword = async (req, res) => {
                 success: false,
                 error:
                     'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
-                    translationKey: "invalid_password"
+                translationKey: 'invalid_password',
             });
             return;
         }

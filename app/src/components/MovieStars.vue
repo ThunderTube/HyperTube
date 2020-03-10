@@ -6,7 +6,7 @@
 import StarRating from 'vue-dynamic-star-rating'
 
 export default {
-  name: 'MovieThumbnailStars',
+  name: 'MovieStars',
   components: {
     StarRating
   },
