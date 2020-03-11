@@ -1,7 +1,7 @@
 <template>
   <Slide disableOutsideClick>
     <div class="ml-8" style="margin-left: 6px;">
-      <router-link :to="`/${$i18n.locale}/`">
+      <router-link to="/">
         <h2
           class="text-white font-bold uppercase font-serif text-2xl"
           style="margin-top: -30px; margin-left: -4px;"
@@ -10,14 +10,14 @@
         </h2>
       </router-link>
     </div>
-    <router-link :to="`/${$i18n.locale}/`">
+    <router-link to="/">
       <img
         src="/favicon.ico"
         style="width: 189px; margin-left: 12px; margin-top: -16px; border-radius: 28px;"
       />
     </router-link>
     <router-link
-      :to="{ name: 'me', lang: $i18n.locale }"
+      :to="{ name: 'me', params: { lang: $i18n.locale } }"
       class="flex items-center"
     >
       <div>
