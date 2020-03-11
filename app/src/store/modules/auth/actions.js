@@ -8,7 +8,6 @@ import {
   updateDetails,
   updatePassword
 } from '@/api/auth'
-import router from '../../../router'
 
 export const registerUser = async ({ commit }, data) => {
   try {
@@ -60,10 +59,12 @@ export const loginUser = async ({ dispatch }, data) => {
   try {
     const res = await login(data)
     if (res.data.success) {
-      // dispatch('setAuthCSRF', res.data.csrfToken)
-      // dispatch('setAuthIsLoggedIn', true)
-      // dispatch('setAuthData', res.data.user)
-      dispatch('getCurrentUser')
+      const {
+        data: { user }
+      } = res
+
+      dispatch('setAuthIsLoggedIn', true)
+      dispatch('setAuthData', user)
     }
     return res
   } catch (error) {
