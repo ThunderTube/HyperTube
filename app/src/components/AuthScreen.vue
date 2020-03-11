@@ -42,7 +42,7 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="current-password"
             />
           </div>
           <div v-else-if="register.visible">
@@ -109,7 +109,7 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="new-password"
             />
           </div>
           <div v-show="login.visible">
