@@ -22,6 +22,7 @@
           {{ $t('profile.details') }}
         </div>
         <div
+          v-if="!hidePasswordField"
           @click="selectAuthForm('password')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
           :class="{ 'bg-gray-700': formType === 'password' }"
@@ -252,7 +253,10 @@ export default {
   computed: {
     ...mapGetters({
       getAuthData: 'auth/getAuthData'
-    })
+    }),
+    hidePasswordField() {
+      return this.getAuthData.OAuthProvider !== undefined
+    }
   },
   created() {
     this.details.form.email = this.getAuthData.email
