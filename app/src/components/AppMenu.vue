@@ -82,15 +82,16 @@ export default {
 .slide.slide {
   .bm-burger-button {
     position: fixed;
-    width: 36px;
-    height: 30px;
     left: 36px;
     top: 36px;
+    width: 32px;
+    height: 28px;
+    z-index: 999;
     cursor: pointer;
   }
 
   .bm-burger-bars {
-    background-color: #373a47;
+    @apply bg-gray-600;
   }
 
   .line-style {
@@ -117,7 +118,9 @@ export default {
   }
 
   .bm-menu {
-    @apply flex items-stretch items-center;
+    @apply flex items-stretch items-center bg-gray-800;
+
+    transition: all 0.3s;
 
     height: 100%; /* 100% Full-height */
     width: 0; /* 0 width - change this with JavaScript */
