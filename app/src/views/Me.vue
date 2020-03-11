@@ -187,15 +187,9 @@ export default {
           await this.me()
         } else if (this.password.visible) {
           const res = await this.updateUserPassword(this.password.form)
-<<<<<<< HEAD
-          if (!res.data.success)
-            return this.$toast.open({
-              message: this.$t(`server.${res.data.translationKey}`),
-=======
           if (!res.data.success) {
             this.$toast.open({
-              message: this.$t(res.data.translationKey),
->>>>>>> eab699c... fix(update-details): fix WTF behaviors :joy:
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
 
