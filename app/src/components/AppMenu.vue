@@ -1,5 +1,5 @@
 <template>
-  <Slide class="slide disableOutsideClick">
+  <Slide class="slide" disableOutsideClick>
     <div class="rounded-full logo w-40 h-40">
       <router-link :to="`/${$i18n.locale}/`"></router-link>
     </div>
