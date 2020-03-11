@@ -17,7 +17,7 @@ const userSchema = new Schema({
             return [true, 'Please add an username'];
         },
         match: [
-            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{3,255}$/,
+            /[A-zÀ-ú]{2}|^[a-zA-Z0-9-]{2,255}$/,
             'Please add a valid username [at least 2 letters, number and [-] are accepted]',
         ],
     },
