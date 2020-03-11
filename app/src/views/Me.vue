@@ -31,26 +31,26 @@
         <form>
           <div v-if="details.visible">
             <app-input
-              v-model="details.form.username"
+              v-model.trim="details.form.username"
               :name="$t('profile.username')"
               :placeholder="$t('profile.username')"
               :autocomplete="$t('profile.username')"
             />
             <app-input
-              v-model="details.form.email"
+              v-model.trim="details.form.email"
               type="email"
               name="email"
               placeholder="email"
               autocomplete="email"
             />
             <app-input
-              v-model="details.form.firstName"
+              v-model.trim="details.form.firstName"
               :name="$t('profile.firstname')"
               :placeholder="$t('profile.firstname')"
               :autocomplete="$t('profile.firstname')"
             />
             <app-input
-              v-model="details.form.lastName"
+              v-model.trim="details.form.lastName"
               :name="$t('profile.lastname')"
               :placeholder="$t('profile.lastname')"
               :autocomplete="$t('profile.lastname')"
@@ -149,36 +149,65 @@ export default {
       try {
         if (this.details.visible) {
           const formData = new FormData()
-          const registrationFormFields = Object.entries(this.details.form)
-          registrationFormFields.forEach(([key, value]) => {
-            formData.append(key, value)
+
+          const updateDetailsFormFields = Object.entries(this.details.form)
+          updateDetailsFormFields.forEach(([key, value]) => {
+            if (!value) return
+
+            if (value instanceof File) {
+              formData.append(key, value)
+              return
+            }
+
+            const trimmedValue =
+              key === 'password' ? String(value) : String(value).trim()
+
+            if (trimmedValue.length === 0) return
+
+            formData.append(key, trimmedValue)
           })
+
           const res = await this.updateUserDetails(formData)
-          if (res.data.error || !res.data.success)
-            return this.$toast.open({
+          if (res.data.error || !res.data.success) {
+            this.$toast.open({
               message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
+
+            return
+          }
+
           this.formType = 'details'
           this.$toast.open({
             message: this.$t('form.account_updated'),
             type: 'success'
           })
+
+          // WTF?
           await this.me()
         } else if (this.password.visible) {
           const res = await this.updateUserPassword(this.password.form)
-          if (!res.data.success)
-            return this.$toast.open({
+          if (!res.data.success) {
+            this.$toast.open({
               message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
+
+            return
+          }
+
           this.formType = 'details'
           this.showAuthForm()
+
+          // WTF?
           await this.me()
-          return this.$toast.open({
+
+          this.$toast.open({
             message: this.$t('form.password_updated'),
             type: 'success'
           })
+
+          return
         }
       } catch (error) {
         console.log('error in submitForm ', error.message)
