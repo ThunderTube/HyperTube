@@ -7,7 +7,7 @@ const got = require('got');
 const foid = require('foid');
 const { extname, join } = require('path');
 const {
-    promises: { mkdir },
+    promises: { mkdir, unlink },
 } = require('fs');
 const send = require('@polka/send-type');
 
@@ -15,6 +15,7 @@ const { pipeline } = require('../utils');
 const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = ms('1 year');
+const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
@@ -62,8 +63,6 @@ async function isUserOAuth(provider, property, value) {
 }
 
 async function createUploadPathIfNotExist() {
-    const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
-
     await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
 
     return UPLOAD_DIRECTORY_PATH;
@@ -572,6 +571,11 @@ exports.updateDetails = async (req, res) => {
             body: { email, username, firstName, lastName },
             file: profilePicture,
         } = req;
+        const {
+            locals: {
+                user: { profilePicture: previousUserProfilePicture },
+            },
+        } = res;
 
         const availableProperties = [
             ['email', email],
@@ -585,9 +589,20 @@ exports.updateDetails = async (req, res) => {
         ];
 
         for (const [key, value] of availableProperties) {
-            // console.log(value);
-
+            console.log('key', value);
             if (value) {
+                if (key === 'profilePicture') {
+                    try {
+                        await unlink(
+                            join(
+                                `${UPLOAD_DIRECTORY_PATH}/${previousUserProfilePicture}`
+                            )
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
                 user[key] = value;
             }
         }
