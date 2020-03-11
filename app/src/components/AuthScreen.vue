@@ -357,11 +357,21 @@ export default {
       try {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
-          if (!res.data.success)
-            return this.$toast.open({
+          if (!res.data.success) {
+            this.$toast.open({
               message: this.$t(res.data.translationKey),
               type: 'error'
             })
+
+            return
+          }
+
+          this.$router
+            .replace({
+              name: 'home',
+              params: this.$route.params
+            })
+            .catch(() => {})
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
