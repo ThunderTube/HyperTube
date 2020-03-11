@@ -113,5 +113,12 @@
     "error": "Il n'y a pas de commentaires ici.",
     "write": "Écrire un commentaire...",
     "send": "Envoyer"
+  },
+
+  "oauth-errors": {
+    "username": "Ce nom d'utilisateur ne peut pas être utilisé",
+    "email": "Cet email ne peut pas être utilisé",
+
+    "redirect-button": "Se connecter autrement"
   }
 }

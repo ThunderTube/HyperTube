@@ -78,7 +78,6 @@ const router = new Router({
         {
           path: 'user/:id',
           name: 'user',
-          beforeEnter: checkIfLoggedIn,
           component: () => import('@/views/User.vue'),
           meta: {
             requiresAuth: true
@@ -87,10 +86,17 @@ const router = new Router({
         {
           path: 'me',
           name: 'me',
-          beforeEnter: checkIfLoggedIn,
           component: () => import('@/views/Me.vue'),
           meta: {
             requiresAuth: true
+          }
+        },
+        {
+          path: '/oauth-error',
+          name: 'oauth-error',
+          component: () => import('@/views/OAuthError.vue'),
+          meta: {
+            requiresNotAuth: true
           }
         }
       ]
