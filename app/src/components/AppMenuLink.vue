@@ -52,7 +52,7 @@ export default {
       attrs.props = {
         to: {
           name: this.link,
-          lang: this.$i18n.locale
+          params: { lang: this.$i18n.locale }
         },
         activeClass: 'menu-link-active'
       }
@@ -60,6 +60,10 @@ export default {
       attrs.on = {
         click: this.action
       }
+    }
+
+    attrs.domProps = {
+      title: this.text
     }
 
     return h(rootComponent, attrs, [

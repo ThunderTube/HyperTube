@@ -39,22 +39,13 @@
             </p>
 
             <router-link
-              :to="{ name: 'me', lang: $i18n.locale }"
+              :to="{ name: 'me', params: { lang: $i18n.locale } }"
               class="text-base text-gray-400"
             >
-              View profile
+              {{ $t('app-drawer.view-profile') }}
             </router-link>
           </div>
         </div>
-
-        <!-- <router-link
-        
-      >
-        
-        <div class="text-gray-500 ml-6 hover:text-gray-300">
-          
-        </div>
-      </router-link> -->
       </footer>
     </div>
   </Slide>
@@ -73,28 +64,26 @@ export default {
     LogoutIcon,
     AppMenuLink
   },
-  data() {
-    return {
-      links: [
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'auth/isLoggedIn',
+      getAuthData: 'auth/getAuthData'
+    }),
+    links() {
+      return [
         {
           link: 'home',
-          text: 'Galerie',
+          text: this.$t('app-drawer.home'),
           icon: 'film'
         },
         {
           action: this.logoutUser,
-          text: 'Déconnexion',
+          text: this.$t('app-drawer.logout'),
           color: 'red-500',
           icon: 'log-out'
         }
       ]
     }
-  },
-  computed: {
-    ...mapGetters({
-      isLoggedIn: 'auth/isLoggedIn',
-      getAuthData: 'auth/getAuthData'
-    })
   },
   methods: {
     profilePictureSrc(image) {

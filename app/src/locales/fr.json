@@ -1,4 +1,10 @@
 {
+  "app-drawer": {
+    "home": "Galerie",
+    "logout": "Se déconnecter",
+    "view-profile": "Voir mon profil"
+  },
+
   "loginscreen": {
     "login": "Se connecter",
     "register": "S'inscrire",

@@ -1,4 +1,10 @@
 {
+  "app-drawer": {
+    "home": "Gallery",
+    "logout": "Log out",
+    "view-profile": "View profile"
+  },
+
   "loginscreen": {
     "login": "Login",
     "register": "Register",
