@@ -54,9 +54,10 @@ function sanitizeUserDocument(doc) {
     return props;
 }
 
-async function isUserOAuth(provider, property, value) {
+async function isUserOAuth(provider, id) {
     const count = await User.countDocuments({
-        [property]: value,
+        // [property]: value,
+        OAuthID: id,
         OAuthProvider: provider,
     });
     return count > 0;
@@ -96,6 +97,7 @@ function createUsernameIfNotExist(username, firstName, lastName) {
 exports.OAuthcontroller = async (req, res) => {
     try {
         const { user: passportUser } = req;
+        // console.log('passportuser =', passportUser);
         const {
             locals: { csrf },
         } = res;
@@ -109,10 +111,14 @@ exports.OAuthcontroller = async (req, res) => {
         const isUserUnique = await User.isUnique({
             email: passportUser.email,
             username,
+            OAuthID: passportUser.id,
+            OAuthProvider: passportUser.provider,
         });
+        console.log('isuserunique =', isUserUnique);
 
         if (isUserUnique === true) {
             const {
+                id,
                 email,
                 lastName,
                 firstName,
@@ -146,6 +152,7 @@ exports.OAuthcontroller = async (req, res) => {
             const csrfSecret = await csrf.secret();
 
             const user = new User({
+                OAuthID: id,
                 username,
                 email,
                 lastName,
@@ -166,17 +173,22 @@ exports.OAuthcontroller = async (req, res) => {
             );
         } else {
             const duplicateField = isUserUnique;
-            const { provider } = req.user;
+            const { provider, id } = req.user;
 
             const userRegisteredUsingOAuth = await isUserOAuth(
                 provider,
-                duplicateField,
-                passportUser[duplicateField] || username
+                id
+                // duplicateField,
+                // passportUser[duplicateField] || username
             );
 
             if (userRegisteredUsingOAuth) {
-                username = req.user.username || username;
-                const user = await User.findOne({ username });
+                // username = req.user.username || username;
+                const user = await User.findOne({
+                    OAuthID: id,
+                    OAuthProvider: provider,
+                });
+                console.log('user in isUserRegisteredusingOAuth=', user);
 
                 const token = user.getSignedJwtToken();
                 const csrfToken = csrf.create(user.csrfSecret);

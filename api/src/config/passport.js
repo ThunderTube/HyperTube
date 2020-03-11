@@ -34,6 +34,7 @@ module.exports = function setupPassport(csrf) {
             },
             (accessToken, refreshToken, profile, cb) => {
                 try {
+                    // console.log('profile =', profile);
                     cb(null, profile);
                 } catch (e) {
                     cb(e, null);
@@ -53,8 +54,6 @@ module.exports = function setupPassport(csrf) {
                 try {
                     const { provider, name, id } = profile;
                     const profilePicture = `https://graph.facebook.com/${id}/picture?type=large`;
-
-                    console.log('profile picture = ', profilePicture);
 
                     cb(null, {
                         provider,
@@ -77,9 +76,16 @@ module.exports = function setupPassport(csrf) {
             },
             (accessToken, refreshToken, profile, cb) => {
                 try {
-                    const { username, displayName, photos, provider } = profile;
+                    const {
+                        id,
+                        username,
+                        displayName,
+                        photos,
+                        provider,
+                    } = profile;
 
                     cb(null, {
+                        id,
                         username,
                         firstName: displayName,
                         profilePicture: photos[0].value,
@@ -100,9 +106,10 @@ module.exports = function setupPassport(csrf) {
             },
             (accessToken, refreshToken, profile, cb) => {
                 try {
-                    const { name, photos, provider } = profile;
+                    const { id, name, photos, provider } = profile;
 
                     cb(null, {
+                        id,
                         firstName: name.givenName,
                         lastName: name.familyName,
                         profilePicture: photos[0].value,
@@ -123,8 +130,9 @@ module.exports = function setupPassport(csrf) {
             },
             (accessToken, refreshToken, profile, cb) => {
                 try {
-                    const { provider, name } = profile;
+                    const { provider, name, id } = profile;
                     cb(null, {
+                        id,
                         username: name,
                         provider,
                     });

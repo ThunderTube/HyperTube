@@ -97,6 +97,9 @@ const userSchema = new Schema({
     OAuthProvider: {
         type: String,
     },
+    OAuthID: {
+        type: String,
+    },
     passwordResets: {
         type: [{ token: String, expiresAt: Date }],
         default() {
@@ -111,18 +114,47 @@ userSchema.methods.getSignedJwtToken = function getSignedJwtToken() {
     });
 };
 
-// Verify if username and email is unique
-userSchema.statics.isUnique = async function isUnique({ email, username }) {
-    if (email !== undefined && (await this.countDocuments({ email })) !== 0) {
+// Verify if username and email are unique or if a user had an Oauth account
+userSchema.statics.isUnique = async function isUnique({
+    email,
+    username,
+    OAuthID,
+    OAuthProvider,
+}) {
+    const selectors = {
+        $or: [],
+    };
+
+    if (username) {
+        selectors['$or'].push({ username });
+    }
+
+    if (email) {
+        selectors['$or'].push({ email });
+    }
+
+    if (OAuthID !== undefined && OAuthProvider !== undefined) {
+        selectors['$or'].push({
+            OAuthID: OAuthID,
+            OAuthProvider: OAuthProvider,
+        });
+    }
+    console.log(' => ', username, email, OAuthProvider, OAuthID);
+
+    const firstMatchingUser = await this.findOne(selectors);
+    if (firstMatchingUser === null) {
+        return true;
+    }
+
+    if (firstMatchingUser.email === email && email !== undefined) {
         return 'email';
     }
-    if (
-        username !== undefined &&
-        (await this.countDocuments({ username })) !== 0
-    ) {
+
+    if (firstMatchingUser.username === username && username !== undefined) {
         return 'username';
     }
-    return true;
+
+    return 'oauth';
 };
 
 userSchema.statics.verifyJWT = function verifyJWT(rawJwt) {
