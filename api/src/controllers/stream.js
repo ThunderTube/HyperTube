@@ -174,7 +174,7 @@ async function triggerVideoDownloading(req, res) {
         return;
     }
 
-    let {subtitles} = movie;
+    let { subtitles } = movie;
     if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
         // Download subtitles
 
