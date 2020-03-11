@@ -2,10 +2,10 @@
   "loginscreen": {
     "login": "Se connecter",
     "register": "S'inscrire",
-    "id": "Identifiant",
-    "id_placeholder": "identifiant ou email",
+    "id": "Nom d'utilisateur",
+    "id_placeholder": "Nom d'utilisateur",
     "password": "Mot de passe",
-    "forgot_password": "Mot de passe oublié?",
+    "forgot_password": "Mot de passe oublié ?",
     "register_input": "S'enregistrer",
     "register_form_title": "Formulaire d'inscription"
   },
@@ -13,20 +13,21 @@
   "registerscreen": {
     "firstName": "Prénom",
     "lastName": "Nom",
+    "email": "Adresse mail",
     "id_placeholder": "Pseudonyme",
     "password": "Mot de passe"
   },
 
   "navbar": {
-    "logout": "Se déconnecter "
+    "logout": "Déconnexion"
   },
 
   "movie": {
     "play": "Lecture",
-    "watchlist_add": "Add to watchlist",
+    "watchlist_add": "À regarder plus tard",
     "error": "Il n'y a aucun film à regarder ici.",
-    "cast": "Acteur.rice.s",
-    "crew": "Equipe"
+    "cast": "Casting",
+    "crew": "Équipe"
   },
 
   "home": {
@@ -66,55 +67,59 @@
     "reality-tv": "TV Réalité",
     "talk-show": "Talk-Show",
     "science-fiction": "Science-Fiction",
-    "superhero": "SuperHero",
+    "superhero": "Super-héros",
     "anime": "Anime",
     "holiday": "Fêtes",
-    "short": "Court Metrage",
+    "short": "Court Métrage",
     "suspense": "Suspense",
     "tv-movie": "Film TV"
   },
 
   "profile": {
-    "title": "Profile de ",
-    "username": "Pseudonyme : ",
-    "firstname": "Prénom : ",
-    "lastname": "Nom : ",
+    "title": "Profil de ",
+    "username": "Pseudonyme",
+    "firstname": "Prénom",
+    "lastname": "Nom",
+    "email": "Email",
+    "username-placeholder": "Pseudo",
+    "firstname-placeholder": "Prénom",
+    "lastname-placeholder": "Nom de famille",
+    "email-placeholder": "Adresse mail",
     "details": "Mes informations",
-    "confirm": "Confirmer",
+    "confirm": "Envoyer",
 
     "favorite-language": "Votre langue préférée"
   },
 
   "form": {
-    "missing_input": "Completer le formulaire",
-    "confirm_account": "Confirmer votre compte",
-    "check_mail": "Verifier vos email",
+    "missing_input": "Complétez le formulaire",
+    "confirm_account": "Confirmez votre compte",
+    "check_mail": "Vérifiez votre boîte mail",
     "password_updated": "Mot de passe mis a jour",
-    "account_updated": "Information mis a jour",
+    "account_updated": "Informations mises à jour",
     "submit": "Envoyer"
   },
 
   "server": {
     "wrong_file_type": "Mauvais type de fichier",
     "missing_user_inputs": "Il manque des champs obligatoires",
-    "username_taken": "Le nom d'utilisateur est pris",
-    "email_taken": "Email est pris",
-    "wrong_confirmation_link": "Mauvais lien de confirmation",
-    "no_user_found": "Aucun utilisateur",
-    "invalid_password": "Mot de passe incorrecte",
-    "incorrect_id": "Identifiant incorrecte",
+    "username_taken": "Ce nom d'utilisateur est déjà pris",
+    "email_taken": "Cet email est déjà pris",
+    "wrong_confirmation_link": "Le lien de confirmation n'est pas correct",
+    "no_user_found": "Aucun utilisateur ne correspond à cette recherche",
+    "invalid_password": "Mot de passe incorrect",
+    "incorrect_id": "Identifiant incorrect",
     "unknown_account": "Compte inconnu",
     "invalid_username": "Nom d'utilisateur invalide",
     "invalid_link": "Lien invalide",
     "invalid_user": "Utilisateur invalide",
-    "duplicate_key": "Champs dupliquer",
     "wrong_email_format": "Mauvais format d'email"
   },
 
   "comments": {
-    "see": "Voir les commentaires",
+    "see": "Charger les commentaires",
     "title": "Commentaires",
-    "error": "Il n'y a pas de commentaires ici.",
+    "error": "Il n'y a pas de commentaires pour ce film",
     "write": "Écrire un commentaire...",
     "send": "Envoyer"
   },

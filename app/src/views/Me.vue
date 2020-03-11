@@ -34,28 +34,28 @@
           <div v-if="details.visible">
             <app-input
               v-model.trim="details.form.username"
+              autocomplete="username"
               :name="$t('profile.username')"
-              :placeholder="$t('profile.username')"
-              :autocomplete="$t('profile.username')"
+              :placeholder="$t('profile.username-placeholder')"
             />
             <app-input
               v-model.trim="details.form.email"
               type="email"
-              name="email"
-              placeholder="email"
-              autocomplete="email"
+              autocomplete="autocomplete"
+              :name="$t('profile.email')"
+              :placeholder="$t('profile.email-placeholder')"
             />
             <app-input
               v-model.trim="details.form.firstName"
+              autocomplete="given-name"
               :name="$t('profile.firstname')"
-              :placeholder="$t('profile.firstname')"
-              :autocomplete="$t('profile.firstname')"
+              :placeholder="$t('profile.firstname-placeholder')"
             />
             <app-input
               v-model.trim="details.form.lastName"
+              autocomplete="family-name"
               :name="$t('profile.lastname')"
-              :placeholder="$t('profile.lastname')"
-              :autocomplete="$t('profile.lastname')"
+              :placeholder="$t('profile.lastname-placeholder')"
             />
             <div class="block">
               <input

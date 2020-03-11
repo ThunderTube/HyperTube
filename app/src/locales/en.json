@@ -2,8 +2,8 @@
   "loginscreen": {
     "login": "Login",
     "register": "Register",
-    "id": "Login",
-    "id_placeholder": "login or email",
+    "id": "Username",
+    "id_placeholder": "Username",
     "password": "Password",
     "forgot_password": "Password forgot?",
     "register_input": "Register",
@@ -13,6 +13,7 @@
   "registerscreen": {
     "firstName": "First name",
     "lastName": "Last name",
+    "email": "Email",
     "id_placeholder": "Username",
     "password": "Password"
   },
@@ -43,7 +44,7 @@
     "action": "Action",
     "adventure": "Adventure",
     "animation": "Animation",
-    "sci-fi": "Sci-Fi",
+    "sci-fi": "Science-Fiction",
     "comedy": "Comedy",
     "crime": "Crime",
     "drama": "Drama",
@@ -65,8 +66,8 @@
     "news": "News",
     "reality-tv": "Reality-TV",
     "talk-show": "Talk-Show",
-    "science-fiction": "Sci-Fi",
-    "superhero": "Superhero",
+    "science-fiction": "Science-Fiction",
+    "superhero": "Superheroes",
     "anime": "Anime",
     "holiday": "Holiday",
     "short": "Short",
@@ -76,9 +77,14 @@
 
   "profile": {
     "title": "Profile of ",
-    "username": "Username : ",
-    "firstname": "Firstname : ",
-    "lastname": "Lastname : ",
+    "username": "Username",
+    "firstname": "First name",
+    "lastname": "Last name",
+    "email": "Email",
+    "username-placeholder": "Username",
+    "firstname-placeholder": "First name",
+    "lastname-placeholder": "Last name",
+    "email-placeholder": "Email",
     "details": "My Details",
     "confirm": "Submit",
 
@@ -100,21 +106,20 @@
     "username_taken": "Username taken",
     "email_taken": "Username taken",
     "wrong_confirmation_link": "Wrong confirmation link",
-    "no_user_found": "No user found",
+    "no_user_found": "No user found for this query",
     "invalid_password": "Invalid password",
     "incorrect_id": "Incorrect ID",
     "unknown_account": "Unknown account",
     "invalid_username": "Invalid username",
     "invalid_link": "Invalid link",
     "invalid_user": "Invalid user",
-    "duplicate_key": "Duplicate key",
     "wrong_email_format": "Wrong email format"
   },
 
   "comments": {
     "see": "See comments",
     "title": "Comments",
-    "error": "There is no comments here",
+    "error": "There are no comments for this movie",
     "write": "Write a comment...",
     "send": "Send"
   },

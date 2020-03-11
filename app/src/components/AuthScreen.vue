@@ -58,8 +58,8 @@
             <app-input
               v-model.trim="register.form.email"
               type="email"
-              name="email"
-              placeholder="email"
+              :name="$t('registerscreen.email')"
+              :placeholder="$t('registerscreen.email')"
               autocomplete="email"
             />
             <app-input
