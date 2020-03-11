@@ -108,8 +108,9 @@ export default {
 
       this.$router
         .replace({
-          path: this.$route.path,
-          params: { lang: locale }
+          name: this.$route.name || '404',
+          params: { ...this.$route.params, lang: locale },
+          query: this.$route.query
         })
         .catch(() => {})
       this.hideDropdown()

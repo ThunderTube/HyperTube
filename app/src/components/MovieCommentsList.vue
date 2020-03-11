@@ -20,7 +20,7 @@
           <template #prepend>✏️</template>
 
           <template #append>
-            <button type="submit" :title="t('comments.send')">🍻</button>
+            <button type="submit" :title="$t('comments.send')">🍻</button>
           </template>
         </movies-search-bar-input>
       </form>

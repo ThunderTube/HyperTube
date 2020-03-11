@@ -186,12 +186,12 @@ exports.OAuthcontroller = async (req, res) => {
             } else {
                 if (duplicateField === 'username') {
                     res.status(400).redirect(
-                        `${process.env.FRONT_URI}/?error=username`
+                        `${process.env.FRONT_URI}/oauth-error/?error=username`
                     ); // Error for username already taken
                 }
                 if (duplicateField === 'email') {
                     res.status(400).redirect(
-                        `${process.env.FRONT_URI}/?error=email`
+                        `${process.env.FRONT_URI}/oauth-error/?error=email`
                     ); // Error for email already taken
                 }
             }
@@ -613,7 +613,11 @@ exports.updateDetails = async (req, res) => {
             }
             console.log('error ', e.errors);
             const msg = e.errors;
-            send(res, 200, { success: false, error: msg, translationKey: 'wrong_email_format' });
+            send(res, 200, {
+                success: false,
+                error: msg,
+                translationKey: 'wrong_email_format',
+            });
             return;
         }
 
@@ -625,7 +629,6 @@ exports.updateDetails = async (req, res) => {
             success: false,
             error: 'An error occured',
         });
-        
     }
 };
 
