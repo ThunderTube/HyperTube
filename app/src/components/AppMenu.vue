@@ -1,7 +1,7 @@
 <template>
   <Slide class="slide disableOutsideClick">
     <div class="rounded-full logo w-40 h-40">
-      <router-link :to="`/${$i18n.locale}/`"> </router-link>
+      <router-link :to="`/${$i18n.locale}/`"></router-link>
     </div>
     <div class="ml-8" style="margin-left: 6px;">
       <router-link to="/">
@@ -10,8 +10,9 @@
         </h2>
       </router-link>
     </div>
+
     <router-link
-      :to="{ name: 'me', params: { lang: $i18n.locale } }"
+      :to="{ name: 'me', lang: $i18n.locale }"
       class="flex items-center"
     >
       <div>
@@ -28,11 +29,11 @@
 
     <button
       @click="logoutUser"
-      class="bg-teal-600 hover:bg-teal-700 hover:shadow-lg rounded px-2 py-1 text-white mb-10"
-      style="border: 2px solid #319795; color: #319795; background-color: #2d3648;
+      class="hover:shadow-lg rounded-full px-2 py-1 text-red mb-10 mt-auto"
+      style="border: 2px solid red; color: red;
     "
     >
-      <span style="color: #319795;">{{ $t('navbar.logout') }}</span>
+      <span class="mr-2" style="color: red;">{{ $t('navbar.logout') }}</span>
       <logout-icon class="w-8" />
     </button>
   </Slide>
