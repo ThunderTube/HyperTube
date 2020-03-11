@@ -1,15 +1,15 @@
+const crypto = require('crypto');
+const { join } = require('path');
+const {
+    promises: { mkdir, unlink, writeFile },
+} = require('fs');
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
 const foid = require('foid');
-const { extname, join } = require('path');
-const {
-    promises: { mkdir, unlink },
-} = require('fs');
 const send = require('@polka/send-type');
+const FileType = require('file-type');
 
 const { pipeline } = require('../utils');
 const { User, validPasswordRegex, hashPassword } = require('../models/User');
@@ -96,8 +96,9 @@ function createUsernameIfNotExist(username, firstName, lastName) {
 exports.OAuthcontroller = async (req, res) => {
     try {
         const { user: passportUser } = req;
-
-        const { csrf } = res.locals;
+        const {
+            locals: { csrf },
+        } = res;
 
         let username = createUsernameIfNotExist(
             passportUser.username,
@@ -122,17 +123,21 @@ exports.OAuthcontroller = async (req, res) => {
 
             let filename;
             if (profilePicture !== undefined) {
-                const fileExtension = extname(profilePicture).slice(1);
+                const pictureBuffer = await got(profilePicture).buffer();
+
+                const { ext: fileExtension } = await FileType.fromBuffer(
+                    pictureBuffer
+                );
                 filename = `${uuid()}.${fileExtension}`;
 
                 await createUploadPathIfNotExist();
 
-                // We fetch the file and save it locally
-                await pipeline(
-                    got.stream(profilePicture),
-                    fs.createWriteStream(
-                        join(__dirname, '../../public/uploads', filename)
-                    )
+                await writeFile(
+                    join(UPLOAD_DIRECTORY_PATH, filename),
+                    pictureBuffer,
+                    {
+                        encoding: null,
+                    }
                 );
             } else {
                 filename = 'default-user.jpg';
