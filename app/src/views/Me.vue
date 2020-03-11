@@ -17,12 +17,14 @@
         <div
           @click="selectAuthForm('details')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'details' }"
         >
           {{ $t('profile.details') }}
         </div>
         <div
           @click="selectAuthForm('password')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'password' }"
         >
           {{ $t('loginscreen.password') }}
         </div>

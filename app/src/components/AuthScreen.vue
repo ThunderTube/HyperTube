@@ -18,12 +18,14 @@
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'login' }"
         >
           {{ $t('loginscreen.login') }}
         </div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'register' }"
         >
           {{ $t('loginscreen.register') }}
         </div>
