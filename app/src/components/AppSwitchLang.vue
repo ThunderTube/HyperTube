@@ -66,6 +66,9 @@
 
 <script>
 import { mixin as clickaway } from 'vue-clickaway'
+
+import { I18N_LOCAL_STORAGE_KEY } from '@/constants.js'
+
 export default {
   mixins: [clickaway],
   data() {
@@ -104,6 +107,8 @@ export default {
       this.$refs.dropdown.children[this.focusedIndex].children[0].focus()
     },
     setLocale(locale) {
+      localStorage.setItem(I18N_LOCAL_STORAGE_KEY, locale)
+
       this.$i18n.locale = locale
 
       this.$router

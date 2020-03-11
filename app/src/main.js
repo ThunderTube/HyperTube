@@ -1,33 +1,19 @@
 import Vue from 'vue'
-import VueTailwind from 'vue-tailwind'
-
-import App from './App.vue'
-
-import router from './router'
-import store from './store'
-import './assets/styles/app.css'
-import i18n from './i18n'
 import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/index.css'
 
-Vue.use(VueToast)
+import './assets/styles/app.css'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import i18n from './i18n'
+import { I18N_LOCAL_STORAGE_KEY } from '@/constants.js'
 
-Vue.use(VueTailwind)
+Vue.use(VueToast)
 
 Vue.config.productionTip = false
 
-router.beforeEach((to, from, next) => {
-  let language = to.params.lang
-  if (!language) {
-    language = 'en'
-  }
-
-  i18n.locale = language
-  next()
-})
-
-// Turn off all console log message
-// console.log = function(){}
+i18n.locale = localStorage.getItem(I18N_LOCAL_STORAGE_KEY) || 'en'
 
 new Vue({
   store,
