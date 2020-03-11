@@ -358,8 +358,8 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success) {
-            this.$toast.open({
-              message: this.$t(res.data.translationKey),
+            return this.$toast.open({
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
 
@@ -381,7 +381,7 @@ export default {
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           this.formType = 'login'
@@ -396,7 +396,7 @@ export default {
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           console.log(res)
@@ -410,7 +410,7 @@ export default {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           localStorage.removeItem('resetPasswordToken')
