@@ -152,6 +152,7 @@ async function getVideoInformations(req, res) {
 async function triggerVideoDownloading(req, res) {
     const {
         params: { id, resolution },
+        user: { favoriteLanguage = 'en' },
     } = req;
     if (!(id && resolution)) {
         send(res, 400);
@@ -271,7 +272,9 @@ async function triggerVideoDownloading(req, res) {
     });
 
     send(res, 200, {
-        subtitles,
+        subtitles: subtitles.filter(
+            ({ langcode }) => langcode === 'en' || langcode === favoriteLanguage
+        ),
         status: TORRENT_STATUSES.LOADING,
         mime: MIME.get(file.extension),
         willNeedTranscoding: streamWillNeedTranscoding,

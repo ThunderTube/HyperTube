@@ -80,7 +80,9 @@
     "firstname": "Firstname : ",
     "lastname": "Lastname : ",
     "details": "My Details",
-    "confirm": "Submit"
+    "confirm": "Submit",
+
+    "favorite-language": "Your favorite language"
   },
 
   "form": {

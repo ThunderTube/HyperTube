@@ -18,12 +18,14 @@
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'login' }"
         >
           {{ $t('loginscreen.login') }}
         </div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'register' }"
         >
           {{ $t('loginscreen.register') }}
         </div>
@@ -42,7 +44,7 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="current-password"
             />
           </div>
           <div v-else-if="register.visible">
@@ -109,7 +111,7 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="new-password"
             />
           </div>
           <div v-show="login.visible">

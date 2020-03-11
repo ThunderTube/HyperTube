@@ -573,7 +573,7 @@ exports.updateDetails = async (req, res) => {
     try {
         const {
             user,
-            body: { email, username, firstName, lastName },
+            body: { email, username, firstName, lastName, favoriteLanguage },
             file: profilePicture,
         } = req;
         const {
@@ -587,6 +587,7 @@ exports.updateDetails = async (req, res) => {
             ['username', username],
             ['firstName', firstName],
             ['lastName', lastName],
+            ['favoriteLanguage', favoriteLanguage],
             [
                 'profilePicture',
                 profilePicture ? profilePicture.path : profilePicture,
