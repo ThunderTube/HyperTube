@@ -18,12 +18,14 @@
         <div
           @click="selectAuthForm('login')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'login' }"
         >
           {{ $t('loginscreen.login') }}
         </div>
         <div
           @click="selectAuthForm('register')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          :class="{ 'bg-gray-700': formType === 'register' }"
         >
           {{ $t('loginscreen.register') }}
         </div>
@@ -32,7 +34,7 @@
         <form>
           <div v-if="login.visible">
             <app-input
-              v-model="login.form.username"
+              v-model.trim="login.form.username"
               :name="$t('loginscreen.id')"
               :placeholder="$t('loginscreen.id_placeholder')"
               autocomplete="username"
@@ -42,32 +44,32 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="current-password"
             />
           </div>
           <div v-else-if="register.visible">
             <!-- {{ $t('loginscreen.register_form_title') }} -->
             <app-input
-              v-model="register.form.username"
+              v-model.trim="register.form.username"
               :name="$t('registerscreen.id_placeholder')"
               :placeholder="$t('registerscreen.id_placeholder')"
               autocomplete="username"
             />
             <app-input
-              v-model="register.form.email"
+              v-model.trim="register.form.email"
               type="email"
               name="email"
               placeholder="email"
               autocomplete="email"
             />
             <app-input
-              v-model="register.form.firstName"
+              v-model.trim="register.form.firstName"
               :name="$t('registerscreen.firstName')"
               :placeholder="$t('registerscreen.firstName')"
               autocomplete="given-name"
             />
             <app-input
-              v-model="register.form.lastName"
+              v-model.trim="register.form.lastName"
               :name="$t('registerscreen.lastName')"
               :placeholder="$t('registerscreen.lastName')"
               autocomplete="family-name"
@@ -92,14 +94,14 @@
           </div>
           <div v-else-if="passwordForgot.visible">
             <app-input
-              v-model="passwordForgot.form.username"
+              v-model.trim="passwordForgot.form.username"
               :name="$t('loginscreen.forgot_password')"
               :placeholder="$t('loginscreen.id')"
             />
           </div>
           <div v-else-if="resetPassword">
             <app-input
-              v-model="passwordReset.form.username"
+              v-model.trim="passwordReset.form.username"
               :name="$t('loginscreen.id')"
               :placeholder="$t('loginscreen.id_placeholder')"
               autocomplete="username"
@@ -109,7 +111,7 @@
               :name="$t('loginscreen.password')"
               type="password"
               placeholder="********"
-              autocomplete="password"
+              autocomplete="new-password"
             />
           </div>
           <div v-show="login.visible">
@@ -357,11 +359,21 @@ export default {
       try {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
-          if (!res.data.success)
+          if (!res.data.success) {
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
+
+            return
+          }
+
+          this.$router
+            .replace({
+              name: 'home',
+              params: this.$route.params
+            })
+            .catch(() => {})
         } else if (this.register.visible) {
           const formData = new FormData()
           const registrationFormFields = Object.entries(this.register.form)
@@ -371,7 +383,7 @@ export default {
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           this.formType = 'login'
@@ -386,7 +398,7 @@ export default {
           const res = await this.forgotUserPassword(this.passwordForgot.form)
           if (!res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           console.log(res)
@@ -400,7 +412,7 @@ export default {
           const res = await this.userPasswordReset(this.passwordReset.form)
           if (!res.data.success)
             return this.$toast.open({
-              message: this.$t(res.data.translationKey),
+              message: this.$t(`server.${res.data.translationKey}`),
               type: 'error'
             })
           localStorage.removeItem('resetPasswordToken')

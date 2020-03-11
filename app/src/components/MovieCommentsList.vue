@@ -20,7 +20,7 @@
           <template #prepend>✏️</template>
 
           <template #append>
-            <button type="submit" :title="t('comments.send')">🍻</button>
+            <button type="submit" :title="$t('comments.send')">🍻</button>
           </template>
         </movies-search-bar-input>
       </form>
@@ -87,10 +87,12 @@ export default {
       }
     },
     sendComment() {
+      const COMMENT_MAX_LENGTH = 255
+
       const comment = this.newComment
       this.newComment = ''
 
-      if (comment.length === 0) return
+      if (comment.length === 0 || comment.length >= COMMENT_MAX_LENGTH) return
 
       const {
         _id: userId,

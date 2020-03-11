@@ -1,21 +1,16 @@
 <template>
-  <Slide disableOutsideClick>
+  <Slide class="slide" disableOutsideClick>
+    <div class="rounded-full logo w-40 h-40">
+      <router-link :to="`/${$i18n.locale}/`"></router-link>
+    </div>
     <div class="ml-8" style="margin-left: 6px;">
-      <router-link :to="`/${$i18n.locale}/`">
-        <h2
-          class="text-white font-bold uppercase font-serif text-2xl"
-          style="margin-top: -30px; margin-left: -4px;"
-        >
+      <router-link to="/">
+        <h2 class="text-white uppercase text-bold title text-2xl">
           Thundertube
         </h2>
       </router-link>
     </div>
-    <router-link :to="`/${$i18n.locale}/`">
-      <img
-        src="/favicon.ico"
-        style="width: 189px; margin-left: 12px; margin-top: -16px; border-radius: 28px;"
-      />
-    </router-link>
+
     <router-link
       :to="{ name: 'me', lang: $i18n.locale }"
       class="flex items-center"
@@ -34,12 +29,11 @@
 
     <button
       @click="logoutUser"
-      class="bg-teal-600 hover:bg-teal-700 hover:shadow-lg rounded px-2 py-1 text-white mb-10"
-      style="display: flex; margin: auto; border: 2px solid #319795; color: #319795; background-color: #2d3648;      bottom: 20px;
-    margin-left: 52px;   position: absolute;
+      class="hover:shadow-lg rounded-full px-2 py-1 text-red mb-10 mt-auto"
+      style="border: 2px solid red; color: red;
     "
     >
-      <span style="margin-right: 8px;  color: #319795;">{{ $t('navbar.logout') }}</span>
+      <span class="mr-2" style="color: red;">{{ $t('navbar.logout') }}</span>
       <logout-icon class="w-8" />
     </button>
   </Slide>
@@ -70,10 +64,107 @@ export default {
     ...mapActions({
       logoutCurrentUser: 'auth/logoutCurrentUser'
     }),
-    logoutUser() {
-      this.logoutCurrentUser()
-      this.$router.push('/')
+    async logoutUser() {
+      const { locale } = this.$i18n
+
+      await this.logoutCurrentUser()
+
+      this.$router
+        .replace({ name: 'auth', params: { lang: locale } })
+        .catch(() => {})
     }
   }
 }
 </script>
+
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Bebas+Neue&display=swap');
+.slide.slide {
+  .bm-burger-button {
+    position: fixed;
+    width: 36px;
+    height: 30px;
+    left: 36px;
+    top: 36px;
+    cursor: pointer;
+  }
+
+  .bm-burger-bars {
+    background-color: #373a47;
+  }
+
+  .line-style {
+    position: absolute;
+    height: 20%;
+    left: 0;
+    right: 0;
+  }
+
+  .cross-style {
+    position: absolute;
+    top: 12px;
+    right: 2px;
+    cursor: pointer;
+  }
+
+  .bm-cross {
+    background: #bdc3c7;
+  }
+
+  .bm-cross-button {
+    height: 24px;
+    width: 24px;
+  }
+
+  .bm-menu {
+    @apply flex items-stretch items-center;
+
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Stay on top */
+    top: 0;
+    left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /*0.5 second transition effect to slide in the sidenav*/
+  }
+
+  .bm-overlay {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .bm-item-list {
+    @apply h-full flex flex-col items-stretch items-center;
+
+    color: #b8b7ad;
+    margin-left: 10%;
+    font-size: 20px;
+  }
+
+  .bm-last {
+    @apply justify-between;
+  }
+
+  .bm-item-list > * {
+    display: flex;
+    text-decoration: none;
+    padding: 0.7em;
+  }
+
+  .bm-item-list > * > span {
+    margin-left: 10px;
+    font-weight: 700;
+    color: white;
+  }
+}
+
+.logo {
+  background-image: url('/favicon.ico');
+  background-size: cover;
+}
+
+.title {
+  font-family: 'Bebas Neue', cursive;
+}
+</style>

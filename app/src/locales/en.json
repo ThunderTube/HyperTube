@@ -18,7 +18,7 @@
   },
 
   "navbar": {
-    "logout": "Logout"
+    "logout": "Logout "
   },
 
   "movie": {
@@ -80,7 +80,9 @@
     "firstname": "Firstname : ",
     "lastname": "Lastname : ",
     "details": "My Details",
-    "confirm": "Submit"
+    "confirm": "Submit",
+
+    "favorite-language": "Your favorite language"
   },
 
   "form": {
@@ -92,20 +94,22 @@
     "submit": "Submit"
   },
 
-  "wrong_file_type": "Wrong file type",
-  "missing_user_inputs": "Missing required inputs",
-  "username_taken": "Username taken",
-  "email_taken": "Username taken",
-  "wrong_confirmation_link": "Wrong confirmation link",
-  "no_user_found": "No user found",
-  "invalid_password": "Invalid password",
-  "incorrect_id": "Incorrect ID",
-  "unknown_account": "Unknown account",
-  "invalid_username": "Invalid username",
-  "invalid_link": "Invalid link",
-  "invalid_user": "Invalid user",
-  "duplicate_key": "Duplicate key",
-  "email_unexistant": "Wrong email format",
+  "server": {
+    "wrong_file_type": "Wrong file type",
+    "missing_user_inputs": "Missing required inputs",
+    "username_taken": "Username taken",
+    "email_taken": "Username taken",
+    "wrong_confirmation_link": "Wrong confirmation link",
+    "no_user_found": "No user found",
+    "invalid_password": "Invalid password",
+    "incorrect_id": "Incorrect ID",
+    "unknown_account": "Unknown account",
+    "invalid_username": "Invalid username",
+    "invalid_link": "Invalid link",
+    "invalid_user": "Invalid user",
+    "duplicate_key": "Duplicate key",
+    "wrong_email_format": "Wrong email format"
+  },
 
   "comments": {
     "see": "See comments",
@@ -113,5 +117,12 @@
     "error": "There is no comments here",
     "write": "Write a comment...",
     "send": "Send"
+  },
+
+  "oauth-errors": {
+    "username": "This username can not be used",
+    "email": "This email adress can not be used",
+
+    "redirect-button": "Connect in another way"
   }
 }

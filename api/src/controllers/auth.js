@@ -1,20 +1,21 @@
+const crypto = require('crypto');
+const { join } = require('path');
+const {
+    promises: { mkdir, unlink, writeFile },
+} = require('fs');
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const fs = require('fs');
 const ms = require('ms');
 const got = require('got');
 const foid = require('foid');
-const { extname, join } = require('path');
-const {
-    promises: { mkdir },
-} = require('fs');
 const send = require('@polka/send-type');
+const FileType = require('file-type');
 
 const { pipeline } = require('../utils');
 const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = ms('1 year');
+const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
 
 function createRegisterMail(req, username, uuid, id) {
     return `Bonjour ${username}, pour activer votre compte
@@ -62,8 +63,6 @@ async function isUserOAuth(provider, property, value) {
 }
 
 async function createUploadPathIfNotExist() {
-    const UPLOAD_DIRECTORY_PATH = join(__dirname, '../..', 'public/uploads');
-
     await mkdir(UPLOAD_DIRECTORY_PATH, { recursive: true });
 
     return UPLOAD_DIRECTORY_PATH;
@@ -97,8 +96,9 @@ function createUsernameIfNotExist(username, firstName, lastName) {
 exports.OAuthcontroller = async (req, res) => {
     try {
         const { user: passportUser } = req;
-
-        const { csrf } = res.locals;
+        const {
+            locals: { csrf },
+        } = res;
 
         let username = createUsernameIfNotExist(
             passportUser.username,
@@ -123,17 +123,21 @@ exports.OAuthcontroller = async (req, res) => {
 
             let filename;
             if (profilePicture !== undefined) {
-                const fileExtension = extname(profilePicture).slice(1);
+                const pictureBuffer = await got(profilePicture).buffer();
+
+                const { ext: fileExtension } = await FileType.fromBuffer(
+                    pictureBuffer
+                );
                 filename = `${uuid()}.${fileExtension}`;
 
                 await createUploadPathIfNotExist();
 
-                // We fetch the file and save it locally
-                await pipeline(
-                    got.stream(profilePicture),
-                    fs.createWriteStream(
-                        join(__dirname, '../../public/uploads', filename)
-                    )
+                await writeFile(
+                    join(UPLOAD_DIRECTORY_PATH, filename),
+                    pictureBuffer,
+                    {
+                        encoding: null,
+                    }
                 );
             } else {
                 filename = 'default-user.jpg';
@@ -186,12 +190,12 @@ exports.OAuthcontroller = async (req, res) => {
             } else {
                 if (duplicateField === 'username') {
                     res.status(400).redirect(
-                        `${process.env.FRONT_URI}/?error=username`
+                        `${process.env.FRONT_URI}/oauth-error/?error=username`
                     ); // Error for username already taken
                 }
                 if (duplicateField === 'email') {
                     res.status(400).redirect(
-                        `${process.env.FRONT_URI}/?error=email`
+                        `${process.env.FRONT_URI}/oauth-error/?error=email`
                     ); // Error for email already taken
                 }
             }
@@ -569,15 +573,21 @@ exports.updateDetails = async (req, res) => {
     try {
         const {
             user,
-            body: { email, username, firstName, lastName },
+            body: { email, username, firstName, lastName, favoriteLanguage },
             file: profilePicture,
         } = req;
+        const {
+            locals: {
+                user: { profilePicture: previousUserProfilePicture },
+            },
+        } = res;
 
         const availableProperties = [
             ['email', email],
             ['username', username],
             ['firstName', firstName],
             ['lastName', lastName],
+            ['favoriteLanguage', favoriteLanguage],
             [
                 'profilePicture',
                 profilePicture ? profilePicture.path : profilePicture,
@@ -585,9 +595,20 @@ exports.updateDetails = async (req, res) => {
         ];
 
         for (const [key, value] of availableProperties) {
-            // console.log(value);
-
+            console.log('key', value);
             if (value) {
+                if (key === 'profilePicture') {
+                    try {
+                        await unlink(
+                            join(
+                                `${UPLOAD_DIRECTORY_PATH}/${previousUserProfilePicture}`
+                            )
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
                 user[key] = value;
             }
         }
@@ -613,7 +634,11 @@ exports.updateDetails = async (req, res) => {
             }
             console.log('error ', e.errors);
             const msg = e.errors;
-            send(res, 200, { success: false, error: msg, translationKey: 'wrong_email_format' });
+            send(res, 200, {
+                success: false,
+                error: msg,
+                translationKey: 'wrong_email_format',
+            });
             return;
         }
 
@@ -625,7 +650,6 @@ exports.updateDetails = async (req, res) => {
             success: false,
             error: 'An error occured',
         });
-        
     }
 };
 

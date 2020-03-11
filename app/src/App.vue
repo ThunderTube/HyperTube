@@ -1,49 +1,50 @@
 <template>
-  <div id="app" class="bg-gray-900 min-h-screen">
-    <div v-if="loading" class="flex justify-center items-center min-h-screen">
-      <atom-spinner :animation-duration="500" :size="120" color="#ffffff" />
-    </div>
-
-    <template v-else>
-      <auth-screen
-        @clear="resetPassword = false"
-        @auth:login="isLoggedIn = true"
-        :is-logged-in="isLoggedIn || $route.name === '404'"
-        :reset-password="resetPassword"
-        :guid="guid"
-      />
-      <template v-if="isLoggedIn">
-        <app-menu />
-      </template>
-
-      <app-switch-lang />
-
+  <div class="bg-gray-900 min-h-screen">
+    <transition
+      enter-active-class="transition duration-150 transition-opacity"
+      leave-active-class="transition duration-150 transition-opacity"
+      enter-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
       <div
-        v-if="isLoggedIn || (!isLoggedIn && $route.name === '404')"
-        class="w-full overflow-hidden"
+        v-if="loading"
+        class="absolute w-full h-full flex justify-center items-center bg-gray-900 z-50"
       >
-        <transition name="page" mode="out-in">
-          <router-view />
-        </transition>
+        <atom-spinner :animation-duration="500" :size="120" color="#ffffff" />
       </div>
+    </transition>
+
+    <template v-if="isLoggedIn">
+      <app-menu />
     </template>
+
+    <app-switch-lang />
+
+    <div class="w-full overflow-hidden">
+      <transition name="page" mode="out-in">
+        <router-view />
+      </transition>
+    </div>
     <app-footer />
   </div>
 </template>
 
 <script>
 import { AtomSpinner } from 'epic-spinners'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, createNamespacedHelpers } from 'vuex'
 import AppMenu from '@/components/AppMenu'
-import AuthScreen from '@/components/AuthScreen'
+
 import AppSwitchLang from '@/components/AppSwitchLang.vue'
 import { getWithExpiry } from './utils/localStorage'
 import AppFooter from '@/components/AppFooter'
 
+const { mapState } = createNamespacedHelpers('auth')
+
 export default {
   components: {
     AppMenu,
-    AuthScreen,
     AtomSpinner,
     AppSwitchLang,
     AppFooter
@@ -51,43 +52,16 @@ export default {
   data() {
     return {
       loading: true,
-      hasCookie: false,
       guid: '',
       resetPassword: false
     }
   },
-  async created() {
-    try {
-      const token = getWithExpiry('resetPasswordToken')
-      if (token) {
-        this.resetPassword = true
-        this.guid = token
-      }
-      const res = await this.me()
-      if (!res) {
-        // this.$toast.open({ message: 'Please login or register an account', type: 'info'})
-        return (this.loading = false)
-      }
-      if (res.data.success) this.hasCookie = true
-
-      setTimeout(() => {
-        this.loading = false
-      }, 1000)
-    } catch (error) {
-      console.log('app created ', error.message)
-    }
+  created() {
+    setTimeout(() => {
+      this.loading = false
+    }, 1000)
   },
-  methods: {
-    ...mapActions({
-      me: 'auth/getCurrentUser'
-    })
-  },
-  computed: {
-    ...mapGetters({
-      isLoggedIn: 'auth/isLoggedIn',
-      getAuthData: 'auth/getAuthData'
-    })
-  }
+  computed: mapState(['isLoggedIn'])
 }
 </script>
 
