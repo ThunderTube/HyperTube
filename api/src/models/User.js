@@ -78,6 +78,7 @@ const userSchema = new Schema({
     favoriteLanguage: {
         type: String,
         enum: ['en', 'fr'],
+        default: 'en',
     },
     profilePicture: {
         type: String,
