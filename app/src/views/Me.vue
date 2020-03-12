@@ -255,7 +255,7 @@ export default {
       getAuthData: 'auth/getAuthData'
     }),
     hidePasswordField() {
-      return this.getAuthData.OAuthProvider !== undefined
+      return this.getAuthData?.OAuthProvider !== undefined
     }
   },
   created() {
