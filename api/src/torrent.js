@@ -17,10 +17,12 @@ function lastContinuousElement(elements) {
     return last;
 }
 
+const MOVIES_DIRECTORY = join(__dirname, '../movies');
+
 class Torrent {
     constructor(magnetUrn) {
         this.engine = torrentStream(magnetUrn, {
-            path: join(__dirname, '../movies'),
+            path: MOVIES_DIRECTORY,
             trackers: [
                 'udp://open.demonii.com:1337/announce',
                 'udp://tracker.openbittorrent.com:80',
@@ -129,4 +131,5 @@ class Torrent {
     }
 }
 
-module.exports.Torrent = Torrent;
+exports.Torrent = Torrent;
+exports.MOVIES_DIRECTORY = MOVIES_DIRECTORY;

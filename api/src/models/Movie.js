@@ -1,5 +1,13 @@
-const mongoose = require('mongoose');
+const { promisify } = require('util');
+const { join } = require('path');
 
+const mongoose = require('mongoose');
+const ms = require('ms');
+const rimraf = require('rimraf');
+
+const rmRf = promisify(rimraf);
+
+const { MOVIES_DIRECTORY } = require('../torrent');
 const { MOVIES_ORIGINS } = require('../get-movies');
 
 const TORRENT_STATUSES = {
@@ -9,7 +17,7 @@ const TORRENT_STATUSES = {
     NONE: 'NONE',
 };
 
-// console.log('last, first', mongoose.Types.ObjectId, mongoose.ObjectId);
+const DELETE_MOVIES_EACH = ms('30 days');
 
 const movieSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
@@ -85,7 +93,24 @@ const movieSchema = new mongoose.Schema({
         },
     ],
     watchedBy: {
-        type: [mongoose.Types.ObjectId],
+        type: [
+            {
+                userId: {
+                    type: mongoose.Types.ObjectId,
+                    required: true,
+                },
+                watchedOn: {
+                    type: Date,
+                    default() {
+                        return new Date();
+                    },
+                },
+                resolution: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
         default() {
             return [];
         },
@@ -231,8 +256,86 @@ movieSchema.statics.finishedUploading = function finishedUploading({
 movieSchema.statics.addUserToWatchedBySet = function addUserToWatchedBySet({
     imdbId,
     userId,
+    resolution,
 }) {
-    return this.updateOne({ imdbId }, { $addToSet: { watchedBy: userId } });
+    return this.updateOne(
+        { imdbId },
+        {
+            $push: {
+                watchedBy: { userId, resolution },
+            },
+        }
+    );
+};
+
+async function getMoviesToDelete() {
+    const today = new Date();
+    const limitDate = new Date(today.getTime() - DELETE_MOVIES_EACH);
+
+    const moviesToDelete = await this.find(
+        {
+            'watchedBy.watchedOn': {
+                $lt: limitDate,
+            },
+        },
+        {
+            _id: 1,
+            torrents: 1,
+        }
+    );
+
+    return moviesToDelete.map(movie => movie.toObject());
+}
+
+movieSchema.statics.deleteOldMovies = async function deleteOldMovies() {
+    const oldMovies = await getMoviesToDelete.apply(this);
+    const downloadedOldTorrents = oldMovies
+        .map(({ _id, torrents }) =>
+            torrents
+                .map(torrent => ({ _id, ...torrent }))
+                .filter(
+                    ({ status, fsPath }) =>
+                        (status === TORRENT_STATUSES.LOADED ||
+                            status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) &&
+                        typeof fsPath === 'string' &&
+                        fsPath.length > 0
+                )
+        )
+        .flat();
+
+    if (downloadedOldTorrents.length === 0) {
+        return;
+    }
+
+    const updateDocumentsPromise = this.updateMany(
+        {
+            $or: downloadedOldTorrents.map(({ _id, resolution }) => ({
+                _id,
+                torrents: {
+                    $elemMatch: {
+                        resolution,
+                    },
+                },
+            })),
+        },
+        {
+            $unset: {
+                'torrents.$[].fsPath': '',
+            },
+            $set: {
+                'torrents.$[].status': 'NONE',
+            },
+        }
+    );
+
+    const removeMoviesDirectoriesPromises = downloadedOldTorrents
+        .map(({ fsPath }) => join(MOVIES_DIRECTORY, fsPath))
+        .map(movieFilePath => rmRf(movieFilePath));
+
+    return Promise.all([
+        updateDocumentsPromise,
+        ...removeMoviesDirectoriesPromises,
+    ]);
 };
 
 exports.TORRENT_STATUSES = TORRENT_STATUSES;
