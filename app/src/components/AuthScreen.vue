@@ -267,8 +267,6 @@ export default {
       else if (this.formType === 'reset-password') o = this.passwordReset.form
       else return
 
-      console.log('o =', o)
-
       let empty = false
 
       Object.keys(o).forEach((key, index) => {

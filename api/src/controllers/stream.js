@@ -150,135 +150,142 @@ async function getVideoInformations(req, res) {
 }
 
 async function triggerVideoDownloading(req, res) {
-    const {
-        params: { id, resolution },
-        user: { favoriteLanguage = 'en' },
-    } = req;
-    if (!(id && resolution)) {
-        send(res, 400);
-        return;
-    }
-
-    const movie = await Movie.findOne(
-        {
-            imdbId: id,
-            torrents: { $elemMatch: { resolution } },
-        },
-        {
-            torrents: { $elemMatch: { resolution } },
+    try {
+        const {
+            params: { id, resolution },
+            user: { favoriteLanguage = 'en' },
+        } = req;
+        if (!(id && resolution)) {
+            send(res, 400);
+            return;
         }
-    );
-    if (!movie) {
-        send(res, 404, {
-            error: 'Could not find this movie',
-        });
-        return;
-    }
 
-    let { subtitles } = movie;
-    if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
-        // Download subtitles
-
-        console.log('save subtitles');
-
-        subtitles = await downloadSubtitles(id);
-
-        await Movie.updateOne(
-            { imdbId: id },
+        const movie = await Movie.findOne(
             {
-                $push: {
-                    subtitles,
-                },
+                imdbId: id,
+                torrents: { $elemMatch: { resolution } },
+            },
+            {
+                torrents: { $elemMatch: { resolution } },
             }
         );
-    }
+        if (!movie) {
+            send(res, 404, {
+                error: 'Could not find this movie',
+            });
+            return;
+        }
 
-    const {
-        torrents: [torrent],
-    } = movie;
-    const { fsPath, status } = torrent;
-    const fsPathExtension = fsPath && extname(fsPath).slice(1);
-    const mime =
-        fsPath &&
-        MIME.get(fsPathExtension === 'mp4' ? fsPathExtension : 'webm');
-    const willNeedTranscoding =
-        fsPath && !['mp4', 'webm'].includes(fsPathExtension);
+        let { subtitles } = movie;
+        if (!(Array.isArray(movie.subtitles) && movie.subtitles.length === 0)) {
+            // Download subtitles
 
-    if (fsPath !== undefined && status === TORRENT_STATUSES.LOADED) {
-        // Load the movie from the local file system.
-        send(res, 200, {
-            status: TORRENT_STATUSES.LOADED,
-            mime,
-            willNeedTranscoding,
+            console.log('save subtitles');
+
+            subtitles = await downloadSubtitles(id);
+
+            await Movie.updateOne(
+                { imdbId: id },
+                {
+                    $push: {
+                        subtitles,
+                    },
+                }
+            );
+        }
+
+        const {
+            torrents: [torrent],
+        } = movie;
+        const { fsPath, status } = torrent;
+        const fsPathExtension = fsPath && extname(fsPath).slice(1);
+        const mime =
+            fsPath &&
+            MIME.get(fsPathExtension === 'mp4' ? fsPathExtension : 'webm');
+        const willNeedTranscoding =
+            fsPath && !['mp4', 'webm'].includes(fsPathExtension);
+
+        if (fsPath !== undefined && status === TORRENT_STATUSES.LOADED) {
+            // Load the movie from the local file system.
+            send(res, 200, {
+                status: TORRENT_STATUSES.LOADED,
+                mime,
+                willNeedTranscoding,
+            });
+            return;
+        }
+        if (status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) {
+            // Can launch polling.
+            send(res, 200, {
+                status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED,
+                mime,
+                willNeedTranscoding,
+            });
+            return;
+        }
+        if (status === TORRENT_STATUSES.LOADING) {
+            send(res, 200, {
+                status: TORRENT_STATUSES.LOADING,
+                willNeedTranscoding,
+            });
+            return;
+        }
+
+        await Movie.lock({
+            imdbId: id,
+            resolution,
         });
-        return;
-    }
-    if (status === TORRENT_STATUSES.FIRST_CHUNKS_LOADED) {
-        // Can launch polling.
-        send(res, 200, {
-            status: TORRENT_STATUSES.FIRST_CHUNKS_LOADED,
-            mime,
-            willNeedTranscoding,
+
+        // Lock the torrent.
+        // Start downloading the movie.
+
+        const {
+            emitter,
+            file,
+            willNeedTranscoding: streamWillNeedTranscoding,
+        } = await streamTorrent(torrent);
+
+        STATE.files.set(toFilesMapKey(id, resolution), file);
+
+        emitter.on('launch', async () => {
+            console.log('launch streaming');
+
+            try {
+                await Movie.loadedFirstChunks({
+                    imdbId: id,
+                    resolution,
+                    path: file.path,
+                });
+            } catch (e) {
+                console.error(e);
+            }
         });
-        return;
-    }
-    if (status === TORRENT_STATUSES.LOADING) {
+
+        emitter.on('end', async () => {
+            try {
+                await Movie.finishedUploading({
+                    imdbId: id,
+                    resolution,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
         send(res, 200, {
+            subtitles: subtitles.filter(
+                ({ langcode }) =>
+                    langcode === 'en' || langcode === favoriteLanguage
+            ),
             status: TORRENT_STATUSES.LOADING,
-            willNeedTranscoding,
+            mime: MIME.get(file.extension),
+            willNeedTranscoding: streamWillNeedTranscoding,
         });
-        return;
+    } catch (e) {
+        send(res, 500, {
+            error: 'An error occured, please retry',
+        });
     }
-
-    await Movie.lock({
-        imdbId: id,
-        resolution,
-    });
-
-    // Lock the torrent.
-    // Start downloading the movie.
-
-    const {
-        emitter,
-        file,
-        willNeedTranscoding: streamWillNeedTranscoding,
-    } = await streamTorrent(torrent);
-
-    STATE.files.set(toFilesMapKey(id, resolution), file);
-
-    emitter.on('launch', async () => {
-        console.log('launch streaming');
-
-        try {
-            await Movie.loadedFirstChunks({
-                imdbId: id,
-                resolution,
-                path: file.path,
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    });
-
-    emitter.on('end', async () => {
-        try {
-            await Movie.finishedUploading({
-                imdbId: id,
-                resolution,
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    });
-
-    send(res, 200, {
-        subtitles: subtitles.filter(
-            ({ langcode }) => langcode === 'en' || langcode === favoriteLanguage
-        ),
-        status: TORRENT_STATUSES.LOADING,
-        mime: MIME.get(file.extension),
-        willNeedTranscoding: streamWillNeedTranscoding,
-    });
 }
 
 async function getDownloadingStatus(req, res) {
@@ -439,15 +446,21 @@ async function commentMovie(req, res) {
 }
 
 async function getCommentsWritersInformations(writers) {
-    const writersWithInformations = await Promise.all(
-        writers.map(userId => User.findById(userId))
-    );
+    try {
+        const writersWithInformations = await Promise.all(
+            writers.map(userId => User.findById(userId))
+        );
 
-    return new Map(
-        writersWithInformations
-            .filter(Boolean)
-            .map(writer => [writer._id.toString(), writer])
-    );
+        return new Map(
+            writersWithInformations
+                .filter(Boolean)
+                .map(writer => [writer._id.toString(), writer])
+        );
+    } catch (e) {
+        send(res, 500, {
+            error: 'An error occured while trying to get the user',
+        });
+    }
 }
 
 async function getMovieComments(req, res) {

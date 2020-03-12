@@ -333,29 +333,31 @@ exports.register = async (req, res) => {
     }
 };
 
-// @desc Register user with 42 strategy
-// @route GET /api/v1/auth/42
-// @access Public
-exports.fortyTwoRegister = async (req, res) => {
-    res.json({ success: true });
-};
-
 // @desc Get confirm user
 // @route GET /api/v1/auth/confirmAccount/:uuid/:id
 // @access Public
 exports.confirmAccount = async (req, res) => {
-    const user = await User.findById(req.params.id);
+    try {
+        const user = await User.findById(req.params.id);
 
-    if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
-        user.isConfirmed = true;
-        user.confirmationLinkUuid = null;
-        await user.save();
-        res.json({ success: true });
-    } else {
-        res.status(200).json({
+        if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
+            user.isConfirmed = true;
+            user.confirmationLinkUuid = null;
+            await user.save();
+            res.json({ success: true });
+        } else {
+            res.status(200).json({
+                success: false,
+                error: 'Wrong confirmation link',
+                translationKey: 'wrong_confirmation_link',
+            });
+        }
+    } catch (e) {
+        console.error(e);
+
+        send(res, 500, {
             success: false,
-            error: 'Wrong confirmation link',
-            translationKey: 'wrong_confirmation_link',
+            error: 'An error occured, please retry',
         });
     }
 };
@@ -584,22 +586,31 @@ exports.resetPassword = async (req, res) => {
 };
 
 function isLinkValid(user, token) {
-    const hashedGuid = hashSha512ToHex(token);
-    let index = 0;
+    try {
+        const hashedGuid = hashSha512ToHex(token);
+        let index = 0;
 
-    for (const { token, expiresAt } of user.passwordResets) {
-        if (expiresAt.getTime() < new Date().getTime()) continue;
+        for (const { token, expiresAt } of user.passwordResets) {
+            if (expiresAt.getTime() < new Date().getTime()) continue;
 
-        if (token === hashedGuid) {
-            // A link can be used only once
-            user.passwordResets.splice(index, 1);
-            return true;
+            if (token === hashedGuid) {
+                // A link can be used only once
+                user.passwordResets.splice(index, 1);
+                return true;
+            }
+
+            index++;
         }
 
-        index++;
-    }
+        return false;
+    } catch (e) {
+        console.error(e);
 
-    return false;
+        send(res, 500, {
+            success: false,
+            error: 'An error occured, please retry',
+        });
+    }
 }
 
 // @desc Update user's details
@@ -719,7 +730,7 @@ exports.updatePassword = async (req, res) => {
                 success: false,
                 error:
                     'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
-                translationKey: 'invalid_password',
+                translationKey: 'password',
             });
             return;
         }
