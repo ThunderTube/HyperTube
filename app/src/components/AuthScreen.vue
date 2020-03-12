@@ -58,8 +58,8 @@
             <app-input
               v-model.trim="register.form.email"
               type="email"
-              name="email"
-              placeholder="email"
+              :name="$t('registerscreen.email')"
+              :placeholder="$t('registerscreen.email')"
               autocomplete="email"
             />
             <app-input
@@ -136,31 +136,38 @@
           >
             <div>
               <a
-                class="bg-gray-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/42"
-                >42</a
               >
+                <forty-two-icon class="w-8 h-8 fill-current" />
+              </a>
             </div>
             <div>
               <a
-                class="bg-blue-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/google"
-                >Google</a
               >
+                <google-icon class="w-8 h-8 fill-current" />
+              </a>
             </div>
             <div>
               <a
-                class="bg-green-900 text-white px-4 py-2 rounded  hover:shadow-lg"
+                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/github"
-                >Github</a
               >
+                <github-icon
+                  class="w-8 h-8 fill-current"
+                  style="color: #1e2327"
+                />
+              </a>
             </div>
             <div>
               <a
-                class="bg-orange-600 text-white px-4 py-2 rounded  hover:shadow-lg"
+                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/reddit"
-                >Reddit</a
               >
+                <reddit-icon class="w-8 h-8 fill-current" />
+              </a>
             </div>
           </div>
           <div class="flex justify-end py-2">
@@ -180,14 +187,23 @@
 <script>
 import axios from 'axios'
 import { mapActions } from 'vuex'
-import AppInput from '../components/AppInput'
-import AppSwitchLang from '@/components/AppSwitchLang.vue'
+
+import AppInput from './AppInput.vue'
+import AppSwitchLang from './AppSwitchLang.vue'
+import FortyTwoIcon from './FortyTwoIcon.vue'
+import GoogleIcon from './GoogleIcon.vue'
+import GithubIcon from './GithubIcon.vue'
+import RedditIcon from './RedditIcon.vue'
 
 export default {
   name: 'AuthScreen',
   components: {
     AppInput,
-    AppSwitchLang
+    AppSwitchLang,
+    FortyTwoIcon,
+    GoogleIcon,
+    GithubIcon,
+    RedditIcon
   },
   props: {
     isLoggedIn: {

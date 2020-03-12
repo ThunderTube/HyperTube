@@ -22,6 +22,7 @@
           {{ $t('profile.details') }}
         </div>
         <div
+          v-if="!hidePasswordField"
           @click="selectAuthForm('password')"
           class="cursor-pointer w-1/2 h-full flex items-center justify-center"
           :class="{ 'bg-gray-700': formType === 'password' }"
@@ -34,28 +35,28 @@
           <div v-if="details.visible">
             <app-input
               v-model.trim="details.form.username"
+              autocomplete="username"
               :name="$t('profile.username')"
-              :placeholder="$t('profile.username')"
-              :autocomplete="$t('profile.username')"
+              :placeholder="$t('profile.username-placeholder')"
             />
             <app-input
               v-model.trim="details.form.email"
               type="email"
-              name="email"
-              placeholder="email"
-              autocomplete="email"
+              autocomplete="autocomplete"
+              :name="$t('profile.email')"
+              :placeholder="$t('profile.email-placeholder')"
             />
             <app-input
               v-model.trim="details.form.firstName"
+              autocomplete="given-name"
               :name="$t('profile.firstname')"
-              :placeholder="$t('profile.firstname')"
-              :autocomplete="$t('profile.firstname')"
+              :placeholder="$t('profile.firstname-placeholder')"
             />
             <app-input
               v-model.trim="details.form.lastName"
+              autocomplete="family-name"
               :name="$t('profile.lastname')"
-              :placeholder="$t('profile.lastname')"
-              :autocomplete="$t('profile.lastname')"
+              :placeholder="$t('profile.lastname-placeholder')"
             />
             <div class="block">
               <input
@@ -252,7 +253,10 @@ export default {
   computed: {
     ...mapGetters({
       getAuthData: 'auth/getAuthData'
-    })
+    }),
+    hidePasswordField() {
+      return this.getAuthData?.OAuthProvider !== undefined
+    }
   },
   created() {
     this.details.form.email = this.getAuthData.email
