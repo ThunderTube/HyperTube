@@ -262,9 +262,12 @@ export default {
     processFormInput() {
       let o
       if (this.formType === 'login') o = this.login.form
-      if (this.formType === 'register') o = this.register.form
-      if (this.formType === 'password-forgot') o = this.passwordReset.form
-      if (this.formType === 'password-reset') o = this.passwordForgot.form
+      else if (this.formType === 'register') o = this.register.form
+      else if (this.formType === 'password-forgot') o = this.passwordForgot.form
+      else if (this.formType === 'reset-password') o = this.passwordReset.form
+      else return
+
+      console.log('o =', o)
 
       let empty = false
 

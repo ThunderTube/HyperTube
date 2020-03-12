@@ -545,8 +545,9 @@ exports.resetPassword = async (req, res) => {
         if (!validPasswordRegex.test(password)) {
             res.status(200).json({
                 success: false,
-                error: 'Invalid password',
-                translationKey: 'invalid_password',
+                error:
+                    'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
+                translationKey: 'password',
             });
             return;
         }

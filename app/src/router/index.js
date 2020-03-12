@@ -164,12 +164,17 @@ async function requireHash(to, _from, next) {
 async function requireToken(to, _from, next) {
   try {
     const guid = to.params.guid
-    if (!guid) return next('/')
+    if (!guid) {
+      next('/')
+
+      return
+    }
+
     setWithExpiry('resetPasswordToken', guid, 600000)
     next('/')
   } catch (e) {
     console.log('confirmation error catch ', e)
-    return next('/')
+    next('/')
   }
 }
 

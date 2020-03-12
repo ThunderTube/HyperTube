@@ -120,6 +120,7 @@
     "invalid_link": "Invalid link",
     "invalid_user": "Invalid user",
     "wrong_email_format": "Wrong email format",
+    "password": "This password is not valid [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]",
 
     "update-details": {
       "username": "This username can not be used",
