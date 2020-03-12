@@ -3,10 +3,10 @@
     <transition name="fade" mode="out-in">
       <loading-spinner v-if="loading" />
 
-      <movie-viewer v-else-if="movie !== null" v-bind="movie" />
+      <movie-viewer v-else-if="movie" v-bind="movie" />
 
       <movie-viewer-no-data v-else>
-        {{ $t('movie.error') }}
+        {{ $t('movie.no-data') }}
       </movie-viewer-no-data>
     </transition>
   </div>

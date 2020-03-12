@@ -31,9 +31,14 @@
   "movie": {
     "play": "Lecture",
     "watchlist_add": "À regarder plus tard",
-    "error": "Il n'y a aucun film à regarder ici.",
     "cast": "Casting",
-    "crew": "Équipe"
+    "crew": "Équipe",
+
+    "no-data": "Il n'y a aucun film à regarder ici."
+  },
+
+  "user": {
+    "no-data": "Cet utilisateur n'existe pas"
   },
 
   "home": {
