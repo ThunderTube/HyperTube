@@ -56,7 +56,7 @@
             @keydown.tab.exact="hideDropdown"
             @keydown.esc.exact="hideDropdown"
           >
-            <span class="ml-2">French</span>
+            <span class="ml-2">Français</span>
           </a>
         </li>
       </ul>
