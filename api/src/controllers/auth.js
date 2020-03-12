@@ -237,6 +237,15 @@ exports.register = async (req, res) => {
             return;
         }
 
+        if (!validPasswordRegex.test(password)) {
+            send(res, 200, {
+                success: false,
+                translationKey: 'password',
+            });
+
+            return;
+        }
+
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
 
@@ -253,12 +262,24 @@ exports.register = async (req, res) => {
 
         try {
             await user.validate();
+            console.log('password');
         } catch (e) {
-            const msg = Object.values(e.errors).map(val => val.message);
+            let msg = Object.values(e.errors).map(val => val.message);
+            msg = msg.toString();
+
+            if (msg.includes('email')) {
+                msg = 'email';
+            } else if (msg.includes('username')) {
+                msg = 'username';
+            } else if (msg.includes('first name')) {
+                msg = 'first_name';
+            } else if (msg.includes('last name')) {
+                msg = 'last_name';
+            }
             send(res, 200, {
                 success: false,
                 error: msg,
-                translationKey: 'missing_user_inputs',
+                translationKey: msg,
             });
             return;
         }
@@ -312,29 +333,31 @@ exports.register = async (req, res) => {
     }
 };
 
-// @desc Register user with 42 strategy
-// @route GET /api/v1/auth/42
-// @access Public
-exports.fortyTwoRegister = async (req, res) => {
-    res.json({ success: true });
-};
-
 // @desc Get confirm user
 // @route GET /api/v1/auth/confirmAccount/:uuid/:id
 // @access Public
 exports.confirmAccount = async (req, res) => {
-    const user = await User.findById(req.params.id);
+    try {
+        const user = await User.findById(req.params.id);
 
-    if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
-        user.isConfirmed = true;
-        user.confirmationLinkUuid = null;
-        await user.save();
-        res.json({ success: true });
-    } else {
-        res.status(200).json({
+        if (user !== null && user.confirmationLinkUuid === req.params.uuid) {
+            user.isConfirmed = true;
+            user.confirmationLinkUuid = null;
+            await user.save();
+            res.json({ success: true });
+        } else {
+            res.status(200).json({
+                success: false,
+                error: 'Wrong confirmation link',
+                translationKey: 'wrong_confirmation_link',
+            });
+        }
+    } catch (e) {
+        console.error(e);
+
+        send(res, 500, {
             success: false,
-            error: 'Wrong confirmation link',
-            translationKey: 'wrong_confirmation_link',
+            error: 'An error occured, please retry',
         });
     }
 };
@@ -355,6 +378,8 @@ exports.login = async (req, res) => {
             OAuthProvider: undefined,
         });
         if (user === null) {
+            console.log('user === null');
+
             // Could not find a user with this username
             res.status(200).json({
                 success: false,
@@ -522,8 +547,9 @@ exports.resetPassword = async (req, res) => {
         if (!validPasswordRegex.test(password)) {
             res.status(200).json({
                 success: false,
-                error: 'Invalid password',
-                translationKey: 'invalid_password',
+                error:
+                    'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
+                translationKey: 'password',
             });
             return;
         }
@@ -633,23 +659,39 @@ exports.updateDetails = async (req, res) => {
 
             // There is a duplicate field
             if (e.code === 11000) {
-                const duplicateField = e.errmsg.includes('username')
-                    ? 'username'
-                    : 'email';
+                const errorMessage = e.errmsg;
+
+                let duplicateField = 'generic';
+                if (errorMessage.includes('username')) {
+                    duplicateField = 'username';
+                } else if (errorMessage.includes('email')) {
+                    duplicateField = 'email';
+                }
 
                 send(res, 200, {
                     success: false,
                     error: `This ${duplicateField} is already used`,
-                    translationKey: 'duplicate_field',
+                    translationKey: duplicateField,
                 });
                 return;
             }
-            console.log('error ', e.errors);
-            const msg = e.errors;
+
+            console.log('e =', { ...e });
+            const errorMessage = e.message;
+
+            let errorField = 'generic';
+            if (errorMessage.includes('email')) {
+                errorField = 'wrong-email-format';
+            } else if (errorMessage.includes('firstName')) {
+                errorField = 'first-name-format';
+            } else if (errorMessage.includes('lastName')) {
+                errorField = 'last-name-format';
+            }
+
             send(res, 200, {
                 success: false,
-                error: msg,
-                translationKey: 'wrong_email_format',
+                error: errorMessage,
+                translationKey: errorField,
             });
             return;
         }
@@ -679,7 +721,7 @@ exports.updatePassword = async (req, res) => {
                 success: false,
                 error:
                     'Please add a valid password [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]',
-                translationKey: 'invalid_password',
+                translationKey: 'password',
             });
             return;
         }

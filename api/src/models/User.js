@@ -42,7 +42,7 @@ const userSchema = new Schema({
             if (this.OAuthProvider) {
                 return false;
             }
-            return [true, 'Please add a last name [at least 2 letters]'];
+            return [true, 'Please add a last name [at least 1 letters]'];
         },
         match: [
             /^[A-zÀ-ú- ]{1,255}$/,
