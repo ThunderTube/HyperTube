@@ -25,7 +25,7 @@
         </div>
       </div>
 
-      <footer class="border-t border-gray-500">
+      <footer class="bg-gray-700">
         <div class="flex items-center py-5 px-3 h-full">
           <img
             :src="profilePictureSrc(getAuthData.profilePicture)"
