@@ -3,19 +3,27 @@
     <transition name="fade" mode="out-in">
       <loading-spinner v-if="loading" />
 
-      <user-profile v-else-if="user !== null" v-bind="user" />
+      <user-profile v-else-if="user" v-bind="user" />
+
+      <no-data v-else>
+        {{ $t('user.no-data') }}
+      </no-data>
     </transition>
   </div>
 </template>
 
 <script>
 import axios from '@/api/axios'
+
 import UserProfile from '@/components/UserProfile.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import NoData from '@/components/NoData.vue'
+
 export default {
   components: {
     UserProfile,
-    LoadingSpinner
+    LoadingSpinner,
+    NoData
   },
   data() {
     return {

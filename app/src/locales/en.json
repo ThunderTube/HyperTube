@@ -31,9 +31,14 @@
   "movie": {
     "play": "Play",
     "watchlist_add": "Add to watchlist",
-    "error": "There is no movie to watch here.",
     "cast": "Cast",
-    "crew": "Crew"
+    "crew": "Crew",
+
+    "no-data": "There is no movie to watch here."
+  },
+
+  "user": {
+    "no-data": "This user does not exist"
   },
 
   "home": {
