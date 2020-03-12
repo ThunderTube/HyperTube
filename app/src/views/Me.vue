@@ -206,7 +206,9 @@ export default {
           const res = await this.updateUserDetails(formData)
           if (res.data.error || !res.data.success) {
             this.$toast.open({
-              message: this.$t(`server.${res.data.translationKey}`),
+              message: this.$t(
+                `server.update-details.${res.data.translationKey}`
+              ),
               type: 'error'
             })
 

@@ -98,10 +98,10 @@
   },
 
   "form": {
-    "missing_input": "Complétez le formulaire",
+    "missing_input": "Veuillez remplir tous les champs requis",
     "confirm_account": "Confirmez votre compte",
     "check_mail": "Vérifiez votre boîte mail",
-    "password_updated": "Mot de passe mis a jour",
+    "password_updated": "Mot de passe à jour",
     "account_updated": "Informations mises à jour",
     "submit": "Envoyer"
   },
@@ -109,8 +109,8 @@
   "server": {
     "wrong_file_type": "Mauvais type de fichier",
     "missing_user_inputs": "Il manque des champs obligatoires",
-    "username_taken": "Ce nom d'utilisateur est déjà pris",
-    "email_taken": "Cet email est déjà pris",
+    "username_taken": "Ce nom d'utilisateur ne peut pas être utilisé",
+    "email_taken": "Cet email ne peut pas être utilisé",
     "wrong_confirmation_link": "Le lien de confirmation n'est pas correct",
     "no_user_found": "Aucun utilisateur ne correspond à cette recherche",
     "invalid_password": "Mot de passe incorrect",
@@ -119,7 +119,28 @@
     "invalid_username": "Nom d'utilisateur invalide",
     "invalid_link": "Lien invalide",
     "invalid_user": "Utilisateur invalide",
-    "wrong_email_format": "Mauvais format d'email"
+    "wrong_email_format": "Mauvais format d'email",
+
+    "update-details": {
+      "username": "Ce nom d'utilisateur ne peut pas être utilisé",
+      "email": "Cette adresse mail ne peut pas être utilisée",
+      "wrong-email-format": "Cette adresse mail n'est pas correcte",
+      "first-name-format": "Ce prénom ne peut être utilisé",
+      "last-name-format": "Ce nom ne peut être utilisé",
+      "generic": "Une erreur s'est produite",
+
+      "wrong_file_type": "Mauvais type de fichier"
+    },
+    "register": {
+      "email": "L'adresse mail est invalide",
+      "username": "Le nom d'utilisateur est invalide [au moins 2 lettres, chiffres et [-] acceptés]",
+      "first_name": "Le prénom est invalide [au moins 1 lettre]",
+      "last_name": "Le nom de famille est invalide [au moins 1 lettre]",
+      "password": "Le mot de passe est invalide [au moins 8 caractères dont 1 majuscule, 1 minuscule et 1 chiffre]",
+      "wrong_file_type": "Mauvais type de fichier",
+      "username_taken": "Ce nom d'utilisateur ne peut pas être utilisé",
+      "email_taken": "Cette adresse mail ne peut pas être utilisée"
+    }
   },
 
   "comments": {

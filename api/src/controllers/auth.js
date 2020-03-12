@@ -237,6 +237,15 @@ exports.register = async (req, res) => {
             return;
         }
 
+        if (!validPasswordRegex.test(password)) {
+            send(res, 200, {
+                success: false,
+                translationKey: 'password',
+            });
+
+            return;
+        }
+
         const confirmationLinkUuid = uuid();
         const csrfSecret = await csrf.secret();
 
@@ -253,12 +262,24 @@ exports.register = async (req, res) => {
 
         try {
             await user.validate();
+            console.log('password');
         } catch (e) {
-            const msg = Object.values(e.errors).map(val => val.message);
+            let msg = Object.values(e.errors).map(val => val.message);
+            msg = msg.toString();
+
+            if (msg.includes('email')) {
+                msg = 'email';
+            } else if (msg.includes('username')) {
+                msg = 'username';
+            } else if (msg.includes('first name')) {
+                msg = 'first_name';
+            } else if (msg.includes('last name')) {
+                msg = 'last_name';
+            }
             send(res, 200, {
                 success: false,
                 error: msg,
-                translationKey: 'missing_user_inputs',
+                translationKey: msg,
             });
             return;
         }
@@ -633,23 +654,39 @@ exports.updateDetails = async (req, res) => {
 
             // There is a duplicate field
             if (e.code === 11000) {
-                const duplicateField = e.errmsg.includes('username')
-                    ? 'username'
-                    : 'email';
+                const errorMessage = e.errmsg;
+
+                let duplicateField = 'generic';
+                if (errorMessage.includes('username')) {
+                    duplicateField = 'username';
+                } else if (errorMessage.includes('email')) {
+                    duplicateField = 'email';
+                }
 
                 send(res, 200, {
                     success: false,
                     error: `This ${duplicateField} is already used`,
-                    translationKey: 'duplicate_field',
+                    translationKey: duplicateField,
                 });
                 return;
             }
-            console.log('error ', e.errors);
-            const msg = e.errors;
+
+            console.log('e =', { ...e });
+            const errorMessage = e.message;
+
+            let errorField = 'generic';
+            if (errorMessage.includes('email')) {
+                errorField = 'wrong-email-format';
+            } else if (errorMessage.includes('firstName')) {
+                errorField = 'first-name-format';
+            } else if (errorMessage.includes('lastName')) {
+                errorField = 'last-name-format';
+            }
+
             send(res, 200, {
                 success: false,
-                error: msg,
-                translationKey: 'wrong_email_format',
+                error: errorMessage,
+                translationKey: errorField,
             });
             return;
         }

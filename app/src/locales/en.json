@@ -98,7 +98,7 @@
   },
 
   "form": {
-    "missing_input": "Check your inputs",
+    "missing_input": "Please fill all required fields",
     "confirm_account": "Confirm your account",
     "check_mail": "Check your mail",
     "password_updated": "Password updated",
@@ -119,7 +119,29 @@
     "invalid_username": "Invalid username",
     "invalid_link": "Invalid link",
     "invalid_user": "Invalid user",
-    "wrong_email_format": "Wrong email format"
+    "wrong_email_format": "Wrong email format",
+
+    "update-details": {
+      "username": "This username can not be used",
+      "email": "This email can not be used",
+      "wrong-email-format": "This email is not correct",
+      "first-name-format": "This first name can not be used",
+      "last-name-format": "This last name can not be used",
+      "generic": "An error occured",
+
+      "wrong_file_type": "Wrong file type"
+    },
+
+    "register": {
+      "email": "This email is not valid",
+      "username": "This username is not valid [at least 2 letters, number and [-] are accepted]",
+      "first_name": "This first name is not valid [at least 1 letter]",
+      "last_name": "This last name is not valid [at least 1 letter]",
+      "password": "This password is not valid [at least 8 characters, 1 uppercase, 1 lowercase and 1 number]",
+      "wrong_file_type": "Wrong file type",
+      "username_taken": "This username can not be used",
+      "email_taken": "This email can not be used"
+    }
   },
 
   "comments": {

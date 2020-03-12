@@ -265,19 +265,26 @@ export default {
       if (this.formType === 'register') o = this.register.form
       if (this.formType === 'password-forgot') o = this.passwordReset.form
       if (this.formType === 'password-reset') o = this.passwordForgot.form
+
       let empty = false
+
       Object.keys(o).forEach((key, index) => {
         if (o[key] === '' || o[key] === null || o[key] === undefined) {
           // error[key] = true;
           empty = true
         }
       })
-      if (empty)
+
+      if (empty) {
         this.$toast.open({
           message: this.$t('form.missing_input'),
           type: 'error'
         })
-      if (!empty) this.submitForm()
+
+        return
+      }
+
+      this.submitForm()
     },
     handleFileUpload() {
       this.register.form.profilePicture = this.$refs.file.files[0]
@@ -376,8 +383,8 @@ export default {
         if (this.login.visible) {
           const res = await this.loginUser(this.login.form)
           if (!res.data.success) {
-            return this.$toast.open({
-              message: this.$t(`server.${res.data.translationKey}`),
+            this.$toast.open({
+              message: this.$t(`server.login.${res.data.translationKey}`),
               type: 'error'
             })
 
@@ -399,7 +406,7 @@ export default {
           const res = await this.registerUser(formData)
           if (res.data.error || !res.data.success)
             return this.$toast.open({
-              message: this.$t(`server.${res.data.translationKey}`),
+              message: this.$t(`server.register.${res.data.translationKey}`),
               type: 'error'
             })
           this.formType = 'login'
