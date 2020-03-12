@@ -140,6 +140,10 @@
       "wrong_file_type": "Mauvais type de fichier",
       "username_taken": "Ce nom d'utilisateur ne peut pas être utilisé",
       "email_taken": "Cette adresse mail ne peut pas être utilisée"
+    },
+    "login": {
+      "no_user_found": "Aucun utilisateur ne correspond à cette recherche",
+      "invalid_password": "Mot de passe incorrect"
     }
   },
 

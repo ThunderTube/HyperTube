@@ -141,6 +141,10 @@
       "wrong_file_type": "Wrong file type",
       "username_taken": "This username can not be used",
       "email_taken": "This email can not be used"
+    },
+    "login": {
+      "no_user_found": "No user found for this query",
+      "invalid_password": "Invalid password"
     }
   },
 

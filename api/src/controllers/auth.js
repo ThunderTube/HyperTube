@@ -376,6 +376,8 @@ exports.login = async (req, res) => {
             OAuthProvider: undefined,
         });
         if (user === null) {
+            console.log('user === null');
+
             // Could not find a user with this username
             res.status(200).json({
                 success: false,
