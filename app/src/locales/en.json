@@ -34,7 +34,7 @@
     "cast": "Cast",
     "crew": "Crew",
 
-    "error": "There is no movie to watch here."
+    "no-data": "There is no movie to watch here."
   },
 
   "user": {
