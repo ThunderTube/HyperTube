@@ -446,21 +446,15 @@ async function commentMovie(req, res) {
 }
 
 async function getCommentsWritersInformations(writers) {
-    try {
-        const writersWithInformations = await Promise.all(
-            writers.map(userId => User.findById(userId))
-        );
+    const writersWithInformations = await Promise.all(
+        writers.map(userId => User.findById(userId))
+    );
 
-        return new Map(
-            writersWithInformations
-                .filter(Boolean)
-                .map(writer => [writer._id.toString(), writer])
-        );
-    } catch (e) {
-        send(res, 500, {
-            error: 'An error occured while trying to get the user',
-        });
-    }
+    return new Map(
+        writersWithInformations
+            .filter(Boolean)
+            .map(writer => [writer._id.toString(), writer])
+    );
 }
 
 async function getMovieComments(req, res) {

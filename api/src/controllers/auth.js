@@ -586,31 +586,22 @@ exports.resetPassword = async (req, res) => {
 };
 
 function isLinkValid(user, token) {
-    try {
-        const hashedGuid = hashSha512ToHex(token);
-        let index = 0;
+    const hashedGuid = hashSha512ToHex(token);
+    let index = 0;
 
-        for (const { token, expiresAt } of user.passwordResets) {
-            if (expiresAt.getTime() < new Date().getTime()) continue;
+    for (const { token, expiresAt } of user.passwordResets) {
+        if (expiresAt.getTime() < new Date().getTime()) continue;
 
-            if (token === hashedGuid) {
-                // A link can be used only once
-                user.passwordResets.splice(index, 1);
-                return true;
-            }
-
-            index++;
+        if (token === hashedGuid) {
+            // A link can be used only once
+            user.passwordResets.splice(index, 1);
+            return true;
         }
 
-        return false;
-    } catch (e) {
-        console.error(e);
-
-        send(res, 500, {
-            success: false,
-            error: 'An error occured, please retry',
-        });
+        index++;
     }
+
+    return false;
 }
 
 // @desc Update user's details
