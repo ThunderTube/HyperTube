@@ -6,10 +6,11 @@ const { join } = require('path');
 const cors = require('cors');
 const passport = require('passport');
 const Tokens = require('csrf');
+const ms = require('ms');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
-const { User } = require('./models/User');
+const { Movie } = require('./models/Movie');
 const setupPassport = require('./config/passport');
 const router = require('./routes');
 
@@ -66,6 +67,12 @@ async function app() {
                 `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
             );
         });
+
+    setInterval(() => {
+        Movie.deleteOldMovies()
+            .then(console.log)
+            .catch(console.error);
+    }, ms('1 hour'));
 }
 
 app().catch(console.error);

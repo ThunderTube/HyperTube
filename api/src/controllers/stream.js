@@ -35,7 +35,9 @@ function hasWatchedTheMovie({ _id }) {
         return {
             ...props,
             id: _id,
-            watched: watchedBy.some(objectId => objectId.toString() === userId),
+            watched: watchedBy.some(
+                ({ userId: watcherId }) => watcherId.toString() === userId
+            ),
         };
     };
 }
@@ -346,6 +348,7 @@ async function getVideoStream(req, res) {
         await Movie.addUserToWatchedBySet({
             imdbId: id,
             userId: user._id,
+            resolution,
         });
 
         await file.pipe(res);
