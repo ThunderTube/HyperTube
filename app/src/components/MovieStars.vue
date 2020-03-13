@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import StarRating from 'vue-dynamic-star-rating'
+import StarRating from './StarRating.vue'
 
 export default {
   name: 'MovieStars',
