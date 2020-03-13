@@ -169,7 +169,9 @@ exports.OAuthcontroller = async (req, res) => {
             const token = user.getSignedJwtToken();
             console.log(csrfToken);
             createCookie(res, token).redirect(
-                `http://localhost:3000/?token=${encodeURIComponent(csrfToken)}`
+                `${process.env.FRONT_URI}/?token=${encodeURIComponent(
+                    csrfToken
+                )}`
             );
         } else {
             const duplicateField = isUserUnique;
@@ -195,7 +197,7 @@ exports.OAuthcontroller = async (req, res) => {
 
                 console.log(csrfToken);
                 createCookie(res, token).redirect(
-                    `http://localhost:3000/?token=${encodeURIComponent(
+                    `${process.env.FRONT_URI}/?token=${encodeURIComponent(
                         csrfToken
                     )}`
                 );
