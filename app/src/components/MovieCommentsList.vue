@@ -1,5 +1,5 @@
 <template>
-  <ul v-if="show" class="flex flex-wrap justify-center items-center">
+  <ul v-if="show" class="flex flex-wrap justify-center items-center mb-6">
     <loading-spinner v-if="loading" class="my-3" />
 
     <template v-else>
