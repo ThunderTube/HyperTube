@@ -18,8 +18,8 @@
       style="grid-column: 1 / -1"
       class="py-5"
     >
-      <div class="h-full w-full flex justify-center items-center">
-        <loading-spinner class="absolute" />
+      <div class="h-full w-full flex justify-center items-center relative">
+        <loading-spinner />
       </div>
     </infinite-scroll>
   </section>
