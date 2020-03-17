@@ -7,11 +7,10 @@ const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
 const ms = require('ms');
 const got = require('got');
-const foid = require('foid');
+const uid = require('uid');
 const send = require('@polka/send-type');
 const FileType = require('file-type');
 
-const { pipeline } = require('../utils');
 const { User, validPasswordRegex, hashPassword } = require('../models/User');
 
 const YEAR_IN_MILLISECONDES = ms('1 year');
@@ -72,7 +71,7 @@ async function createUploadPathIfNotExist() {
 function createUsernameIfNotExist(username, firstName, lastName) {
     if (username === undefined) {
         if (firstName === undefined && lastName === undefined) {
-            return foid(4);
+            return uid(4);
         }
 
         if (firstName === undefined || lastName === undefined) {
