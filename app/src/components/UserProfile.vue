@@ -1,7 +1,7 @@
 <template>
   <div class="md:flex items-center bg-white rounded-lg p-6">
     <img
-      class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6"
+      class="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6 object-cover"
       :src="profilePictureSrc"
     />
     <div class="text-center md:text-left">
