@@ -17,6 +17,12 @@ const securityRouter = require('./routes/security');
 
 async function app() {
     // Connect to database
+    console.log(
+        'process.env.MONGO_URI',
+        process.env.MONGO_URI,
+        'port =',
+        process.env.PORT
+    );
     await connectDB();
 
     const server = express();

@@ -1,0 +1,14 @@
+FROM node:lts-alpine
+
+RUN apk update && apk add ffmpeg && rm -rf /var/cache/apk/*
+
+WORKDIR /api
+
+COPY ./package.json .
+COPY ./yarn.lock .
+
+RUN yarn install --frozen-lockfile
+
+EXPOSE 8080
+
+CMD ["yarn", "run", "server"]

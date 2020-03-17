@@ -1,0 +1,20 @@
+FROM node:lts-alpine
+
+RUN npm install --global sirv-cli
+
+WORKDIR /app
+
+COPY package.json .
+COPY yarn.lock .
+
+RUN yarn install --frozen-lockfile
+
+# If we don't copy the files we can't build them ;-)
+COPY . .
+
+# Build static files
+RUN yarn build
+
+EXPOSE 3000
+
+CMD ["sirv", "start", "dist", "--port", "3000", "--single"]
