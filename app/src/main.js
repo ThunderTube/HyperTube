@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueToast from 'vue-toast-notification'
-import 'vue-toast-notification/dist/index.css'
+import 'vue-toast-notification/dist/theme-default.css'
 
 import './assets/styles/app.css'
 import App from './App.vue'
