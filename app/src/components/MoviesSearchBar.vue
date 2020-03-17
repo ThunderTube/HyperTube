@@ -66,33 +66,7 @@ export default {
   data() {
     return {
       show: false,
-      genres: [
-        { text: this.$t('genres.action'), value: 'action' },
-        { text: this.$t('genres.adventure'), value: 'adventure' },
-        { text: this.$t('genres.animation'), value: 'animation' },
-        { text: this.$t('genres.sci-fi'), value: 'science-fiction' },
-        { text: this.$t('genres.comedy'), value: 'comedy' },
-        { text: this.$t('genres.crime'), value: 'crime' },
-        { text: this.$t('genres.drama'), value: 'drama' },
-        { text: this.$t('genres.film-noir'), value: 'film-noir' },
-        { text: this.$t('genres.romance'), value: 'romance' },
-        { text: this.$t('genres.thriller'), value: 'thriller' },
-        { text: this.$t('genres.horror'), value: 'horror' },
-        { text: this.$t('genres.history'), value: 'history' },
-        { text: this.$t('genres.mystery'), value: 'mystery' },
-        { text: this.$t('genres.music'), value: 'music' },
-        { text: this.$t('genres.documentary'), value: 'documentary' },
-        { text: this.$t('genres.sport'), value: 'sport' },
-        { text: this.$t('genres.war'), value: 'war' },
-        { text: this.$t('genres.fantasy'), value: 'fantasy' },
-        { text: this.$t('genres.musical'), value: 'musical' },
-        { text: this.$t('genres.family'), value: 'family' },
-        { text: this.$t('genres.biography'), value: 'biography' },
-        { text: this.$t('genres.western'), value: 'western' },
-        { text: this.$t('genres.news'), value: 'news' },
-        { text: this.$t('genres.reality-tv'), value: 'reality-tv' },
-        { text: this.$t('genres.talk-show'), value: 'talk-show' }
-      ],
+
       years: [
         { text: '1950', value: '1950' },
         { text: '1951', value: '1951' },
@@ -165,6 +139,42 @@ export default {
         { text: '2018', value: '2018' },
         { text: '2019', value: '2019' }
       ]
+    }
+  },
+  computed: {
+    genres() {
+      const genres = [
+        ['genres.action', 'action'],
+        ['genres.adventure', 'adventure'],
+        ['genres.animation', 'animation'],
+        ['genres.sci-fi', 'science-fiction'],
+        ['genres.comedy', 'comedy'],
+        ['genres.crime', 'crime'],
+        ['genres.drama', 'drama'],
+        ['genres.film-noir', 'film-noir'],
+        ['genres.romance', 'romance'],
+        ['genres.thriller', 'thriller'],
+        ['genres.horror', 'horror'],
+        ['genres.history', 'history'],
+        ['genres.mystery', 'mystery'],
+        ['genres.music', 'music'],
+        ['genres.documentary', 'documentary'],
+        ['genres.sport', 'sport'],
+        ['genres.war', 'war'],
+        ['genres.fantasy', 'fantasy'],
+        ['genres.musical', 'musical'],
+        ['genres.family', 'family'],
+        ['genres.biography', 'biography'],
+        ['genres.western', 'western'],
+        ['genres.news', 'news'],
+        ['genres.reality-tv', 'reality-tv'],
+        ['genres.talk-show', 'talk-show']
+      ]
+
+      return genres.map(([i18nProperty, value]) => ({
+        text: this.$t(i18nProperty),
+        value
+      }))
     }
   }
 }
