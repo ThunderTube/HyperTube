@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     fetchMore: debounce(function fetchMore() {
-      const LIMIT = 30
+      const LIMIT = 15
 
       this.loading = true
       this.initialLoad = false
