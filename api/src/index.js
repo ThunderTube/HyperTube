@@ -13,6 +13,7 @@ const Mail = require('./email');
 const { Movie } = require('./models/Movie');
 const setupPassport = require('./config/passport');
 const router = require('./routes');
+const securityRouter = require('./routes/security');
 
 async function app() {
     // Connect to database
@@ -34,6 +35,7 @@ async function app() {
     setupPassport(csrf);
 
     server
+        .use(securityRouter)
         .use(cookieParser(process.env.COOKIE_SECRET))
         .use(express.json())
         .use(express.urlencoded({ extended: false }))
@@ -47,6 +49,8 @@ async function app() {
         .use(passport.initialize())
         .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
+            console.log('req =', res);
+
             // This middleware sets the context
             res.locals = {
                 email,
