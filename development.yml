@@ -29,7 +29,5 @@ services:
 
   mongo:
     container_name: mongo-dev
-    build:
-      context: ./mongo
-      dockerfile: Dockerfile
-    image: hypertube-mongo
+    volumes:
+      - ./mongo/data/db:/data/db
