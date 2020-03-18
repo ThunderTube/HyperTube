@@ -7,15 +7,6 @@ const cors = require('cors');
 const passport = require('passport');
 const Tokens = require('csrf');
 const ms = require('ms');
-// const {
-//     dnsPrefetchControl,
-//     frameguard,
-//     hidePoweredBy,
-//     hsts,
-//     ieNoOpen,
-//     noSniff,
-//     xssFilter,
-// } = require('helmet');
 
 const connectDB = require('./config/db');
 const Mail = require('./email');
@@ -44,15 +35,6 @@ async function app() {
     setupPassport(csrf);
 
     server
-        // .use(helmet())
-        // .use(dnsPrefetchControl())
-        // .use(frameguard())
-        // .use(hidePoweredBy({ setTo: 'PHP 7.4.3' }))
-        // .use(hsts())
-        // .use(ieNoOpen())
-        // .use(noSniff())
-        // .use(xssFilter())
-        // .use('/', security)
         .use(securityRouter)
         .use(cookieParser(process.env.COOKIE_SECRET))
         .use(express.json())
