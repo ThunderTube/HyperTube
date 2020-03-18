@@ -21,8 +21,8 @@ To start the projet on production mode run :
 
 `docker-compose -f common.yml -f production.yml up`
 
-## Database seeding (WIP)
+## Database seeding
 
-To seed the database you can run :
+The database seeding is automatically performed by `mongo-seed` service.
 
-`MONGO_URI=<URI to MongoDB> yarn run restore`
+This service is started after `mongo` one has been launched, reads `db.json` file which contains more than 14K films and insert all of them into the database.

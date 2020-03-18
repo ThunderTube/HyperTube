@@ -4,8 +4,8 @@ RUN apk update && apk add ffmpeg && rm -rf /var/cache/apk/*
 
 WORKDIR /api
 
-COPY ./package.json .
-COPY ./yarn.lock .
+COPY package.json .
+COPY yarn.lock .
 
 RUN yarn install --frozen-lockfile
 

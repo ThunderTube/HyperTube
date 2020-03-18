@@ -1,6 +1,6 @@
-const { getMovies } = require('../api/src/get-movies');
-const connectDB = require('../api/src/config/db');
-const { Movie } = require('../api/src/models/Movie');
+const { getMovies } = require('../../api/src/get-movies');
+const connectDB = require('../../api/src/config/db');
+const { Movie } = require('../../api/src/models/Movie');
 
 async function cli() {
     try {

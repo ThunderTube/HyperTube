@@ -12,7 +12,7 @@
         v-if="loading"
         class="absolute w-full h-full flex justify-center items-center bg-gray-900 z-50"
       >
-        <atom-spinner :animation-duration="500" :size="120" color="#ffffff" />
+        <loading-spinner />
       </div>
     </transition>
 
@@ -31,19 +31,19 @@
 </template>
 
 <script>
-import { AtomSpinner } from 'epic-spinners'
 import { mapGetters, mapActions, createNamespacedHelpers } from 'vuex'
-import AppMenu from '@/components/AppMenu'
 
+import AppMenu from '@/components/AppMenu'
 import AppSwitchLang from '@/components/AppSwitchLang.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { mapState } = createNamespacedHelpers('auth')
 
 export default {
   components: {
     AppMenu,
-    AtomSpinner,
-    AppSwitchLang
+    AppSwitchLang,
+    LoadingSpinner
   },
   data() {
     return {

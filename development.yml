@@ -7,6 +7,10 @@ services:
       context: ./app
       dockerfile: Dockerfile.dev
     image: hypertube-app
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
     volumes:
       - ./app:/app
       - /app/node_modules
@@ -17,6 +21,8 @@ services:
       context: ./api
       dockerfile: Dockerfile.dev
     image: hypertube-api
+    environment:
+      - NODE_ENV=development
     volumes:
       - ./api:/api
       - /api/node_modules

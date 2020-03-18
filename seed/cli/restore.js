@@ -2,8 +2,8 @@ const {
     promises: { readFile },
 } = require('fs');
 
-const { Movie } = require('../api/src/models/Movie');
-const connectDB = require('../api/src/config/db');
+const { Movie } = require('../../api/src/models/Movie');
+const connectDB = require('../../api/src/config/db');
 const { DUMP_FILE } = require('./constants');
 
 async function cli() {

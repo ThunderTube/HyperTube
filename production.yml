@@ -9,12 +9,16 @@ services:
     image: hypertube-app-prod
     environment:
       - NODE_ENV=production
+    ports:
+      - "3000:80"
 
   api:
     container_name: api-prod
     build:
       context: ./api
       dockerfile: Dockerfile.prod
+    environment:
+      - NODE_ENV=production
     image: hypertube-api-prod
 
   mongo:

@@ -15,9 +15,9 @@
     "logs:api": "docker logs api",
     "logs:app": "docker logs app",
     "logs:mongo": "docker logs mongo",
-    "seed": "node cli/seed",
-    "dump": "node cli/dump",
-    "restore": "node cli/restore"
+    "seed": "node seed/cli/seed",
+    "dump": "node seed/cli/dump",
+    "restore": "node seed/cli/restore"
   },
   "author": "42",
   "license": "MIT"
