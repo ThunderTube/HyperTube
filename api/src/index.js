@@ -17,12 +17,6 @@ const securityRouter = require('./routes/security');
 
 async function app() {
     // Connect to database
-    console.log(
-        'process.env.MONGO_URI',
-        process.env.MONGO_URI,
-        'port =',
-        process.env.PORT
-    );
     await connectDB();
 
     const server = express();
@@ -55,8 +49,6 @@ async function app() {
         .use(passport.initialize())
         .use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
         .use((req, res, next) => {
-            console.log('req =', res);
-
             // This middleware sets the context
             res.locals = {
                 email,
