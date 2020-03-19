@@ -6,9 +6,10 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile.prod
-    image: hypertube-app-prod
+    image: devessier/hypertube-app
     environment:
       - NODE_ENV=production
+      - PORT=80
     ports:
       - "3000:80"
 
@@ -19,7 +20,10 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       - NODE_ENV=production
-    image: hypertube-api-prod
+    image: devessier/hypertube-api
 
   mongo:
     container_name: mongo-prod
+
+  mongo-seed:
+    image: devessier/hypertube-mongo-seed
