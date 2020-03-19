@@ -31,6 +31,6 @@ services:
     links:
       - mongo:mongo
     environment:
-      - MONGO_URI=mongodb://mongo:27017/hypertube
+      - MONGODB_URI=mongodb://mongo:27017/hypertube
     depends_on:
       - "mongo"

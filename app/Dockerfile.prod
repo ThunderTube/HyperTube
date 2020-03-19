@@ -1,5 +1,10 @@
 FROM node:lts-alpine AS build-stage
 
+ARG NODE_ENV=production
+ARG VUE_APP_BASE_URL=http://localhost:8080/v1
+ARG VUE_APP_I18N_LOCALE=en
+ARG VUE_APP_I18N_FALLBACK_LOCALE=en
+
 WORKDIR /app
 
 COPY package.json .
