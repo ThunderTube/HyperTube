@@ -27,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: seed/Dockerfile
-    image: mongo-seed
+    image: hypertube-mongo-seed
     links:
       - mongo:mongo
     environment:
