@@ -43,7 +43,7 @@ async function app() {
         .use(
             cors({
                 credentials: true,
-                origin: ['http://localhost', process.env.FRONT_URI],
+                origin: true,
             })
         )
         .use(passport.initialize())
