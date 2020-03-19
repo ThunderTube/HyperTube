@@ -1,9 +1,9 @@
 <template>
-  <ul v-if="show" class="flex flex-wrap justify-center items-center mb-6">
+  <ul v-if="show" class="flex flex-wrap items-center justify-center mb-6">
     <loading-spinner v-if="loading" class="my-3" />
 
     <template v-else>
-      <div v-if="comments.length > 0" class="grid grid-columns-1 w-full mb-3">
+      <div v-if="comments.length > 0" class="grid w-full mb-3 grid-columns-1">
         <movie-comment
           v-for="{ id, ...props } in comments"
           :key="id"
@@ -68,9 +68,7 @@ export default {
       try {
         this.loading = true
 
-        const { status, data } = await axios(
-          `/stream/video/${this.id}/comments`
-        )
+        const { status, data } = await axios(`stream/video/${this.id}/comments`)
         if (status !== 200) {
           throw new Error('Incorrect response', e)
         }
