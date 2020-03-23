@@ -4,7 +4,10 @@ const purgecss = require('@fullhuman/postcss-purgecss')({
   content: ['./src/**/*.vue', './public/index.html'],
 
   // Include any special characters you're using in this regular expression
-  defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || []
+  defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
+
+  whitelistPatterns: [/^fade/],
+  whitelistPatternsChildren: [/^notices/]
 })
 
 module.exports = {
