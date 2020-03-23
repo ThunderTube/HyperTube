@@ -10,7 +10,7 @@
       crossorigin="use-credentials"
       :preload="selectedSource !== undefined ? 'auto' : 'none'"
       :poster="poster"
-      class="w-full focus:outline-none z-0"
+      class="z-0 w-full focus:outline-none"
       :class="{ 'h-full object-cover object-top': !hasPlayed }"
       controls
       @playing="hasPlayed = true"
@@ -39,7 +39,7 @@
 
       <ul
         v-else-if="selectedResolution === null"
-        class="absolute inset-0 flex flex-col items-center justify-center z-20"
+        class="absolute inset-0 z-20 flex flex-col items-center justify-center"
         style="background-color: rgba(0, 0, 0, 0.4)"
       >
         <div>
@@ -52,11 +52,11 @@
               textColor
             } in orderedTorrents"
             :key="resolution"
-            class="bg-white rounded px-2 py-1 mb-2 cursor-pointer w-full flex items-center justify-between"
+            class="flex items-center justify-between w-full px-2 py-1 mb-2 bg-white rounded cursor-pointer"
             @click="launch(resolution)"
           >
             <span
-              class="inline-block bg-gray-500 text-white rounded-full px-2 py-1 align-middle mr-1"
+              class="inline-block px-2 py-1 mr-1 text-white align-middle bg-gray-500 rounded-full"
               >{{ resolution }}</span
             >
             <span :class="textColor" class="font-medium">{{ text }}</span>
@@ -66,7 +66,7 @@
 
       <div
         v-else-if="loading"
-        class="absolute inset-0 flex flex-col items-center justify-center z-20"
+        class="absolute inset-0 z-20 flex flex-col items-center justify-center"
         style="background-color: rgba(0, 0, 0, 0.4)"
       >
         <loading-spinner />
@@ -165,7 +165,7 @@ export default {
     async poll() {
       try {
         const { data, status } = await axios(
-          `/stream/video/status/${this.id}/${this.selectedResolution}`
+          `stream/video/status/${this.id}/${this.selectedResolution}`
         )
         if (status !== 200) {
           throw new Error('Bad response')
@@ -200,7 +200,7 @@ export default {
         this.selectedResolution = resolution
 
         const { data: informations } = await axios(
-          `/stream/video/download/${this.id}/${resolution}`
+          `stream/video/download/${this.id}/${resolution}`
         )
         if (!informations) {
           throw new Error('An error occured during the downloading of the film')

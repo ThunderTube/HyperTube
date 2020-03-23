@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  app:
+    container_name: app-prod
+    build:
+      context: ./app
+      dockerfile: Dockerfile.prod
+    image: hypertube-app-prod
+    environment:
+      - PORT=80
+    ports:
+      - "3000:80"
+
+  api:
+    container_name: api-prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    environment:
+      - NODE_ENV=production
+    image: hypertube-api-prod
+
+  mongo:
+    container_name: mongo-prod
+
+  mongo-seed:
+    container_name: mongo-seed-prod

@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  app:
+    container_name: app-dev
+    build:
+      context: ./app
+      dockerfile: Dockerfile.dev
+    image: hypertube-app
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+
+  api:
+    container_name: api-dev
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    image: hypertube-api
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./api:/api
+      - /api/node_modules
+
+  mongo:
+    container_name: mongo-dev
+    volumes:
+      - ./mongo/data/db:/data/db

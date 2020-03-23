@@ -1,21 +1,28 @@
-To start project make sure yarn and docker ce is installed on your machine
+# ThunderTube
 
-At the root of the project you can interact with the scripts in the package.json
+We did our Hypertube project using Vue.js, TailwindCSS, Node.js with Express.js and MongoDB.
+Everything can be launched using Docker 🎉.
 
-To start the project
+## Requirements
 
-`yarn dev:install && yarn dev:up`
+To start the project make sure Docker is correctly installed on your machine.
 
-After the first run you can just
+At the root of the project you can interact with the scripts in the `package.json` file.
 
-`yarn dev:up`
+## Development mode
 
-To install any packages you need to stop the containers
+To start the project on development mode run :
 
-`yarn dev:down`
+`docker-compose -f common.yml -f development.yml up`
 
-cd into the app or api yarn add your-module and start back up the containers
+## Production mode
 
-To seed the database, you can run the following command :
+To start the projet on production mode run :
 
-`MONGO_URI=<URI to MongoDB> yarn run restore`
+`docker-compose -f common.yml -f production.yml up`
+
+## Database seeding
+
+The database seeding is automatically performed by `mongo-seed` service.
+
+This service is started after `mongo` one has been launched, reads `db.json` file which contains more than 14K films and insert all of them into the database.
