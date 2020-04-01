@@ -51,6 +51,10 @@
         "uuid": "^7.0.2"
     },
     "devDependencies": {
+        "@babel/cli": "^7.8.4",
+        "@babel/core": "^7.9.0",
+        "@babel/node": "^7.8.7",
+        "babel-plugin-transform-remove-console": "^6.9.4",
         "eslint": "^6.8.0",
         "eslint-config-airbnb-base": "^14.1.0",
         "eslint-config-prettier": "^6.10.0",
