@@ -491,7 +491,8 @@ exports.forgotPassword = async (req, res) => {
         } = res;
 
         const user = await User.findOne({ username });
-        if (user === null) {
+        console.log('user :', user);
+        if (user === null || user.OAuthProvider !== undefined) {
             res.status(200).json({
                 success: false,
                 error: 'Unknown account',
