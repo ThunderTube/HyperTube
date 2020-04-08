@@ -1,22 +1,14 @@
 <template>
   <div
-    class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
+    class="relative top-0 left-0 flex items-center justify-center w-full h-full min-h-screen bg-black bg-gray-900 modal modal-active"
   >
-    <div class="z-50">
-      <app-switch-lang />
-    </div>
-    <div
-      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
-    ></div>
-    <div
-      class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
-    >
+    <div class="w-11/12 mx-auto my-3 bg-white modal-container md:max-w-md">
       <div
-        class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800"
+        class="flex items-center justify-center w-full h-12 text-white bg-gray-800 shadow-xl"
       >
         <div
           @click="selectAuthForm('details')"
-          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          class="flex items-center justify-center w-1/2 h-full cursor-pointer"
           :class="{ 'bg-gray-700': formType === 'details' }"
         >
           {{ $t('profile.details') }}
@@ -24,13 +16,13 @@
         <div
           v-if="!hidePasswordField"
           @click="selectAuthForm('password')"
-          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          class="flex items-center justify-center w-1/2 h-full cursor-pointer"
           :class="{ 'bg-gray-700': formType === 'password' }"
         >
           {{ $t('loginscreen.password') }}
         </div>
       </div>
-      <div class="py-4 text-left px-6">
+      <div class="px-6 py-4 text-left">
         <form>
           <div v-if="details.visible">
             <app-input
@@ -70,24 +62,24 @@
 
             <div>
               <label class="">
-                <p class="capitalize font-bold mt-2">
+                <p class="mt-2 font-bold capitalize">
                   {{ $t('profile.favorite-language') }}
                 </p>
 
                 <div class="relative w-full">
                   <select
                     v-model="details.form.favoriteLanguage"
-                    class="block appearance-none w-full border bg-white border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-gray-500"
+                    class="block w-full px-4 py-3 pr-8 leading-tight text-gray-700 bg-white border border-gray-200 rounded appearance-none focus:outline-none focus:border-gray-500"
                   >
                     <option value="en">EN</option>
                     <option value="fr">FR</option>
                   </select>
 
                   <div
-                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                    class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 pointer-events-none"
                   >
                     <svg
-                      class="fill-current h-4 w-4"
+                      class="w-4 h-4 fill-current"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 20 20"
                     >
@@ -112,7 +104,7 @@
           <div class="flex justify-end py-2">
             <button
               @click.prevent="submitForm"
-              class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
+              class="p-3 px-4 mr-2 text-white uppercase bg-blue-900 hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 focus:outline-none"
             >
               {{ $t('form.submit') }}
             </button>

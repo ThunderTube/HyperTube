@@ -2,7 +2,7 @@
   <div>
     <button
       href="#"
-      class="focus:outline-none flex top-0 right-0 m-2 p-2 rounded absolute text-white font-bold z-20"
+      class="fixed top-0 right-0 z-50 flex p-2 m-2 font-bold text-white rounded focus:outline-none"
       @click="toggleVisibility"
       @keydown.space.exact.prevent="toggleVisibility"
       @keydown.esc.exact="hideDropdown"
@@ -29,7 +29,7 @@
         v-on-clickaway="hideDropdown"
         v-if="isVisible"
         ref="dropdown"
-        class="absolute top-0 right-0 normal-case z-30 font-normal bg-white shadow overflow-hidden rounded w-48 border m-2 py-1"
+        class="absolute top-0 right-0 z-30 w-48 py-1 m-2 overflow-hidden font-normal normal-case bg-white border rounded shadow"
       >
         <li>
           <a

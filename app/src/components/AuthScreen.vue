@@ -1,36 +1,28 @@
 <template>
   <div
     v-if="!isLoggedIn"
-    class="z-40 modal modal-active fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black"
+    class="relative top-0 left-0 flex items-center justify-center w-full h-full min-h-screen bg-black bg-gray-900 modal modal-active"
   >
-    <div class="z-50">
-      <app-switch-lang />
-    </div>
-    <div
-      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-75"
-    ></div>
-    <div
-      class="modal-container bg-white w-11/12 md:max-w-md mx-auto z-50 overflow-y-auto"
-    >
+    <div class="w-11/12 mx-auto my-3 bg-white modal-container md:max-w-md">
       <div
-        class="w-full h-12 flex items-center justify-center text-white shadow-xl bg-gray-800"
+        class="flex items-center justify-center w-full h-12 text-white bg-gray-800 shadow-xl"
       >
         <div
           @click="selectAuthForm('login')"
-          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          class="flex items-center justify-center w-1/2 h-full cursor-pointer"
           :class="{ 'bg-gray-700': formType === 'login' }"
         >
           {{ $t('loginscreen.login') }}
         </div>
         <div
           @click="selectAuthForm('register')"
-          class="cursor-pointer w-1/2 h-full flex items-center justify-center"
+          class="flex items-center justify-center w-1/2 h-full cursor-pointer"
           :class="{ 'bg-gray-700': formType === 'register' }"
         >
           {{ $t('loginscreen.register') }}
         </div>
       </div>
-      <div class="py-4 text-left px-6">
+      <div class="px-6 py-4 text-left">
         <form>
           <div v-if="login.visible">
             <app-input
@@ -132,11 +124,11 @@
           </div>
           <div
             v-if="login.visible || register.visible"
-            class="flex justify-between my-8"
+            class="flex flex-wrap justify-between my-8"
           >
             <div>
               <a
-                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
+                class="flex items-center p-2 transition-colors duration-150 rounded-full hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/42"
               >
                 <forty-two-icon class="w-8 h-8 fill-current" />
@@ -144,7 +136,7 @@
             </div>
             <div>
               <a
-                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
+                class="flex items-center p-2 transition-colors duration-150 rounded-full hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/google"
               >
                 <google-icon class="w-8 h-8 fill-current" />
@@ -152,7 +144,7 @@
             </div>
             <div>
               <a
-                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
+                class="flex items-center p-2 transition-colors duration-150 rounded-full hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/github"
               >
                 <github-icon
@@ -163,7 +155,7 @@
             </div>
             <div>
               <a
-                class="flex items-center p-2 rounded-full transition-colors duration-150 hover:bg-gray-200"
+                class="flex items-center p-2 transition-colors duration-150 rounded-full hover:bg-gray-200"
                 href="http://localhost:8080/v1/auth/reddit"
               >
                 <reddit-icon class="w-8 h-8 fill-current" />
@@ -173,7 +165,7 @@
           <div class="flex justify-end py-2">
             <button
               @click.prevent="processFormInput"
-              class="px-4 bg-blue-900 p-3 text-white hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 mr-2 uppercase focus:outline-none"
+              class="p-3 px-4 mr-2 text-white uppercase bg-blue-900 hover:bg-gray-100 hover:shadow-xl hover:text-indigo-400 focus:outline-none"
             >
               {{ $t('form.submit') }}
             </button>
@@ -480,9 +472,5 @@ export default {
 <style scoped>
 .modal {
   transition: opacity 0.25s ease;
-}
-.modal-active {
-  overflow-x: hidden;
-  overflow-y: visible !important;
 }
 </style>
