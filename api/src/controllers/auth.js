@@ -263,7 +263,7 @@ exports.register = async (req, res) => {
             await user.validate();
             console.log('password');
         } catch (e) {
-            let msg = Object.values(e.errors).map(val => val.message);
+            let msg = Object.values(e.errors).map((val) => val.message);
             msg = msg.toString();
 
             if (msg.includes('email')) {
@@ -325,7 +325,7 @@ exports.register = async (req, res) => {
     } catch (e) {
         console.error(e);
 
-        send(res, 500, {
+        send(res, 418, {
             success: false,
             error: 'An error occured during registering',
         });
@@ -354,7 +354,7 @@ exports.confirmAccount = async (req, res) => {
     } catch (e) {
         console.error(e);
 
-        send(res, 500, {
+        send(res, 418, {
             success: false,
             error: 'An error occured, please retry',
         });
@@ -407,7 +407,7 @@ exports.login = async (req, res) => {
         });
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+        res.sendStatus(418);
     }
 };
 
@@ -424,7 +424,7 @@ exports.getMe = async (req, res) => {
         });
     } catch (e) {
         console.error(e);
-        send(res, 500, {
+        send(res, 418, {
             error: 'Could not get you',
         });
     }
@@ -463,7 +463,7 @@ exports.getUser = async (req, res) => {
         });
     } catch (e) {
         console.error(e);
-        send(res, 500, {
+        send(res, 418, {
             error: 'An error occured while trying to get the user',
         });
     }
@@ -532,7 +532,7 @@ ${link}
         res.json({ success: true });
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+        res.sendStatus(418);
     }
 };
 
@@ -581,7 +581,7 @@ exports.resetPassword = async (req, res) => {
         res.json({ success: true });
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+        res.sendStatus(418);
     }
 };
 
@@ -700,7 +700,7 @@ exports.updateDetails = async (req, res) => {
     } catch (e) {
         console.error(e);
 
-        send(res, 500, {
+        send(res, 418, {
             success: false,
             error: 'An error occured',
         });

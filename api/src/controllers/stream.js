@@ -29,7 +29,7 @@ function toFilesMapKey(id, resolution) {
 function hasWatchedTheMovie({ _id }) {
     const userId = _id.toString();
 
-    return movie => {
+    return (movie) => {
         const { _id, watchedBy, ...props } = movie.toObject();
 
         return {
@@ -66,7 +66,7 @@ async function getVideos(req, res) {
         send(res, 200, movies.map(hasWatchedTheMovie(user)));
     } catch (e) {
         console.error(e);
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -127,7 +127,7 @@ async function searchVideos(req, res) {
         });
     } catch (e) {
         console.error(e);
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -147,7 +147,7 @@ async function getVideoInformations(req, res) {
         send(res, 200, hasWatchedTheMovie(user)(movie));
     } catch (e) {
         console.error(e);
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -284,7 +284,7 @@ async function triggerVideoDownloading(req, res) {
             willNeedTranscoding: streamWillNeedTranscoding,
         });
     } catch (e) {
-        send(res, 500, {
+        send(res, 418, {
             error: 'An error occured, please retry',
         });
     }
@@ -308,7 +308,7 @@ async function getDownloadingStatus(req, res) {
         send(res, status === undefined ? 404 : 200, status);
     } catch (e) {
         console.error(e);
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -358,7 +358,7 @@ async function getVideoStream(req, res) {
         }
 
         console.error(e);
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -394,7 +394,7 @@ async function getSubtitleForVideoAndLangcode(req, res) {
     } catch (e) {
         console.error(e);
 
-        send(res, 500);
+        send(res, 418);
     }
 }
 
@@ -442,7 +442,7 @@ async function commentMovie(req, res) {
         });
     } catch (e) {
         console.error(e);
-        send(res, 500, {
+        send(res, 418, {
             error: 'An error occured during comment saving',
         });
     }
@@ -450,13 +450,13 @@ async function commentMovie(req, res) {
 
 async function getCommentsWritersInformations(writers) {
     const writersWithInformations = await Promise.all(
-        writers.map(userId => User.findById(userId))
+        writers.map((userId) => User.findById(userId))
     );
 
     return new Map(
         writersWithInformations
             .filter(Boolean)
-            .map(writer => [writer._id.toString(), writer])
+            .map((writer) => [writer._id.toString(), writer])
     );
 }
 
@@ -525,7 +525,7 @@ async function getMovieComments(req, res) {
         });
     } catch (e) {
         console.error(e);
-        send(res, 500, {
+        send(res, 418, {
             error: 'An error occured during comments getting',
         });
     }
@@ -559,7 +559,7 @@ async function streamMoviePosterToClient(req, res) {
         }
     } catch (e) {
         console.error(e);
-        send(res, 500, {
+        send(res, 418, {
             error: 'An error occured during image pipelining',
         });
     }
