@@ -5,3 +5,9 @@ export function resolveAfter(ms, value) {
     }, ms)
   })
 }
+
+export function decodeHTMLEntities(text) {
+  var textArea = document.createElement('textarea')
+  textArea.innerHTML = text
+  return textArea.value
+}

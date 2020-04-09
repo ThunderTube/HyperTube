@@ -2,26 +2,26 @@
   <article>
     <router-link
       :to="`/${$i18n.locale}/movie/${imdbId}`"
-      :title="title"
-      class="h-full flex flex-col bg-gray-800 text-gray-200 shadow-xl rounded transition-transform duration-300 transform hover:scale-95 relative"
+      :title="decodedTitle"
+      class="relative flex flex-col h-full text-gray-200 transition-transform duration-300 transform bg-gray-800 rounded shadow-xl hover:scale-95"
     >
       <lazy-movie-image
         :src="image"
         :alt="imageAlt"
-        class="w-full self-start rounded-t bg-gray-300 object-cover movie-thumbnail__img"
+        class="self-start object-cover w-full bg-gray-300 rounded-t movie-thumbnail__img"
       />
 
       <div
         v-if="watched"
-        class="absolute top-0 left-0 flex items-center justify-center m-2 p-1 rounded-full bg-gray-700"
+        class="absolute top-0 left-0 flex items-center justify-center p-1 m-2 bg-gray-700 rounded-full"
       >
-        <eye-icon class="text-white w-5 h-5" />
+        <eye-icon class="w-5 h-5 text-white" />
       </div>
 
       <div class="flex-grow px-6 pt-4 pb-2">
-        <h2 class="font-bold text-xl mb-2 leading-tight">{{ title }}</h2>
+        <h2 class="mb-2 text-xl font-bold leading-tight">{{ decodedTitle }}</h2>
 
-        <p class="text-gray-400 text-base font-semibold mb-2">{{ year }}</p>
+        <p class="mb-2 text-base font-semibold text-gray-400">{{ year }}</p>
 
         <div class="flex flex-wrap items-center py-1">
           <tag v-for="genre in genres" :key="genre">{{
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="mb-2 px-6 max-w-full flex justify-center items-center">
+      <div class="flex items-center justify-center max-w-full px-6 mb-2">
         <movie-stars :rating="rating" />
       </div>
     </router-link>
@@ -42,6 +42,7 @@ import Tag from './Tag.vue'
 import MovieStars from './MovieStars.vue'
 import LazyMovieImage from './LazyMovieImage'
 import EyeIcon from './EyeIcon.vue'
+import { decodeHTMLEntities } from '@/utils.js'
 
 export default {
   name: 'MovieThumbnail',
@@ -84,7 +85,10 @@ export default {
   },
   computed: {
     imageAlt() {
-      return `${this.title} movie background picture`
+      return `${this.decodedTitle} movie background picture`
+    },
+    decodedTitle() {
+      return decodeHTMLEntities(this.title)
     }
   }
 }
