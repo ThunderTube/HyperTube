@@ -78,3 +78,7 @@ async function app() {
 }
 
 app().catch(console.error);
+
+if (process.env.NODE_ENV === 'production') {
+    process.on('unhandledRejection', () => {});
+}
