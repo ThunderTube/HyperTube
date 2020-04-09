@@ -463,6 +463,8 @@ async function getSubtitles(id) {
     const OpenSubtitles = new OS({
         useragent: 'TemporaryUserAgent',
         ssl: true,
+        username: process.env.OPENSUBTITLES_USERNAME,
+        password: process.env.OPENSUBTITLES_PASSWORD,
     });
 
     const subtitles = await OpenSubtitles.search({

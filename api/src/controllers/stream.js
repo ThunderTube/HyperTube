@@ -284,6 +284,8 @@ async function triggerVideoDownloading(req, res) {
             willNeedTranscoding: streamWillNeedTranscoding,
         });
     } catch (e) {
+        console.error(e);
+
         send(res, 418, {
             error: 'An error occured, please retry',
         });
