@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-gray-900 min-h-screen">
+  <div class="relative min-h-screen bg-gray-900">
     <transition
-      enter-active-class="transition duration-150 transition-opacity"
-      leave-active-class="transition duration-150 transition-opacity"
+      enter-active-class="transition transition-opacity duration-150"
+      leave-active-class="transition transition-opacity duration-150"
       enter-class="opacity-0"
       enter-to-class="opacity-100"
       leave-class="opacity-100"
@@ -10,7 +10,7 @@
     >
       <div
         v-if="loading"
-        class="absolute w-full h-full flex justify-center items-center bg-gray-900 z-50"
+        class="absolute z-50 flex items-center justify-center w-full h-full bg-gray-900"
       >
         <loading-spinner />
       </div>
@@ -27,6 +27,15 @@
         <router-view />
       </transition>
     </div>
+
+    <footer class="absolute bottom-0 right-0 p-1 text-white">
+      <div class="block md:hidden">
+        TT
+      </div>
+      <div class="hidden md:block">
+        ThunderTube
+      </div>
+    </footer>
   </div>
 </template>
 
