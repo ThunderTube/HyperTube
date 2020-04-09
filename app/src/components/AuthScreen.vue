@@ -23,6 +23,10 @@
         </div>
       </div>
       <div class="px-6 py-4 text-left">
+        <p v-if="passwordReset.visible" class="text-center">
+          {{ $t('loginscreen.password-reset-title') }}
+        </p>
+
         <form>
           <div v-if="login.visible">
             <app-input

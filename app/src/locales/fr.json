@@ -13,7 +13,8 @@
     "password": "Mot de passe",
     "forgot_password": "Mot de passe oublié ?",
     "register_input": "S'enregistrer",
-    "register_form_title": "Formulaire d'inscription"
+    "register_form_title": "Formulaire d'inscription",
+    "password-reset-title": "Remise à zéro du mot de passe"
   },
 
   "registerscreen": {

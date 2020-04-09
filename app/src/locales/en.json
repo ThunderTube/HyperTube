@@ -13,7 +13,8 @@
     "password": "Password",
     "forgot_password": "Password forgot?",
     "register_input": "Register",
-    "register_form_title": "Register form"
+    "register_form_title": "Register form",
+    "password-reset-title": "Password reset"
   },
 
   "registerscreen": {
